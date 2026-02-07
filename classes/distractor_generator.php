@@ -26,8 +26,6 @@
 
 namespace local_hlai_quizgen;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Distractor generator class.
  */

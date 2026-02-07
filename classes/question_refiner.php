@@ -24,8 +24,6 @@
 
 namespace local_hlai_quizgen;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Uses AI to suggest improvements and refinements to questions.
  *

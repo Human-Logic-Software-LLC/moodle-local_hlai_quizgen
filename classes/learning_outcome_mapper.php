@@ -24,8 +24,6 @@
 
 namespace local_hlai_quizgen;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Aligns questions with learning outcomes and competencies.
  */

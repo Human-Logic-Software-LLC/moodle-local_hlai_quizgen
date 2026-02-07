@@ -24,8 +24,6 @@
 
 namespace local_hlai_quizgen;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Analyzes student performance to automatically calibrate question difficulty.
  */

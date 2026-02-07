@@ -24,8 +24,6 @@
 
 namespace local_hlai_quizgen;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Provides comprehensive analytics on question usage and performance.
  */

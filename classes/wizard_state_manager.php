@@ -24,8 +24,6 @@
 
 namespace local_hlai_quizgen;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Manages wizard state persistence across sessions.
  */

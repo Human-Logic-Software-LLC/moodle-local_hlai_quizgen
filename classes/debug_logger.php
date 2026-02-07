@@ -27,8 +27,6 @@
 
 namespace local_hlai_quizgen;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Debug logger class for comprehensive error and event logging.
  */

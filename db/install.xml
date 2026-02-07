@@ -23,8 +23,9 @@
         <FIELD NAME="custom_instructions" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Optional custom instructions from teacher"/>
         <FIELD NAME="content_hash" TYPE="char" LENGTH="64" NOTNULL="false" SEQUENCE="false" COMMENT="SHA-256 hash of content for deduplication"/>
         <FIELD NAME="error_message" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Error message if failed"/>
-        <FIELD NAME="progress" TYPE="number" LENGTH="5" NOTNULL="true" DEFAULT="0" DECIMALS="2" SEQUENCE="false" COMMENT="Progress percentage 0-100"/>
+        <FIELD NAME="progress" TYPE="number" LENGTH="10" NOTNULL="true" DEFAULT="0" DECIMALS="2" SEQUENCE="false" COMMENT="Progress percentage 0-100"/>
         <FIELD NAME="progress_message" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Current progress message"/>
+        <FIELD NAME="category_name" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Custom category name for quiz"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="timecompleted" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="When request completed or failed"/>
@@ -81,6 +82,11 @@
         <FIELD NAME="blooms_level" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="remember, understand, apply, analyze, evaluate, create"/>
         <FIELD NAME="ai_reasoning" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Why AI generated this question"/>
         <FIELD NAME="status" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="pending" SEQUENCE="false" COMMENT="pending, approved, rejected, deployed"/>
+        <FIELD NAME="rejection_reason" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Reason for question rejection"/>
+        <FIELD NAME="rejection_feedback" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Detailed feedback on rejection"/>
+        <FIELD NAME="accepted_on_first_try" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" COMMENT="1=accepted first try, 0=not"/>
+        <FIELD NAME="time_approved" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Timestamp when approved"/>
+        <FIELD NAME="review_duration" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time spent reviewing in seconds"/>
         <FIELD NAME="validation_score" TYPE="int" LENGTH="3" NOTNULL="false" SEQUENCE="false" COMMENT="Quality validation score 0-100"/>
         <FIELD NAME="quality_rating" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="excellent, good, acceptable, poor, unacceptable"/>
         <FIELD NAME="moodle_questionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="ID in mdl_question table after deployment"/>
@@ -101,6 +107,8 @@
       <INDEXES>
         <INDEX NAME="requestid_status" UNIQUE="false" FIELDS="requestid, status"/>
         <INDEX NAME="questiontype" UNIQUE="false" FIELDS="questiontype"/>
+        <INDEX NAME="status_rejection" UNIQUE="false" FIELDS="status, rejection_reason"/>
+        <INDEX NAME="accepted_first_try" UNIQUE="false" FIELDS="accepted_on_first_try, status"/>
       </INDEXES>
     </TABLE>
     
@@ -115,6 +123,7 @@
         <FIELD NAME="feedbackformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
         <FIELD NAME="is_correct" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="1 if correct answer"/>
         <FIELD NAME="distractor_reasoning" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Why this distractor is plausible"/>
+        <FIELD NAME="plausibility_score" TYPE="number" LENGTH="3" NOTNULL="false" DECIMALS="2" SEQUENCE="false" COMMENT="Distractor plausibility score"/>
         <FIELD NAME="sortorder" TYPE="int" LENGTH="5" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
@@ -481,8 +490,8 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User making the request"/>
-        <FIELD NAME="action" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="Action type: regenerate, analyze_content, etc"/>
-        <FIELD NAME="ip_address" TYPE="char" LENGTH="45" NOTNULL="false" SEQUENCE="false" COMMENT="IP address of requester"/>
+        <FIELD NAME="limittype" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Type of rate limit"/>
+        <FIELD NAME="details" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON details of the violation"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
@@ -490,8 +499,67 @@
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
-        <INDEX NAME="userid_action_time" UNIQUE="false" FIELDS="userid, action, timecreated"/>
+        <INDEX NAME="userid_time" UNIQUE="false" FIELDS="userid, timecreated"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="local_hlai_quizgen_qst_history" COMMENT="Question version history for tracking changes">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="original_questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Original question ID"/>
+        <FIELD NAME="requestid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Parent request ID"/>
+        <FIELD NAME="topicid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Topic ID"/>
+        <FIELD NAME="questiontype" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="questiontext" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="questiontextformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="generalfeedback" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="difficulty" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="medium" SEQUENCE="false"/>
+        <FIELD NAME="blooms_level" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="ai_reasoning" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="validation_score" TYPE="int" LENGTH="3" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="quality_rating" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="version_number" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Version number of this snapshot"/>
+        <FIELD NAME="answers_json" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="JSON-encoded answers"/>
+        <FIELD NAME="replaced_by_questionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="ID of replacement question"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="requestid" TYPE="foreign" FIELDS="requestid" REFTABLE="local_hlai_quizgen_requests" REFFIELDS="id"/>
+        <KEY NAME="topicid" TYPE="foreign" FIELDS="topicid" REFTABLE="local_hlai_quizgen_topics" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="original_questionid" UNIQUE="false" FIELDS="original_questionid"/>
+        <INDEX NAME="original_version" UNIQUE="false" FIELDS="original_questionid, version_number"/>
         <INDEX NAME="timecreated" UNIQUE="false" FIELDS="timecreated"/>
+      </INDEXES>
+    </TABLE>
+
+    <TABLE NAME="local_hlai_quizgen_templates" COMMENT="Reusable configuration presets for question generation">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="Template name"/>
+        <FIELD NAME="description" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="is_public" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether template is shared"/>
+        <FIELD NAME="is_default" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Whether template is default"/>
+        <FIELD NAME="config_data" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="JSON configuration data"/>
+        <FIELD NAME="usage_count" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+        <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid_public" UNIQUE="false" FIELDS="userid, is_public"/>
+        <INDEX NAME="courseid_public" UNIQUE="false" FIELDS="courseid, is_public"/>
+        <INDEX NAME="is_default" UNIQUE="false" FIELDS="is_default"/>
       </INDEXES>
     </TABLE>
   </TABLES>

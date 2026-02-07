@@ -24,8 +24,6 @@
 
 namespace local_hlai_quizgen;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Test class for gateway_client.
  *
@@ -35,7 +33,6 @@ defined('MOODLE_INTERNAL') || die();
  * @covers     \local_hlai_quizgen\gateway_client
  */
 class gateway_client_test extends \advanced_testcase {
-
     /**
      * Test that get_gateway_url returns a string.
      */
