@@ -12,6 +12,20 @@
 *.backup
 *.old
 
+# Environment files (but allow .env.example)
+.env
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
 # Node modules (if any)
 node_modules/
 
