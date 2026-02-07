@@ -181,7 +181,7 @@ class api {
      * Get questions for a request.
      *
      * @param int $requestid Request ID
-     * @param string $status Filter by status (optional)
+     * @param string|null $status Filter by status (optional)
      * @return array Array of question objects
      */
     public static function get_questions(int $requestid, ?string $status = null): array {
@@ -335,7 +335,7 @@ class api {
      * Get request history for a course.
      *
      * @param int $courseid Course ID
-     * @param int $userid User ID (optional, defaults to current user)
+     * @param int|null $userid User ID (optional, defaults to current user)
      * @return array Array of request objects
      */
     public static function get_request_history(int $courseid, ?int $userid = null): array {
@@ -363,7 +363,7 @@ class api {
     /**
      * Get plugin statistics.
      *
-     * @param int $courseid Course ID (optional)
+     * @param int|null $courseid Course ID (optional)
      * @return array Statistics
      */
     public static function get_statistics(?int $courseid = null): array {

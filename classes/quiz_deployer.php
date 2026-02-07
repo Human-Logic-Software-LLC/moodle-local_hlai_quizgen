@@ -45,7 +45,7 @@ class quiz_deployer {
      *
      * @param array $questionids Array of question IDs to deploy
      * @param int $courseid Course ID
-     * @param string $categoryname Category name (optional)
+     * @param string|null $categoryname Category name (optional)
      * @return array Array of deployed question IDs in question bank
      * @throws \moodle_exception If deployment fails
      */
