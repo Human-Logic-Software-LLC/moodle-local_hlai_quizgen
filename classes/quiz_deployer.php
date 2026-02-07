@@ -583,6 +583,7 @@ class quiz_deployer {
      * @param int $questionid Moodle question ID
      * @param \stdClass $genquestion Generated question object
      * @param \stdClass $category Question category object
+     * @return void
      */
     private static function tag_question(int $questionid, \stdClass $genquestion, \stdClass $category): void {
         global $DB;
@@ -675,6 +676,7 @@ class quiz_deployer {
      *
      * @param int $questionid Question ID
      * @param \stdClass $genquestion Generated question
+     * @return void
      */
     private static function add_multichoice_data(int $questionid, \stdClass $genquestion): void {
         global $DB;
@@ -716,6 +718,7 @@ class quiz_deployer {
      *
      * @param int $questionid Question ID
      * @param \stdClass $genquestion Generated question
+     * @return void
      */
     private static function add_truefalse_data(int $questionid, \stdClass $genquestion): void {
         global $DB;
@@ -760,6 +763,7 @@ class quiz_deployer {
      *
      * @param int $questionid Question ID
      * @param \stdClass $genquestion Generated question
+     * @return void
      */
     private static function add_shortanswer_data(int $questionid, \stdClass $genquestion): void {
         global $DB;
@@ -791,6 +795,7 @@ class quiz_deployer {
      *
      * @param int $questionid Question ID
      * @param \stdClass $genquestion Generated question
+     * @return void
      */
     private static function add_essay_data(int $questionid, \stdClass $genquestion): void {
         global $DB;
@@ -847,6 +852,7 @@ class quiz_deployer {
      *
      * @param int $questionid Question ID
      * @param \stdClass $genquestion Generated question
+     * @return void
      */
     private static function add_matching_data(int $questionid, \stdClass $genquestion): void {
         global $DB;

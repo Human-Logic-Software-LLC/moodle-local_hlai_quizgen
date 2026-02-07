@@ -648,6 +648,7 @@ class question_generator {
      *
      * @param array $config Configuration array
      * @throws \moodle_exception If invalid
+     * @return void
      */
     private static function validate_config(array $config): void {
         if (empty($config['question_types'])) {

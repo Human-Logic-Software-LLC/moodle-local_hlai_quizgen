@@ -267,6 +267,7 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
      * @param string $status Status (processing, completed, failed)
      * @param float $progress Progress percentage (0-100)
      * @param string $message Progress message
+     * @return void
      */
     private static function update_progress(int $requestid, string $status, float $progress, string $message): void {
         global $DB;

@@ -606,6 +606,7 @@ class review_workflow {
      *
      * @param int $reviewid Review ID
      * @param string $event Event type
+     * @return void
      */
     private static function send_review_notification(int $reviewid, string $event): void {
         // Notification implementation - using Moodle messaging API.
@@ -618,6 +619,7 @@ class review_workflow {
      * @param int $reviewid Review ID
      * @param string $action Action type
      * @param int $userid User ID
+     * @return void
      */
     private static function log_review_action(int $reviewid, string $action, int $userid): void {
         global $DB;

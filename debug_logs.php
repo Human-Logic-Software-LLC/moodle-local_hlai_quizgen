@@ -456,6 +456,8 @@ function display_recent_requests(int $limit): void {
 
 /**
  * Display system info.
+ *
+ * @return void
  */
 function display_system_info(): void {
     global $CFG, $DB;

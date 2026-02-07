@@ -79,6 +79,7 @@ class process_generation_queue extends \core\task\scheduled_task {
      *
      * @param \stdClass $request Request record
      * @throws \Exception If processing fails
+     * @return void
      */
     private function process_request(\stdClass $request): void {
         global $DB;

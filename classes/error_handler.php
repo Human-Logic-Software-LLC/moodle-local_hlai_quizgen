@@ -97,6 +97,7 @@ class error_handler {
      *
      * @param array $errordetails Error details
      * @param int|null $requestid Optional request ID
+     * @return void
      */
     private static function log_error(array $errordetails, ?int $requestid = null): void {
         global $DB, $USER;

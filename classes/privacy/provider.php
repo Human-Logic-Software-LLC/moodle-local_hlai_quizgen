@@ -118,6 +118,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
      * Get users in a context.
      *
      * @param userlist $userlist User list
+     * @return void
      */
     public static function get_users_in_context(userlist $userlist): void {
         $context = $userlist->get_context();
@@ -138,6 +139,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
      * Export user data.
      *
      * @param approved_contextlist $contextlist Approved contexts
+     * @return void
      */
     public static function export_user_data(approved_contextlist $contextlist): void {
         global $DB;
@@ -200,6 +202,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
      * Delete user data for approved contexts.
      *
      * @param \context $context The context to delete data for
+     * @return void
      */
     public static function delete_data_for_all_users_in_context(\context $context): void {
         global $DB;
@@ -222,6 +225,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
      * Delete user data.
      *
      * @param approved_contextlist $contextlist Approved contexts
+     * @return void
      */
     public static function delete_data_for_user(approved_contextlist $contextlist): void {
         global $DB;
@@ -262,6 +266,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
      * Delete data for users in approved userlist.
      *
      * @param approved_userlist $userlist Approved users
+     * @return void
      */
     public static function delete_data_for_users(approved_userlist $userlist): void {
         global $DB;
@@ -301,6 +306,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
      * Delete all data for a request.
      *
      * @param int $requestid Request ID
+     * @return void
      */
     private static function delete_request_data(int $requestid): void {
         global $DB;

@@ -55,6 +55,7 @@ class debug_logger {
 
     /**
      * Initialize the logger.
+     * @return void
      */
     private static function init(): void {
         global $CFG;
@@ -78,6 +79,7 @@ class debug_logger {
      * @param string $message Log message
      * @param array $context Additional context data
      * @param int|null $requestid Optional request ID
+     * @return void
      */
     public static function debug(string $message, array $context = [], ?int $requestid = null): void {
         self::log(self::LEVEL_DEBUG, $message, $context, $requestid);
@@ -89,6 +91,7 @@ class debug_logger {
      * @param string $message Log message
      * @param array $context Additional context data
      * @param int|null $requestid Optional request ID
+     * @return void
      */
     public static function info(string $message, array $context = [], ?int $requestid = null): void {
         self::log(self::LEVEL_INFO, $message, $context, $requestid);
@@ -100,6 +103,7 @@ class debug_logger {
      * @param string $message Log message
      * @param array $context Additional context data
      * @param int|null $requestid Optional request ID
+     * @return void
      */
     public static function warning(string $message, array $context = [], ?int $requestid = null): void {
         self::log(self::LEVEL_WARNING, $message, $context, $requestid);
@@ -111,6 +115,7 @@ class debug_logger {
      * @param string $message Log message
      * @param array $context Additional context data
      * @param int|null $requestid Optional request ID
+     * @return void
      */
     public static function error(string $message, array $context = [], ?int $requestid = null): void {
         self::log(self::LEVEL_ERROR, $message, $context, $requestid);
@@ -122,6 +127,7 @@ class debug_logger {
      * @param string $message Log message
      * @param array $context Additional context data
      * @param int|null $requestid Optional request ID
+     * @return void
      */
     public static function critical(string $message, array $context = [], ?int $requestid = null): void {
         self::log(self::LEVEL_CRITICAL, $message, $context, $requestid);
@@ -133,6 +139,7 @@ class debug_logger {
      * @param \Throwable $exception The exception to log
      * @param string $component Component where exception occurred
      * @param int|null $requestid Optional request ID
+     * @return void
      */
     public static function exception(\Throwable $exception, string $component = 'unknown', ?int $requestid = null): void {
         $context = [
@@ -160,6 +167,7 @@ class debug_logger {
      * @param mixed $response Response received
      * @param float $duration Request duration in seconds
      * @param int|null $requestid Optional request ID
+     * @return void
      */
     public static function ai_request(
         string $operation,
@@ -201,6 +209,7 @@ class debug_logger {
      * @param string $error Error message
      * @param array $details Additional details
      * @param int|null $requestid Optional request ID
+     * @return void
      */
     public static function ai_error(
         string $operation,
@@ -223,6 +232,7 @@ class debug_logger {
      * @param int $questionsgenerated Number of questions generated
      * @param int $questionsrequested Number of questions requested
      * @param array $types Question types
+     * @return void
      */
     public static function question_generation(
         int $requestid,
@@ -254,6 +264,7 @@ class debug_logger {
      * @param string $action Action performed
      * @param int|null $requestid Request ID
      * @param array $data Additional data
+     * @return void
      */
     public static function wizard_step(int $step, string $action, ?int $requestid = null, array $data = []): void {
         $context = array_merge([
@@ -271,6 +282,7 @@ class debug_logger {
      * @param string $message Log message
      * @param array $context Additional context
      * @param int|null $requestid Optional request ID
+     * @return void
      */
     public static function log(string $level, string $message, array $context = [], ?int $requestid = null): void {
         self::init();
@@ -326,6 +338,7 @@ class debug_logger {
      * Write log entry to file.
      *
      * @param string $entry Log entry
+     * @return void
      */
     private static function writetofile(string $entry): void {
         if (self::$logfile) {
@@ -347,6 +360,7 @@ class debug_logger {
      * @param array $context Context data
      * @param int|null $requestid Request ID
      * @param int $userid User ID
+     * @return void
      */
     private static function writetodatabase(
         string $level,
@@ -495,6 +509,7 @@ class debug_logger {
      * Log system/environment info (useful for debugging).
      *
      * @param int|null $requestid Request ID
+     * @return void
      */
     public static function logsysteminfo(?int $requestid = null): void {
         global $CFG;

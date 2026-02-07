@@ -308,6 +308,7 @@ class api {
      * @param array $details Additional details
      * @param string $status Status (success/error)
      * @param string $error Error message
+     * @return void
      */
     public static function log_action(
         string $action,
