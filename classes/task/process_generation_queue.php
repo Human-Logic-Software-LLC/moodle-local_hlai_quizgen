@@ -44,6 +44,8 @@ class process_generation_queue extends \core\task\scheduled_task {
 
     /**
      * Execute the task.
+     *
+     * @return void
      */
     public function execute() {
         global $DB;
@@ -106,13 +108,13 @@ class process_generation_queue extends \core\task\scheduled_task {
             $difficultydist = ['easy' => 20, 'medium' => 60, 'hard' => 20];
             mtrace('  Using default difficulty distribution');
         }
-        
+
         $questiontypes = json_decode($request->question_types, true);
         if (!is_array($questiontypes) || empty($questiontypes)) {
             $questiontypes = ['multichoice', 'truefalse'];
             mtrace('  Using default question types');
         }
-        
+
         // Decode Bloom's taxonomy distribution
         $bloomsdist = json_decode($request->blooms_distribution ?? '{}', true);
         if (!is_array($bloomsdist) || empty($bloomsdist)) {
@@ -126,7 +128,7 @@ class process_generation_queue extends \core\task\scheduled_task {
             ];
             mtrace('  Using default Bloom\'s distribution');
         }
-        
+
         $config = [
             'processing_mode' => $request->processing_mode ?? 'balanced',
             'difficulty_distribution' => $difficultydist,
@@ -168,7 +170,7 @@ class process_generation_queue extends \core\task\scheduled_task {
                     $request->id,
                     $topicconfig
                 );
-                
+
                 // Update global index after generating questions
                 $globalquestionindex += count($questions);
 
@@ -228,6 +230,7 @@ class process_generation_queue extends \core\task\scheduled_task {
      *
      * @param int $requestid Request ID
      * @param string $error Error message
+     * @return void
      */
     private function mark_request_failed(int $requestid, string $error): void {
         global $DB;
@@ -246,6 +249,7 @@ class process_generation_queue extends \core\task\scheduled_task {
      * Send completion notification to user.
      *
      * @param \stdClass $request Request record
+     * @return void
      */
     private function send_completion_notification(\stdClass $request): void {
         global $DB;
@@ -279,6 +283,7 @@ class process_generation_queue extends \core\task\scheduled_task {
      *
      * @param \stdClass $request Request record
      * @param string $error Error message
+     * @return void
      */
     private function send_failure_notification(\stdClass $request, string $error): void {
         global $DB;

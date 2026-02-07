@@ -101,8 +101,8 @@ class batch_exporter {
         ];
 
         foreach ($questions as $question) {
-            $answers = $DB->get_records('hlai_quizgen_answers', 
-                ['questionid' => $question->id], 
+            $answers = $DB->get_records('hlai_quizgen_answers',
+                ['questionid' => $question->id],
                 'sortorder ASC'
             );
 
@@ -176,7 +176,7 @@ class batch_exporter {
         global $DB;
 
         $csv = [];
-        
+
         // Header row.
         $headers = [
             'ID',
@@ -199,8 +199,8 @@ class batch_exporter {
         $csv[] = $headers;
 
         foreach ($questions as $question) {
-            $answers = $DB->get_records('hlai_quizgen_answers', 
-                ['questionid' => $question->id], 
+            $answers = $DB->get_records('hlai_quizgen_answers',
+                ['questionid' => $question->id],
                 'sortorder ASC'
             );
 
@@ -265,8 +265,8 @@ class batch_exporter {
         $xml->addAttribute('timestamp', time());
 
         foreach ($questions as $question) {
-            $answers = $DB->get_records('hlai_quizgen_answers', 
-                ['questionid' => $question->id], 
+            $answers = $DB->get_records('hlai_quizgen_answers',
+                ['questionid' => $question->id],
                 'sortorder ASC'
             );
 
@@ -274,7 +274,7 @@ class batch_exporter {
             $questionxml->addAttribute('type', self::map_question_type($question->questiontype));
 
             $questionxml->addChild('name')->addChild('text', 'Question ' . $question->id);
-            
+
             $questiontext = $questionxml->addChild('questiontext');
             $questiontext->addAttribute('format', 'html');
             $questiontext->addChild('text', htmlspecialchars($question->questiontext));
@@ -292,9 +292,9 @@ class batch_exporter {
                 $answerxml = $questionxml->addChild('answer');
                 $answerxml->addAttribute('fraction', $answer->fraction * 100);
                 $answerxml->addAttribute('format', 'html');
-                
+
                 $answerxml->addChild('text', htmlspecialchars($answer->answer));
-                
+
                 $feedbackxml = $answerxml->addChild('feedback');
                 $feedbackxml->addAttribute('format', 'html');
                 $feedbackxml->addChild('text', htmlspecialchars($answer->feedback ?? ''));
@@ -327,14 +327,14 @@ class batch_exporter {
         $gift .= "// Exported: " . date('Y-m-d H:i:s') . "\n\n";
 
         foreach ($questions as $question) {
-            $answers = $DB->get_records('hlai_quizgen_answers', 
-                ['questionid' => $question->id], 
+            $answers = $DB->get_records('hlai_quizgen_answers',
+                ['questionid' => $question->id],
                 'sortorder ASC'
             );
 
             // Add category comment.
             $gift .= "// Question {$question->id} - {$question->difficulty} - {$question->blooms_level}\n";
-            
+
             // Question text.
             $gift .= self::escape_gift_text($question->questiontext) . " {\n";
 
@@ -342,7 +342,7 @@ class batch_exporter {
             foreach ($answers as $answer) {
                 $prefix = $answer->is_correct ? '=' : '~';
                 $gift .= "    {$prefix}" . self::escape_gift_text($answer->answer);
-                
+
                 if ($answer->feedback) {
                     $gift .= " # " . self::escape_gift_text($answer->feedback);
                 }
@@ -381,8 +381,8 @@ class batch_exporter {
                 continue;
             }
 
-            $answers = $DB->get_records('hlai_quizgen_answers', 
-                ['questionid' => $question->id], 
+            $answers = $DB->get_records('hlai_quizgen_answers',
+                ['questionid' => $question->id],
                 'sortorder ASC'
             );
 
@@ -397,7 +397,7 @@ class batch_exporter {
             foreach ($answers as $answer) {
                 $letter = $letters[$index];
                 $aiken .= "{$letter}. " . self::clean_html($answer->answer) . "\n";
-                
+
                 if ($answer->is_correct) {
                     $correctletter = $letter;
                 }
@@ -473,7 +473,7 @@ class batch_exporter {
             $request->timecreated = time();
             $request->timemodified = time();
             $request->timecompleted = time();
-            
+
             if (isset($data['request_config'])) {
                 $config = $data['request_config'];
                 $request->difficulty_distribution = json_encode($config['difficulty_distribution'] ?? null);
@@ -577,8 +577,8 @@ class batch_exporter {
     private static function escape_gift_text(string $text): string {
         $text = self::clean_html($text);
         // Escape special GIFT characters.
-        $text = str_replace(['~', '=', '#', '{', '}', ':'], 
-                           ['\~', '\=', '\#', '\{', '\}', '\:'], 
+        $text = str_replace(['~', '=', '#', '{', '}', ':'],
+                           ['\~', '\=', '\#', '\{', '\}', '\:'],
                            $text);
         return $text;
     }

@@ -56,14 +56,14 @@ class question_generator {
     private static function select_difficulty_from_distribution(array $distribution): string {
         $rand = rand(1, 100);
         $cumulative = 0;
-        
+
         foreach ($distribution as $level => $percentage) {
             $cumulative += $percentage;
             if ($rand <= $cumulative) {
                 return $level;
             }
         }
-        
+
         return 'medium'; // Fallback
     }
 
@@ -76,14 +76,14 @@ class question_generator {
     private static function select_blooms_from_distribution(array $distribution): string {
         $rand = rand(1, 100);
         $cumulative = 0;
-        
+
         foreach ($distribution as $level => $percentage) {
             $cumulative += $percentage;
             if ($rand <= $cumulative) {
                 return $level;
             }
         }
-        
+
         return 'understand'; // Fallback
     }
 
@@ -124,7 +124,7 @@ class question_generator {
 
         // Get topic details.
         $topic = $DB->get_record('hlai_quizgen_topics', ['id' => $topicid], '*', MUST_EXIST);
-        
+
         // OPTIMIZATION: Cache content to avoid repeated expensive extractions.
         // Only fetch content once per request, not once per topic.
         $cachekey = "request_{$requestid}_content";
@@ -162,11 +162,11 @@ class question_generator {
 
         // Get global question index (tracks across all topics)
         $globalindex = $config['global_question_index'] ?? 0;
-        
+
         // OPTIMIZATION: Generate in batches to reduce API calls and tokens.
         $batchsize = min(10, $numquestions); // Generate up to 10 questions per API call.
         $batches = ceil($numquestions / $batchsize);
-        
+
         for ($batch = 0; $batch < $batches; $batch++) {
             $batchstart = $batch * $batchsize;
             $batchcount = min($batchsize, $numquestions - $batchstart);
@@ -223,7 +223,7 @@ class question_generator {
                 }
             }
         }
-        
+
         // Update request token totals.
         if ($totalprompt > 0 || $totalresponse > 0) {
             $DB->execute(
@@ -376,7 +376,7 @@ class question_generator {
      */
     private static function parse_batch_response(string $response, array $types): array {
         $response = trim($response);
-        
+
         // Extract JSON array.
         if (preg_match('/```json\\s*(.*?)\\s*```/s', $response, $matches)) {
             $response = $matches[1];
@@ -400,9 +400,9 @@ class question_generator {
         // FIX: Only process the number of questions we requested (count of $types).
         $expectedcount = count($types);
         $actualcount = count($data);
-        
+
         // Only process the number of questions we requested.
-        
+
         for ($i = 0; $i < $expectedcount && $i < $actualcount; $i++) {
             $qdata = $data[$i];
             $type = $types[$i] ?? 'multichoice';
@@ -421,11 +421,11 @@ class question_generator {
             $question->ai_reasoning = $qdata['ai_reasoning'] ?? $qdata['rationale'] ?? '';
             $question->status = 'pending';
             $question->answers = $qdata['answers'] ?? [];
-            
+
             if ($type === 'matching' && isset($qdata['subquestions'])) {
                 $question->subquestions = $qdata['subquestions'];
             }
-            
+
             $questions[] = $question;
         }
 
@@ -443,7 +443,7 @@ class question_generator {
     private static function parse_question_response(string $response, string $type): \stdClass {
         // Extract JSON from response.
         $response = trim($response);
-        
+
         if (preg_match('/```json\s*(.*?)\s*```/s', $response, $matches)) {
             $response = $matches[1];
         } else if (preg_match('/```\s*(.*?)\s*```/s', $response, $matches)) {
@@ -478,7 +478,7 @@ class question_generator {
         $question->ai_reasoning = $data['ai_reasoning'] ?? '';
         $question->status = 'pending';
         $question->answers = $data['answers'] ?? [];
-        
+
         // For essay questions, store grading criteria.
         if ($type === 'essay' && isset($data['grading_criteria'])) {
             $question->grading_criteria = json_encode($data['grading_criteria']);
@@ -510,7 +510,7 @@ class question_generator {
                 $question,
                 $question->answers ?? []
             );
-            
+
             // Store validation metadata.
             $question->validation_score = $validation['score'];
             $question->quality_rating = $validation['quality_rating'];
@@ -537,7 +537,7 @@ class question_generator {
         $record->status = 'pending';
         $record->timecreated = $now;
         $record->timemodified = $now;
-        
+
         // Include validation scores if present
         if (isset($question->validation_score)) {
             $record->validation_score = $question->validation_score;
@@ -545,7 +545,7 @@ class question_generator {
         if (isset($question->quality_rating)) {
             $record->quality_rating = $question->quality_rating;
         }
-        
+
         // Validate required fields.
         if (empty($record->requestid)) {
             throw new \moodle_exception('error:missingrequestid', 'local_hlai_quizgen', '', null,
@@ -645,13 +645,13 @@ class question_generator {
             throw new \moodle_exception('error:invaliddifficulty', 'local_hlai_quizgen');
         }
     }
-    
+
     /**
      * Get full content for a request from all original sources.
-     * 
+     *
      * This is called ONCE per request and cached, not once per topic.
      * Prevents redundant content extraction that wastes tokens.
-     * 
+     *
      * Instead of relying on AI-generated excerpts, this fetches the actual
      * content from activities, files, and other sources to ensure questions
      * are generated from real content.
@@ -661,24 +661,24 @@ class question_generator {
      */
     private static function get_full_content_for_request(\stdClass $request): string {
         global $DB;
-        
+
         $fullcontent = '';
-        
+
         // Get manual text from custom_instructions.
         if (!empty($request->custom_instructions)) {
             $fullcontent .= $request->custom_instructions . "\n\n";
         }
-        
+
         // Get uploaded files.
         $fs = get_file_storage();
         $context = \context_course::instance($request->courseid);
         $files = $fs->get_area_files($context->id, 'local_hlai_quizgen', 'content', $request->id, 'filename', false);
-        
+
         if (!empty($files)) {
             foreach ($files as $file) {
                 $filepath = $file->copy_content_to_temp();
                 $filename = $file->get_filename();
-                
+
                 try {
                     $result = \local_hlai_quizgen\content_extractor::extract_from_file($filepath, $filename);
                     if (!empty($result['text'])) {
@@ -694,7 +694,7 @@ class question_generator {
                 }
             }
         }
-        
+
         // Get content from activities.
         if (!empty($request->content_sources)) {
             $sources = json_decode($request->content_sources, true);
@@ -746,14 +746,14 @@ class question_generator {
                 }
             }
         }
-        
+
         // Get URL content.
         $urlcontent = $DB->get_records('hlai_quizgen_url_content', ['requestid' => $request->id]);
         foreach ($urlcontent as $url) {
             $fullcontent .= "\n\n=== Content from {$url->title} ===\n\n";
             $fullcontent .= $url->content;
         }
-        
+
         // Return full content (trimmed).
         return trim($fullcontent);
     }

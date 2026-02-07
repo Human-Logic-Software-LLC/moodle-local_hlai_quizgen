@@ -56,11 +56,11 @@ class rate_limiter {
         }
 
         // Get limits from config.
-        $limitperhour = get_config('local_hlai_quizgen', 'rate_limit_per_hour') 
+        $limitperhour = get_config('local_hlai_quizgen', 'rate_limit_per_hour')
             ?: self::DEFAULT_LIMIT_PER_HOUR;
-        $limitperday = get_config('local_hlai_quizgen', 'rate_limit_per_day') 
+        $limitperday = get_config('local_hlai_quizgen', 'rate_limit_per_day')
             ?: self::DEFAULT_LIMIT_PER_DAY;
-        $sitelimitperhour = get_config('local_hlai_quizgen', 'site_rate_limit_per_hour') 
+        $sitelimitperhour = get_config('local_hlai_quizgen', 'site_rate_limit_per_hour')
             ?: self::DEFAULT_SITE_LIMIT_PER_HOUR;
 
         // Check user hourly limit.
@@ -96,7 +96,7 @@ class rate_limiter {
         global $DB;
 
         $hourstarttime = strtotime('-1 hour');
-        
+
         $count = $DB->count_records_select(
             'hlai_quizgen_requests',
             'userid = ? AND timecreated > ?',
@@ -128,7 +128,7 @@ class rate_limiter {
         global $DB;
 
         $daystarttime = strtotime('-24 hours');
-        
+
         $count = $DB->count_records_select(
             'hlai_quizgen_requests',
             'userid = ? AND timecreated > ?',
@@ -159,7 +159,7 @@ class rate_limiter {
         global $DB;
 
         $hourstarttime = strtotime('-1 hour');
-        
+
         $count = $DB->count_records_select(
             'hlai_quizgen_requests',
             'timecreated > ?',
@@ -213,9 +213,9 @@ class rate_limiter {
             [$userid, $daystarttime]
         );
 
-        $limitperhour = get_config('local_hlai_quizgen', 'rate_limit_per_hour') 
+        $limitperhour = get_config('local_hlai_quizgen', 'rate_limit_per_hour')
             ?: self::DEFAULT_LIMIT_PER_HOUR;
-        $limitperday = get_config('local_hlai_quizgen', 'rate_limit_per_day') 
+        $limitperday = get_config('local_hlai_quizgen', 'rate_limit_per_day')
             ?: self::DEFAULT_LIMIT_PER_DAY;
 
         return [
@@ -250,7 +250,7 @@ class rate_limiter {
             [$hourstarttime]
         );
 
-        $sitelimitperhour = get_config('local_hlai_quizgen', 'site_rate_limit_per_hour') 
+        $sitelimitperhour = get_config('local_hlai_quizgen', 'site_rate_limit_per_hour')
             ?: self::DEFAULT_SITE_LIMIT_PER_HOUR;
 
         return [

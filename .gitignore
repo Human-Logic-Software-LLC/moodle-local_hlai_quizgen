@@ -31,6 +31,7 @@ node_modules/
 
 # Log files
 *.log
+*.log.*
 
 # Build files
 amd/build/*.min.js
@@ -45,3 +46,14 @@ Thumbs.db
 
 # Documentation files that are development-only
 docs/development/
+
+# Moodle plugin CI cache
+ci/
+moodledata/
+.phpunit.result.cache
+
+# Composer dependencies (if vendor is not tracked)
+# vendor/
+
+# Gateway subdirectory (excluded from CI)
+gateway/

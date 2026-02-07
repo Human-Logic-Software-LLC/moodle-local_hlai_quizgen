@@ -44,6 +44,8 @@ class cleanup_old_requests extends \core\task\scheduled_task {
 
     /**
      * Execute the task.
+     *
+     * @return void
      */
     public function execute() {
         global $DB;
@@ -51,7 +53,7 @@ class cleanup_old_requests extends \core\task\scheduled_task {
         mtrace('AI Quiz Generator: Cleaning up old requests...');
 
         $cleanupdays = get_config('local_hlai_quizgen', 'cleanup_days');
-        
+
         if (empty($cleanupdays) || $cleanupdays <= 0) {
             mtrace('Cleanup disabled (cleanup_days = 0)');
             return;
@@ -63,7 +65,7 @@ class cleanup_old_requests extends \core\task\scheduled_task {
         $sql = "SELECT id FROM {hlai_quizgen_requests}
                  WHERE (status = 'completed' OR status = 'failed')
                    AND timecompleted < :cutoff";
-        
+
         $requests = $DB->get_records_sql($sql, ['cutoff' => $cutofftime]);
 
         if (empty($requests)) {
@@ -90,6 +92,7 @@ class cleanup_old_requests extends \core\task\scheduled_task {
      * Delete a request and all associated data.
      *
      * @param int $requestid Request ID
+     * @return void
      */
     private function delete_request(int $requestid): void {
         global $DB;

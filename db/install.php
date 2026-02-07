@@ -32,14 +32,14 @@ defined('MOODLE_INTERNAL') || die();
  */
 function xmldb_local_hlai_quizgen_install() {
     global $CFG;
-    
+
     // Force purge all caches to ensure language strings and navigation load properly
     purge_all_caches();
-    
+
     // Log successful installation
     if (function_exists('debugging')) {
         debugging('HLAI Quiz Generator installed successfully. Version: 1.5.2', DEBUG_DEVELOPER);
     }
-    
+
     return true;
 }

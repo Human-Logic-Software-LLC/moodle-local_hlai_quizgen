@@ -84,8 +84,8 @@ class question_analytics {
             'quiz_count' => $quizcount,
             'first_used' => $usage->first_used ?? null,
             'last_used' => $usage->last_used ?? null,
-            'days_in_use' => $usage->first_used 
-                ? ceil((time() - $usage->first_used) / 86400) 
+            'days_in_use' => $usage->first_used
+                ? ceil((time() - $usage->first_used) / 86400)
                 : 0
         ];
     }
@@ -99,7 +99,7 @@ class question_analytics {
     private static function get_performance_stats(int $questionid): array {
         global $DB;
 
-        $sql = "SELECT 
+        $sql = "SELECT
                     AVG(qa.fraction) as avg_score,
                     MIN(qa.fraction) as min_score,
                     MAX(qa.fraction) as max_score,
@@ -124,8 +124,8 @@ class question_analytics {
             'fully_correct_count' => (int)($stats->fully_correct ?? 0),
             'partially_correct_count' => (int)($stats->partially_correct ?? 0),
             'incorrect_count' => (int)($stats->incorrect ?? 0),
-            'fully_correct_pct' => $totalattempts > 0 
-                ? round(($stats->fully_correct / $totalattempts) * 100, 1) 
+            'fully_correct_pct' => $totalattempts > 0
+                ? round(($stats->fully_correct / $totalattempts) * 100, 1)
                 : 0,
             'average_time_seconds' => round($stats->avg_time_spent ?? 0)
         ];
@@ -141,7 +141,7 @@ class question_analytics {
         global $DB;
 
         // Performance by month.
-        $sql = "SELECT 
+        $sql = "SELECT
                     DATE_FORMAT(FROM_UNIXTIME(qa.timecreated), '%Y-%m') as month,
                     AVG(qa.fraction) as avg_score,
                     COUNT(*) as attempt_count
@@ -168,10 +168,10 @@ class question_analytics {
         if (count($trend) >= 3) {
             $recent = array_slice($trend, 0, 3);
             $older = array_slice($trend, -3);
-            
+
             $recentavg = array_sum(array_column($recent, 'average_score')) / count($recent);
             $olderavg = array_sum(array_column($older, 'average_score')) / count($older);
-            
+
             if ($recentavg > $olderavg + 5) {
                 $direction = 'improving';
             } else if ($recentavg < $olderavg - 5) {
@@ -230,16 +230,16 @@ class question_analytics {
                 ) subquery";
 
         $bettercount = $DB->get_field_sql($sql, [$question->qtype, $thisavg]) ?? 0;
-        
+
         $sql = "SELECT COUNT(DISTINCT questionid) as total_questions
                 FROM {question_attempts} qa
                 JOIN {question} q ON q.id = qa.questionid
                 WHERE q.qtype = ?";
-                
+
         $totalquestions = $DB->get_field_sql($sql, [$question->qtype]) ?? 1;
-        
-        $percentile = $totalquestions > 0 
-            ? round((1 - ($bettercount / $totalquestions)) * 100, 1) 
+
+        $percentile = $totalquestions > 0
+            ? round((1 - ($bettercount / $totalquestions)) * 100, 1)
             : 50;
 
         return [
@@ -485,14 +485,14 @@ class question_analytics {
             }
 
             $analytics = self::get_question_analytics($question->moodle_questionid);
-            
+
             // Only include if has usage.
             if ($analytics['usage']['total_attempts'] > 0) {
                 $report['questions'][$question->id] = $analytics;
                 $report['summary']['analyzed_questions']++;
-                
+
                 $healthscores[] = $analytics['recommendations']['overall_health']['health_score'];
-                
+
                 if ($analytics['recommendations']['overall_health']['status'] === 'needs_attention') {
                     $report['summary']['questions_needing_attention']++;
                 }

@@ -42,18 +42,18 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // Initial install - no upgrade needed yet.
         upgrade_plugin_savepoint(true, 2025111300, 'local', 'hlai_quizgen');
     }
-    
+
     if ($oldversion < 2025111303) {
         $dbman = $DB->get_manager();
-        
+
         // Recreate topics table with correct schema.
         $table = new xmldb_table('hlai_quizgen_topics');
         $DB->delete_records('hlai_quizgen_topics');
-        
+
         if ($dbman->table_exists($table)) {
             $dbman->drop_table($table);
         }
-        
+
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('requestid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('title', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null);
@@ -65,17 +65,17 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         $table->add_field('content_excerpt', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $table->add_field('learning_objectives', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        
+
         $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
         $table->add_key('requestid', XMLDB_KEY_FOREIGN, array('requestid'), 'hlai_quizgen_requests', array('id'));
         $table->add_key('parent_topic_id', XMLDB_KEY_FOREIGN, array('parent_topic_id'), 'hlai_quizgen_topics', array('id'));
         $table->add_index('requestid_selected', XMLDB_INDEX_NOTUNIQUE, array('requestid', 'selected'));
-        
+
         $dbman->create_table($table);
-        
+
         // Create questions table if it doesn't exist.
         $questionstable = new xmldb_table('hlai_quizgen_questions');
-        
+
         if (!$dbman->table_exists($questionstable)) {
             $questionstable->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
             $questionstable->add_field('requestid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
@@ -92,19 +92,19 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
             $questionstable->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
             $questionstable->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
             $questionstable->add_field('timedeployed', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-            
+
             $questionstable->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
             $questionstable->add_key('requestid', XMLDB_KEY_FOREIGN, array('requestid'), 'hlai_quizgen_requests', array('id'));
             $questionstable->add_key('topicid', XMLDB_KEY_FOREIGN, array('topicid'), 'hlai_quizgen_topics', array('id'));
             $questionstable->add_index('requestid_status', XMLDB_INDEX_NOTUNIQUE, array('requestid', 'status'));
             $questionstable->add_index('questiontype', XMLDB_INDEX_NOTUNIQUE, array('questiontype'));
-            
+
             $dbman->create_table($questionstable);
         }
-        
+
         // Create answers table if it doesn't exist.
         $answerstable = new xmldb_table('hlai_quizgen_answers');
-        
+
         if (!$dbman->table_exists($answerstable)) {
             $answerstable->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
             $answerstable->add_field('questionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
@@ -116,14 +116,14 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
             $answerstable->add_field('is_correct', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
             $answerstable->add_field('distractor_reasoning', XMLDB_TYPE_TEXT, null, null, null, null, null);
             $answerstable->add_field('sortorder', XMLDB_TYPE_INTEGER, '5', null, XMLDB_NOTNULL, null, '0');
-            
+
             $answerstable->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
             $answerstable->add_key('questionid', XMLDB_KEY_FOREIGN, array('questionid'), 'hlai_quizgen_questions', array('id'));
             $answerstable->add_index('questionid_sortorder', XMLDB_INDEX_NOTUNIQUE, array('questionid', 'sortorder'));
-            
+
             $dbman->create_table($answerstable);
         }
-        
+
         upgrade_plugin_savepoint(true, 2025111303, 'local', 'hlai_quizgen');
     }
 
@@ -138,41 +138,41 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
 
         upgrade_plugin_savepoint(true, 2025120901, 'local', 'hlai_quizgen');
     }
-    
+
     if ($oldversion < 2025111304) {
         // Add content_hash field to hlai_quizgen_requests table for deduplication.
         $table = new xmldb_table('hlai_quizgen_requests');
         $field = new xmldb_field('content_hash', XMLDB_TYPE_CHAR, '64', null, null, null, null, 'custom_instructions');
-        
+
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        
+
         // Add index on content_hash for fast duplicate lookups.
         $index = new xmldb_index('content_hash', XMLDB_INDEX_NOTUNIQUE, array('content_hash'));
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
-        
+
         upgrade_plugin_savepoint(true, 2025111304, 'local', 'hlai_quizgen');
     }
-    
+
     if ($oldversion < 2025111305) {
         // Add blooms_distribution field to hlai_quizgen_requests table.
         $table = new xmldb_table('hlai_quizgen_requests');
         $field = new xmldb_field('blooms_distribution', XMLDB_TYPE_TEXT, null, null, null, null, null, 'difficulty_distribution');
-        
+
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        
+
         upgrade_plugin_savepoint(true, 2025111305, 'local', 'hlai_quizgen');
     }
-    
+
     if ($oldversion < 2025111306) {
         // Create table for URL content extraction.
         $table = new xmldb_table('hlai_quizgen_url_content');
-        
+
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('requestid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('url', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
@@ -180,56 +180,56 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         $table->add_field('content', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
         $table->add_field('word_count', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        
+
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table->add_key('requestid', XMLDB_KEY_FOREIGN, ['requestid'], 'hlai_quizgen_requests', ['id']);
-        
+
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
-        
+
         upgrade_plugin_savepoint(true, 2025111306, 'local', 'hlai_quizgen');
     }
-    
+
     if ($oldversion < 2025111307) {
         // Add token tracking fields to requests table.
         $table = new xmldb_table('hlai_quizgen_requests');
-        
+
         $field = new xmldb_field('prompt_tokens', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'processing_mode');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        
+
         $field = new xmldb_field('response_tokens', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'prompt_tokens');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        
+
         $field = new xmldb_field('total_tokens', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'response_tokens');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
 
-        
+
         upgrade_plugin_savepoint(true, 2025111307, 'local', 'hlai_quizgen');
     }
-    
+
     if ($oldversion < 2025111600) {
         // No database changes - this upgrade is for field naming fixes and code improvements.
         // All field naming corrections are handled by the corrected code itself.
-        
+
         upgrade_plugin_savepoint(true, 2025111600, 'local', 'hlai_quizgen');
     }
 
     if ($oldversion < 2025111601) {
         // Add question validation fields.
         $table = new xmldb_table('hlai_quizgen_questions');
-        
+
         $field = new xmldb_field('validation_score', XMLDB_TYPE_INTEGER, '3', null, null, null, null, 'status');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        
+
         $field = new xmldb_field('quality_rating', XMLDB_TYPE_CHAR, '20', null, null, null, null, 'validation_score');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
@@ -241,7 +241,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
     if ($oldversion < 2025111602) {
         // Add cache table for AI responses.
         $table = new xmldb_table('hlai_quizgen_cache');
-        
+
         if (!$dbman->table_exists($table)) {
             $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
             $table->add_field('cachetype', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null);
@@ -251,35 +251,35 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
             $table->add_field('hits', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
             $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
             $table->add_field('lastaccessed', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-            
+
             $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
             $table->add_index('cachetype_key', XMLDB_INDEX_UNIQUE, ['cachetype', 'cachekey']);
             $table->add_index('timecreated', XMLDB_INDEX_NOTUNIQUE, ['timecreated']);
             $table->add_index('lastaccessed', XMLDB_INDEX_NOTUNIQUE, ['lastaccessed']);
-            
+
             $dbman->create_table($table);
         }
-        
+
         // Add rate limit violations table.
         $table = new xmldb_table('hlai_quizgen_ratelimit_log');
-        
+
         if (!$dbman->table_exists($table)) {
             $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
             $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
             $table->add_field('limittype', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null);
             $table->add_field('details', XMLDB_TYPE_TEXT, null, null, null, null, null);
             $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-            
+
             $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
             $table->add_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
             $table->add_index('userid_time', XMLDB_INDEX_NOTUNIQUE, ['userid', 'timecreated']);
-            
+
             $dbman->create_table($table);
         }
 
         upgrade_plugin_savepoint(true, 2025111602, 'local', 'hlai_quizgen');
     }
-    
+
     if ($oldversion < 2025111603) {
 
         // Define table hlai_quizgen_outcome_map.
@@ -351,12 +351,12 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
 
         upgrade_plugin_savepoint(true, 2025111603, 'local', 'hlai_quizgen');
     }
-    
+
     if ($oldversion < 2025111604) {
 
         // Define table hlai_quizgen_reviews.
         $table = new xmldb_table('hlai_quizgen_reviews');
-        
+
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('questionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('reviewerid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
@@ -373,23 +373,23 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('timestarted', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
         $table->add_field('timecompleted', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
-        
+
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table->add_key('questionid', XMLDB_KEY_FOREIGN, ['questionid'], 'hlai_quizgen_questions', ['id']);
         $table->add_key('reviewerid', XMLDB_KEY_FOREIGN, ['reviewerid'], 'user', ['id']);
         $table->add_key('submitterid', XMLDB_KEY_FOREIGN, ['submitterid'], 'user', ['id']);
-        
+
         $table->add_index('status', XMLDB_INDEX_NOTUNIQUE, ['status']);
         $table->add_index('reviewer_status', XMLDB_INDEX_NOTUNIQUE, ['reviewerid', 'status']);
         $table->add_index('due_date', XMLDB_INDEX_NOTUNIQUE, ['due_date']);
-        
+
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
-        
+
         // Define table hlai_quizgen_review_comments.
         $table = new xmldb_table('hlai_quizgen_review_comments');
-        
+
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('reviewid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
@@ -397,20 +397,20 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         $table->add_field('comment_type', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, 'review');
         $table->add_field('is_resolved', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        
+
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table->add_key('reviewid', XMLDB_KEY_FOREIGN, ['reviewid'], 'hlai_quizgen_reviews', ['id']);
         $table->add_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
-        
+
         $table->add_index('reviewid_time', XMLDB_INDEX_NOTUNIQUE, ['reviewid', 'timecreated']);
-        
+
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
-        
+
         // Define table hlai_quizgen_review_ratings.
         $table = new xmldb_table('hlai_quizgen_review_ratings');
-        
+
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('reviewid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
@@ -421,18 +421,18 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         $table->add_field('distractor_quality', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
         $table->add_field('overall_rating', XMLDB_TYPE_INTEGER, '2', null, null, null, null);
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        
+
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table->add_key('fk_rating_review', XMLDB_KEY_FOREIGN, ['reviewid'], 'hlai_quizgen_reviews', ['id']);
         $table->add_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
-        
+
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
-        
+
         // Define table hlai_quizgen_revision_issues.
         $table = new xmldb_table('hlai_quizgen_revision_issues');
-        
+
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('reviewid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('issue_type', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null);
@@ -441,57 +441,57 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         $table->add_field('suggested_fix', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $table->add_field('is_resolved', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        
+
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table->add_key('reviewid', XMLDB_KEY_FOREIGN, ['reviewid'], 'hlai_quizgen_reviews', ['id']);
-        
+
         $table->add_index('reviewid_resolved', XMLDB_INDEX_NOTUNIQUE, ['reviewid', 'is_resolved']);
-        
+
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
-        
+
         // Define table hlai_quizgen_revisions.
         $table = new xmldb_table('hlai_quizgen_revisions');
-        
+
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('reviewid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('changes', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
         $table->add_field('revision_notes', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        
+
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table->add_key('reviewid', XMLDB_KEY_FOREIGN, ['reviewid'], 'hlai_quizgen_reviews', ['id']);
         $table->add_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
-        
+
         $table->add_index('reviewid_time', XMLDB_INDEX_NOTUNIQUE, ['reviewid', 'timecreated']);
-        
+
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
-        
+
         // Define table hlai_quizgen_review_log.
         $table = new xmldb_table('hlai_quizgen_review_log');
-        
+
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('reviewid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('action', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        
+
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table->add_key('reviewid', XMLDB_KEY_FOREIGN, ['reviewid'], 'hlai_quizgen_reviews', ['id']);
-        
+
         $table->add_index('reviewid_time', XMLDB_INDEX_NOTUNIQUE, ['reviewid', 'timecreated']);
-        
+
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
-        
+
         // Define table hlai_quizgen_refinements.
         $table = new xmldb_table('hlai_quizgen_refinements');
-        
+
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('questionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
@@ -499,86 +499,86 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         $table->add_field('changes', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
         $table->add_field('improvements_applied', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        
+
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table->add_key('questionid', XMLDB_KEY_FOREIGN, ['questionid'], 'hlai_quizgen_questions', ['id']);
-        
+
         $table->add_index('questionid_time', XMLDB_INDEX_NOTUNIQUE, ['questionid', 'timecreated']);
-        
+
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
-        
+
         // Define table hlai_quizgen_refine_suggest.
         $table = new xmldb_table('hlai_quizgen_refine_suggest');
-        
+
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('questionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('refinement_type', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, null);
         $table->add_field('suggestions', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
         $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        
+
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table->add_key('questionid', XMLDB_KEY_FOREIGN, ['questionid'], 'hlai_quizgen_questions', ['id']);
-        
+
         $table->add_index('questionid_type', XMLDB_INDEX_NOTUNIQUE, ['questionid', 'refinement_type']);
-        
+
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
-        
+
         // Define table hlai_quizgen_alternatives.
         $table = new xmldb_table('hlai_quizgen_alternatives');
-        
+
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('original_questionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('questiontext', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
         $table->add_field('answers', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null);
         $table->add_field('rationale', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        
+
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table->add_key('original_questionid', XMLDB_KEY_FOREIGN, ['original_questionid'], 'hlai_quizgen_questions', ['id']);
-        
+
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
 
         upgrade_plugin_savepoint(true, 2025111604, 'local', 'hlai_quizgen');
     }
-    
+
     if ($oldversion < 2025111605) {
         // Fix: Ensure requestid field exists in questions table.
         $table = new xmldb_table('hlai_quizgen_questions');
         $field = new xmldb_field('requestid', XMLDB_TYPE_INTEGER, '10', null, false, null, null, 'id');
-        
+
         if (!$dbman->field_exists($table, $field)) {
             // Add field as nullable first.
             $dbman->add_field($table, $field);
-            
+
             // Try to populate from any existing data or set to 0.
             $DB->execute("UPDATE {hlai_quizgen_questions} SET requestid = 0 WHERE requestid IS NULL");
-            
+
             // Now make it NOT NULL.
             $field = new xmldb_field('requestid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
             $dbman->change_field_notnull($table, $field);
-            
+
             // Add foreign key.
             $key = new xmldb_key('requestid', XMLDB_KEY_FOREIGN, ['requestid'], 'hlai_quizgen_requests', ['id']);
             $dbman->add_key($table, $key);
         }
-        
+
         upgrade_plugin_savepoint(true, 2025111605, 'local', 'hlai_quizgen');
     }
-    
+
     if ($oldversion < 2025111606) {
         // Fix: Remove duplicate/legacy fields from questions table.
         // The table has both 'requestid' and 'request_id', 'topicid' and 'topic_id', etc.
         // We need to keep the non-underscore versions as per install.xml.
-        
+
         $table = new xmldb_table('hlai_quizgen_questions');
-        
+
         // Remove legacy 'request_id' field if it exists (we use 'requestid').
         $field = new xmldb_field('request_id');
         if ($dbman->field_exists($table, $field)) {
@@ -594,7 +594,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
             // Now drop the field.
             $dbman->drop_field($table, $field);
         }
-        
+
         // Remove legacy 'topic_id' field if it exists (we use 'topicid').
         $field = new xmldb_field('topic_id');
         if ($dbman->field_exists($table, $field)) {
@@ -608,14 +608,14 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
             }
             $dbman->drop_field($table, $field);
         }
-        
+
         // Remove other legacy underscore fields if they exist.
         $legacy_fields = [
             'question_name', 'question_text', 'question_format', 'question_type',
             'general_feedback', 'default_mark', 'grading_criteria', 'ai_confidence',
             'regeneration_count', 'moodle_question_id', 'category_id', 'timereviewed'
         ];
-        
+
         foreach ($legacy_fields as $fieldname) {
             $field = new xmldb_field($fieldname);
             if ($dbman->field_exists($table, $field)) {
@@ -631,20 +631,20 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
                 $dbman->drop_field($table, $field);
             }
         }
-        
+
         upgrade_plugin_savepoint(true, 2025111606, 'local', 'hlai_quizgen');
     }
-    
+
     if ($oldversion < 2025111607) {
         // Add missing fields to questions table to match install.xml schema.
         $table = new xmldb_table('hlai_quizgen_questions');
-        
+
         // Add topicid field (nullable).
         $field = new xmldb_field('topicid', XMLDB_TYPE_INTEGER, '10', null, false, null, null, 'requestid');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        
+
         // Add questiontype field (nullable first, then set default for existing rows).
         $field = new xmldb_field('questiontype', XMLDB_TYPE_CHAR, '50', null, false, null, null, 'topicid');
         if (!$dbman->field_exists($table, $field)) {
@@ -655,7 +655,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
             $field = new xmldb_field('questiontype', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, 'multichoice', 'topicid');
             $dbman->change_field_notnull($table, $field);
         }
-        
+
         // Add questiontext field (nullable first).
         $field = new xmldb_field('questiontext', XMLDB_TYPE_TEXT, null, null, false, null, null, 'questiontype');
         if (!$dbman->field_exists($table, $field)) {
@@ -666,7 +666,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
             $field = new xmldb_field('questiontext', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null, 'questiontype');
             $dbman->change_field_notnull($table, $field);
         }
-        
+
         // Add questiontextformat field (nullable first).
         $field = new xmldb_field('questiontextformat', XMLDB_TYPE_INTEGER, '2', null, false, null, null, 'questiontext');
         if (!$dbman->field_exists($table, $field)) {
@@ -677,31 +677,31 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
             $field = new xmldb_field('questiontextformat', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1', 'questiontext');
             $dbman->change_field_notnull($table, $field);
         }
-        
+
         // Add generalfeedback field (nullable).
         $field = new xmldb_field('generalfeedback', XMLDB_TYPE_TEXT, null, null, false, null, null, 'questiontextformat');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        
+
         // Add moodle_questionid field (nullable).
         $field = new xmldb_field('moodle_questionid', XMLDB_TYPE_INTEGER, '10', null, false, null, null, 'quality_rating');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        
+
         // Add foreign key for topicid.
         $key = new xmldb_key('topicid', XMLDB_KEY_FOREIGN, ['topicid'], 'hlai_quizgen_topics', ['id']);
         if (!$dbman->find_key_name($table, $key)) {
             $dbman->add_key($table, $key);
         }
-        
+
         // Add index for questiontype.
         $index = new xmldb_index('questiontype', XMLDB_INDEX_NOTUNIQUE, ['questiontype']);
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
-        
+
         upgrade_plugin_savepoint(true, 2025111607, 'local', 'hlai_quizgen');
     }
 
@@ -841,42 +841,42 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // Number fields need sufficient precision for their range.
         $table = new xmldb_table('hlai_quizgen_requests');
         $field = new xmldb_field('progress', XMLDB_TYPE_NUMBER, '10, 2', null, XMLDB_NOTNULL, null, '0', 'error_message');
-        
+
         // Change field precision.
         $dbman->change_field_precision($table, $field);
-        
+
         upgrade_plugin_savepoint(true, 2025111812, 'local', 'hlai_quizgen');
     }
 
     if ($oldversion < 2025111813) {
         // Fix all remaining NUMBER field LENGTH attributes to prevent validation errors.
-        
+
         // Fix alignment_score and similarity_score in hlai_quizgen_outcome_map.
         $table = new xmldb_table('hlai_quizgen_outcome_map');
-        
+
         $field = new xmldb_field('alignment_score', XMLDB_TYPE_NUMBER, '10, 2', null, XMLDB_NOTNULL, null, '0.0', 'blooms_level');
         if ($dbman->field_exists($table, $field)) {
             $dbman->change_field_precision($table, $field);
         }
-        
+
         $field = new xmldb_field('similarity_score', XMLDB_TYPE_NUMBER, '10, 2', null, XMLDB_NOTNULL, null, '0.0', 'alignment_score');
         if ($dbman->field_exists($table, $field)) {
             $dbman->change_field_precision($table, $field);
         }
-        
+
         // Fix average_score and discrimination_index in hlai_quizgen_calibration.
         $table = new xmldb_table('hlai_quizgen_calibration');
-        
+
         $field = new xmldb_field('average_score', XMLDB_TYPE_NUMBER, '10, 2', null, XMLDB_NOTNULL, null, '0.0', 'attempts_analyzed');
         if ($dbman->field_exists($table, $field)) {
             $dbman->change_field_precision($table, $field);
         }
-        
+
         $field = new xmldb_field('discrimination_index', XMLDB_TYPE_NUMBER, '10, 3', null, XMLDB_NOTNULL, null, '0.0', 'average_score');
         if ($dbman->field_exists($table, $field)) {
             $dbman->change_field_precision($table, $field);
         }
-        
+
         upgrade_plugin_savepoint(true, 2025111813, 'local', 'hlai_quizgen');
     }
 
@@ -884,25 +884,25 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // ITEM 7: Add distribution fields to hlai_quizgen_topics table.
         // These fields are critical for proper distribution handling when generating questions.
         $table = new xmldb_table('hlai_quizgen_topics');
-        
+
         // Add difficulty_distribution field.
         $field = new xmldb_field('difficulty_distribution', XMLDB_TYPE_TEXT, null, null, null, null, null, 'learning_objectives');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        
+
         // Add blooms_distribution field.
         $field = new xmldb_field('blooms_distribution', XMLDB_TYPE_TEXT, null, null, null, null, null, 'difficulty_distribution');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        
+
         // Add question_types field.
         $field = new xmldb_field('question_types', XMLDB_TYPE_TEXT, null, null, null, null, null, 'blooms_distribution');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        
+
         upgrade_plugin_savepoint(true, 2025111814, 'local', 'hlai_quizgen');
     }
 
@@ -910,20 +910,20 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // ITEM 8: Add plausibility_score field to hlai_quizgen_answers table.
         // This field stores distractor plausibility scores for MCQ quality improvement.
         $table = new xmldb_table('hlai_quizgen_answers');
-        
+
         // Add plausibility_score field.
         $field = new xmldb_field('plausibility_score', XMLDB_TYPE_NUMBER, '3, 2', null, null, null, null, 'distractor_reasoning');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        
+
         upgrade_plugin_savepoint(true, 2025111815, 'local', 'hlai_quizgen');
     }
 
     if ($oldversion < 2025120201) {
         // Add question_history table for version tracking.
         $table = new xmldb_table('hlai_quizgen_qst_history');
-        
+
         $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
         $table->add_field('original_questionid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('requestid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
@@ -942,20 +942,20 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         $table->add_field('replaced_by_questionid', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
         $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-        
+
         $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
         $table->add_key('requestid', XMLDB_KEY_FOREIGN, ['requestid'], 'hlai_quizgen_requests', ['id']);
         $table->add_key('topicid', XMLDB_KEY_FOREIGN, ['topicid'], 'hlai_quizgen_topics', ['id']);
         $table->add_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
-        
+
         $table->add_index('original_questionid', XMLDB_INDEX_NOTUNIQUE, ['original_questionid']);
         $table->add_index('original_version', XMLDB_INDEX_NOTUNIQUE, ['original_questionid', 'version_number']);
         $table->add_index('timecreated', XMLDB_INDEX_NOTUNIQUE, ['timecreated']);
-        
+
         if (!$dbman->table_exists($table)) {
             $dbman->create_table($table);
         }
-        
+
         upgrade_plugin_savepoint(true, 2025120201, 'local', 'hlai_quizgen');
     }
 
@@ -963,45 +963,45 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // CRITICAL FIX: Remove duplicate columns from hlai_quizgen_answers table.
         // Bug discovered: answer_text, answer_format, and answer_order were duplicates causing INSERT failures.
         // The table uses 'answer' and 'answerformat' fields, not these duplicates.
-        
+
         $table = new xmldb_table('hlai_quizgen_answers');
-        
+
         // First, make answer_text nullable to avoid constraint errors during drop.
         $field = new xmldb_field('answer_text', XMLDB_TYPE_TEXT, null, null, null, null, null);
         if ($dbman->field_exists($table, $field)) {
             $dbman->change_field_notnull($table, $field);
         }
-        
+
         // Drop duplicate columns that were causing database errors.
         $field = new xmldb_field('answer_text');
         if ($dbman->field_exists($table, $field)) {
             $dbman->drop_field($table, $field);
         }
-        
+
         $field = new xmldb_field('answer_format');
         if ($dbman->field_exists($table, $field)) {
             $dbman->drop_field($table, $field);
         }
-        
+
         $field = new xmldb_field('answer_order');
         if ($dbman->field_exists($table, $field)) {
             $dbman->drop_field($table, $field);
         }
-        
+
         upgrade_plugin_savepoint(true, 2025120202, 'local', 'hlai_quizgen');
     }
 
     if ($oldversion < 2025120203) {
         // Add category_name field to hlai_quizgen_requests for custom quiz naming.
         // Allows users to specify custom category names instead of auto-generated timestamps.
-        
+
         $table = new xmldb_table('hlai_quizgen_requests');
         $field = new xmldb_field('category_name', XMLDB_TYPE_CHAR, '255', null, null, null, null);
         // Guard missing previous column and avoid "AFTER" on unknown column.
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        
+
         upgrade_plugin_savepoint(true, 2025120203, 'local', 'hlai_quizgen');
     }
 
@@ -1009,26 +1009,26 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // Fix orphan top-level categories that were created with parent=0.
         // These cause "more than one record" errors in the question bank.
         // Proper hierarchy should have only one top-level category per context.
-        
+
         // Get all contexts with multiple top-level categories.
-        $sql = "SELECT contextid, COUNT(*) as count 
-                FROM {question_categories} 
-                WHERE parent = 0 
-                GROUP BY contextid 
+        $sql = "SELECT contextid, COUNT(*) as count
+                FROM {question_categories}
+                WHERE parent = 0
+                GROUP BY contextid
                 HAVING COUNT(*) > 1";
-        
+
         $contexts = $DB->get_records_sql($sql);
-        
+
         foreach ($contexts as $context) {
             // Get all top-level categories for this context.
-            $categories = $DB->get_records('question_categories', 
-                ['contextid' => $context->contextid, 'parent' => 0], 
+            $categories = $DB->get_records('question_categories',
+                ['contextid' => $context->contextid, 'parent' => 0],
                 'id ASC');
-            
+
             // Keep the first one as the real top category, fix the rest.
             $first = true;
             $topcategoryid = null;
-            
+
             foreach ($categories as $category) {
                 if ($first) {
                     $topcategoryid = $category->id;
@@ -1039,7 +1039,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
                 }
             }
         }
-        
+
         upgrade_plugin_savepoint(true, 2025120204, 'local', 'hlai_quizgen');
     }
 
@@ -1052,7 +1052,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // - Enhanced error handling and logging throughout.
         // - Moodle 4.1.9+ compatibility verified.
         // No database schema changes in this version.
-        
+
         upgrade_plugin_savepoint(true, 2025120300, 'local', 'hlai_quizgen');
     }
 
@@ -1064,7 +1064,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // - Questions numbered sequentially (Q1, Q2, Q3...) for easy identification.
         // - Improves searchability and organization in question bank interface.
         // No database schema changes - existing questions retain their names.
-        
+
         upgrade_plugin_savepoint(true, 2025120301, 'local', 'hlai_quizgen');
     }
 
@@ -1075,7 +1075,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // - Falls back to question_get_top_category() only when no top category exists.
         // - Prevents "mdb->get_record() found more than one record" debugging message.
         // No database schema changes - works with existing category structure.
-        
+
         upgrade_plugin_savepoint(true, 2025120302, 'local', 'hlai_quizgen');
     }
 
@@ -1087,7 +1087,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // - Fixed config.php path to use correct relative path.
         // - Ensures cross-platform compatibility for log viewing.
         // No database schema changes.
-        
+
         upgrade_plugin_savepoint(true, 2025120303, 'local', 'hlai_quizgen');
     }
 
@@ -1099,7 +1099,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // - Uses actual section structure from course content (e.g., "Week 1: Introduction").
         // - Content extractor already includes activity names with === markers for clear identification.
         // No database schema changes.
-        
+
         upgrade_plugin_savepoint(true, 2025120800, 'local', 'hlai_quizgen');
     }
 
@@ -1112,7 +1112,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // - Ensures questions directly relate to what's actually taught in activities.
         // - Added get_full_content_for_topic() method to fetch original content.
         // No database schema changes.
-        
+
         upgrade_plugin_savepoint(true, 2025120801, 'local', 'hlai_quizgen');
     }
 
@@ -1125,7 +1125,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // - Renamed get_full_content_for_topic() to get_full_content_for_request().
         // - Significantly reduces token consumption while maintaining quality.
         // No database schema changes.
-        
+
         upgrade_plugin_savepoint(true, 2025120802, 'local', 'hlai_quizgen');
     }
 
@@ -1140,7 +1140,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // - Full activity content used for question generation.
         // - Optimized content caching to reduce token usage by ~90%.
         // No database schema changes.
-        
+
         upgrade_plugin_savepoint(true, 2025120903, 'local', 'hlai_quizgen');
     }
 
@@ -1156,7 +1156,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // - Topics now extracted from actual headings/sections WITHIN activities.
         // - Content format: "# Heading" for H1, "## Subheading" for H2, etc.
         // No database schema changes.
-        
+
         upgrade_plugin_savepoint(true, 2025120904, 'local', 'hlai_quizgen');
     }
 
@@ -1169,7 +1169,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // - Enhanced AI prompt with exclusion rules for invalid topics.
         // - Only meaningful educational topics are saved to database.
         // No database schema changes.
-        
+
         upgrade_plugin_savepoint(true, 2025120905, 'local', 'hlai_quizgen');
     }
 
@@ -1183,7 +1183,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // - NEW: fetch_url_content() method to extract content from external URLs.
         // - IMPROVED: Better error logging for all extraction failures (non-blocking).
         // No database schema changes.
-        
+
         upgrade_plugin_savepoint(true, 2025121100, 'local', 'hlai_quizgen');
     }
 
@@ -1193,7 +1193,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // - FIXED: JavaScript toggleContentSection() now handles missing sections gracefully.
         // - IMPROVED: Bulk scan options now work correctly across all Moodle installations.
         // No database schema changes.
-        
+
         upgrade_plugin_savepoint(true, 2025121101, 'local', 'hlai_quizgen');
     }
 
@@ -1206,21 +1206,21 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // - NEW: Add review_duration field for time spent reviewing a question.
         // - NEW: Add templates table for storing reusable configuration presets.
         // - IMPROVED: Enhanced analytics tracking for dashboard charts.
-        
+
         $table = new xmldb_table('hlai_quizgen_questions');
-        
+
         // Add rejection_reason field.
         $field = new xmldb_field('rejection_reason', XMLDB_TYPE_CHAR, '100', null, null, null, null, 'status');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        
+
         // Add rejection_feedback field.
         $field = new xmldb_field('rejection_feedback', XMLDB_TYPE_TEXT, null, null, null, null, null, 'rejection_reason');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        
+
         // Add accepted_on_first_try field (1 = yes, 0 = no, null = not yet reviewed).
         $field = new xmldb_field('accepted_on_first_try', XMLDB_TYPE_INTEGER, '1', null, null, null, null, 'rejection_feedback');
         if (!$dbman->field_exists($table, $field)) {
@@ -1229,34 +1229,34 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
             $DB->execute("UPDATE {hlai_quizgen_questions} SET accepted_on_first_try = 1 WHERE status = 'approved' AND regeneration_count = 0");
             $DB->execute("UPDATE {hlai_quizgen_questions} SET accepted_on_first_try = 0 WHERE status = 'approved' AND regeneration_count > 0");
         }
-        
+
         // Add time_approved field (timestamp when question was approved).
         $field = new xmldb_field('time_approved', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'accepted_on_first_try');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        
+
         // Add review_duration field (seconds spent reviewing).
         $field = new xmldb_field('review_duration', XMLDB_TYPE_INTEGER, '10', null, null, null, null, 'time_approved');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-        
+
         // Add index for rejection tracking.
         $index = new xmldb_index('status_rejection', XMLDB_INDEX_NOTUNIQUE, ['status', 'rejection_reason']);
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
-        
+
         // Add index for FTAR analysis.
         $index = new xmldb_index('accepted_first_try', XMLDB_INDEX_NOTUNIQUE, ['accepted_on_first_try', 'status']);
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
-        
+
         // Create templates table for storing configuration presets.
         $table = new xmldb_table('hlai_quizgen_templates');
-        
+
         if (!$dbman->table_exists($table)) {
             $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
             $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
@@ -1269,18 +1269,18 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
             $table->add_field('usage_count', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
             $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
             $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-            
+
             $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
             $table->add_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
             $table->add_key('courseid', XMLDB_KEY_FOREIGN, ['courseid'], 'course', ['id']);
-            
+
             $table->add_index('userid_public', XMLDB_INDEX_NOTUNIQUE, ['userid', 'is_public']);
             $table->add_index('courseid_public', XMLDB_INDEX_NOTUNIQUE, ['courseid', 'is_public']);
             $table->add_index('is_default', XMLDB_INDEX_NOTUNIQUE, ['is_default']);
-            
+
             $dbman->create_table($table);
         }
-        
+
         upgrade_plugin_savepoint(true, 2025121701, 'local', 'hlai_quizgen');
     }
 
@@ -1293,10 +1293,10 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // - IMPROVED: Error handling in navigation prevents silent failures.
         // - IMPROVED: String loading with fallbacks prevents [[pluginname]] display issues.
         // No database schema changes - this is purely a compatibility/UX fix.
-        
+
         // Force cache purge to ensure language strings load.
         purge_all_caches();
-        
+
         upgrade_plugin_savepoint(true, 2026020401, 'local', 'hlai_quizgen');
     }
 

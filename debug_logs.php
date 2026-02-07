@@ -280,6 +280,10 @@ function display_database_logs(?int $requestid, string $level, int $limit): void
     echo '</tbody></table></div>';
 
     echo '<script>
+    /**
+     * Toggle details display.
+     * @param {number} id Row ID
+     */
     function toggleDetails(id) {
         var el = document.getElementById("details-" + id);
         el.style.display = el.style.display === "none" ? "block" : "none";

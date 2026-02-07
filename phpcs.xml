@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="Moodle Coding Standards">
+    <description>Moodle coding standards for local_hlai_quizgen plugin</description>
+
+    <!-- Include the main Moodle ruleset -->
+    <rule ref="moodle"/>
+
+    <!-- Exclude third-party libraries -->
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/node_modules/*</exclude-pattern>
+    <exclude-pattern>*/gateway/*</exclude-pattern>
+    <exclude-pattern>*/thirdpartylibs.xml</exclude-pattern>
+
+    <!-- Exclude generated or third-party files -->
+    <exclude-pattern>*/apexcharts.js</exclude-pattern>
+    <exclude-pattern>*/bulma.css</exclude-pattern>
+    <exclude-pattern>*/styles-bulma.css</exclude-pattern>
+
+    <!-- Files to check -->
+    <file>.</file>
+</ruleset>

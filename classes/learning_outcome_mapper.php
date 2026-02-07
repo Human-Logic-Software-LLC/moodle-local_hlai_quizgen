@@ -66,7 +66,7 @@ class learning_outcome_mapper {
         if (class_exists('\\core_competency\\course_competency')) {
             try {
                 $coursecompetencies = \core_competency\course_competency::list_competencies($courseid);
-                
+
                 foreach ($coursecompetencies as $competency) {
                     $outcomes[] = [
                         'id' => $competency->get('id'),
@@ -149,7 +149,7 @@ class learning_outcome_mapper {
      */
     public static function detect_blooms_level(string $text): string {
         $text = strtolower($text);
-        
+
         // Check for action verbs.
         foreach (self::BLOOMS_VERBS as $level => $verbs) {
             foreach ($verbs as $verb) {
@@ -179,7 +179,7 @@ class learning_outcome_mapper {
         }
 
         $outcomes = self::get_course_outcomes($courseid);
-        
+
         if (empty($outcomes)) {
             return [
                 'mapped' => false,
@@ -194,7 +194,7 @@ class learning_outcome_mapper {
 
         // Find best matching outcomes.
         $matches = [];
-        
+
         foreach ($outcomes as $outcome) {
             $score = self::calculate_alignment_score(
                 $questiontext,
@@ -219,7 +219,7 @@ class learning_outcome_mapper {
         // Store mapping.
         if (!empty($matches)) {
             $bestmatch = $matches[0];
-            
+
             $mapping = new \stdClass();
             $mapping->questionid = $questionid;
             $mapping->outcome_data = json_encode($bestmatch['outcome']);
@@ -228,7 +228,7 @@ class learning_outcome_mapper {
             $mapping->timecreated = time();
 
             // Check if mapping exists.
-            $existing = $DB->get_record('hlai_quizgen_outcome_map', 
+            $existing = $DB->get_record('hlai_quizgen_outcome_map',
                 ['questionid' => $questionid]);
 
             if ($existing) {
@@ -318,7 +318,7 @@ class learning_outcome_mapper {
      */
     private static function tokenize(string $text): array {
         // Remove common stop words.
-        $stopwords = ['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 
+        $stopwords = ['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at',
                       'to', 'for', 'of', 'with', 'is', 'are', 'was', 'were'];
 
         $words = preg_split('/\W+/', $text);
@@ -398,14 +398,14 @@ class learning_outcome_mapper {
             foreach ($data['questions'] as $qid) {
                 $confidences[] = $mappings[$qid]['alignment_score'] ?? 0;
             }
-            $data['avg_confidence'] = count($confidences) > 0 
-                ? array_sum($confidences) / count($confidences) 
+            $data['avg_confidence'] = count($confidences) > 0
+                ? array_sum($confidences) / count($confidences)
                 : 0;
         }
 
         $report['outcome_coverage'] = array_values($coveredoutcomes);
-        $report['coverage_percentage'] = count($outcomes) > 0 
-            ? round(count($coveredoutcomes) / count($outcomes) * 100, 1) 
+        $report['coverage_percentage'] = count($outcomes) > 0
+            ? round(count($coveredoutcomes) / count($outcomes) * 100, 1)
             : 0;
 
         // Find uncovered.

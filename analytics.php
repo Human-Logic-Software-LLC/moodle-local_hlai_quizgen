@@ -79,7 +79,14 @@ switch ($timerange) {
         $timefilter = 0; // All time
 }
 
-// Helper function for time-filtered queries
+/**
+ * Helper function for time-filtered queries.
+ *
+ * @param string $basesql Base SQL query
+ * @param int $timefilter Time filter timestamp
+ * @param string $timefield Time field name
+ * @return string Modified SQL
+ */
 function get_filtered_sql($basesql, $timefilter, $timefield = 'timecreated') {
     if ($timefilter > 0) {
         return $basesql . " AND {$timefield} >= {$timefilter}";
@@ -150,12 +157,12 @@ $total_requests = $DB->count_records_sql($sql, [$userid, $courseid]);
 
 // ===== QUESTION TYPE BREAKDOWN =====
 $sql = get_filtered_sql(
-    "SELECT questiontype, COUNT(*) as count, 
+    "SELECT questiontype, COUNT(*) as count,
             SUM(CASE WHEN status IN ('approved', 'deployed') THEN 1 ELSE 0 END) as approved,
             SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected,
             AVG(validation_score) as avg_quality,
             AVG(regeneration_count) as avg_regen
-     FROM {hlai_quizgen_questions} 
+     FROM {hlai_quizgen_questions}
      WHERE userid = ? AND courseid = ?",
     $timefilter
 );
@@ -210,7 +217,7 @@ echo $OUTPUT->header();
         </div>
         <div class="level-right">
             <div class="buttons">
-                <a href="<?php echo new moodle_url('/local/hlai_quizgen/index.php', ['courseid' => $courseid]); ?>" 
+                <a href="<?php echo new moodle_url('/local/hlai_quizgen/index.php', ['courseid' => $courseid]); ?>"
                    class="button is-light">
                     <span><i class="fa fa-arrow-left" style="color: #64748B;"></i></span>
                     <span>Back to Dashboard</span>
@@ -224,19 +231,19 @@ echo $OUTPUT->header();
         <div class="is-flex is-align-items-center">
             <span class="has-text-weight-semibold mr-3"><i class="fa fa-calendar" style="color: #06B6D4;"></i> Time Range:</span>
             <div class="buttons has-addons">
-                <a href="?courseid=<?php echo $courseid; ?>&timerange=7" 
+                <a href="?courseid=<?php echo $courseid; ?>&timerange=7"
                    class="button is-small <?php echo $timerange === '7' ? 'is-primary' : 'is-light'; ?>">
                     Last 7 Days
                 </a>
-                <a href="?courseid=<?php echo $courseid; ?>&timerange=30" 
+                <a href="?courseid=<?php echo $courseid; ?>&timerange=30"
                    class="button is-small <?php echo $timerange === '30' ? 'is-primary' : 'is-light'; ?>">
                     Last 30 Days
                 </a>
-                <a href="?courseid=<?php echo $courseid; ?>&timerange=90" 
+                <a href="?courseid=<?php echo $courseid; ?>&timerange=90"
                    class="button is-small <?php echo $timerange === '90' ? 'is-primary' : 'is-light'; ?>">
                     Last 90 Days
                 </a>
-                <a href="?courseid=<?php echo $courseid; ?>&timerange=all" 
+                <a href="?courseid=<?php echo $courseid; ?>&timerange=all"
                    class="button is-small <?php echo $timerange === 'all' ? 'is-primary' : 'is-light'; ?>">
                     All Time
                 </a>
@@ -300,7 +307,7 @@ echo $OUTPUT->header();
                 <div id="funnel-chart" style="height: 350px;"></div>
             </div>
         </div>
-        
+
         <div class="column is-half">
             <div class="box">
                 <p class="title is-6"><i class="fa fa-star" style="color: #F59E0B;"></i> Quality Score Distribution</p>
@@ -331,7 +338,7 @@ echo $OUTPUT->header();
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($type_stats as $type => $stats): 
+                            <?php foreach ($type_stats as $type => $stats):
                                 if (empty($type)) continue;
                                 $rate = $stats->count > 0 ? round(($stats->approved / $stats->count) * 100, 1) : 0;
                             ?>
@@ -430,7 +437,7 @@ echo $OUTPUT->header();
             <?php
             // Generate insights based on data
             $insights = [];
-            
+
             if ($ftar < 50) {
                 $insights[] = [
                     'type' => 'warning',
@@ -446,7 +453,7 @@ echo $OUTPUT->header();
                     'message' => 'Your FTAR of ' . $ftar . '% is excellent! The AI is generating high-quality questions that match your expectations.'
                 ];
             }
-            
+
             if ($avg_regenerations > 2) {
                 $insights[] = [
                     'type' => 'warning',
@@ -455,7 +462,7 @@ echo $OUTPUT->header();
                     'message' => 'On average, questions need ' . $avg_regenerations . ' regenerations. Try using more structured content or clearer learning objectives.'
                 ];
             }
-            
+
             // Find best performing question type
             $best_type = null;
             $best_rate = 0;
@@ -476,7 +483,7 @@ echo $OUTPUT->header();
                     'message' => ucfirst($best_type) . ' questions have the highest acceptance rate at ' . round($best_rate, 1) . '%. Consider using more of this type.'
                 ];
             }
-            
+
             if (empty($insights)) {
                 $insights[] = [
                     'type' => 'info',
@@ -485,7 +492,7 @@ echo $OUTPUT->header();
                     'message' => 'Generate more questions to see detailed insights and recommendations based on your usage patterns.'
                 ];
             }
-            
+
             foreach ($insights as $insight):
             ?>
             <div class="column is-one-third">

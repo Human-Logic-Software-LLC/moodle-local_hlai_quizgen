@@ -100,7 +100,7 @@ class distractor_generator {
     private static function parse_distractor_response(string $response): array {
         // Extract JSON from response.
         $response = trim($response);
-        
+
         if (preg_match('/```json\s*(.*?)\s*```/s', $response, $matches)) {
             $response = $matches[1];
         } else if (preg_match('/```\s*(.*?)\s*```/s', $response, $matches)) {

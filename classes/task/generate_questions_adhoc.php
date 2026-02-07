@@ -98,7 +98,7 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
 
             // Build base config from request (as array, not object).
             $questiontypedist = json_decode($request->question_types ?? '{}', true);
-            
+
             // If stored as expanded array (old format), convert to distribution
             if (isset($questiontypedist[0])) {
                 $dist = [];
@@ -107,7 +107,7 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                 }
                 $questiontypedist = $dist;
             }
-            
+
             // CRITICAL FIX: Expand question types into a global array for all questions
             // This ensures correct distribution across all topics
             $globalquestiontypes = [];
@@ -124,7 +124,7 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                     $globalquestiontypes[] = 'multichoice';
                 }
             }
-            
+
             $baseconfig = [
                 'processing_mode' => $request->processing_mode ?? 'balanced',
                 'difficulty_distribution' => json_decode($request->difficulty_distribution ?? '{}', true),
@@ -149,7 +149,7 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                 $topicconfig = $baseconfig;
                 $topicconfig['num_questions'] = $topic->num_questions;
                 $topicconfig['global_question_index'] = $currentquestion;
-                
+
                 // ITEM 7 FIX: Use topic-specific distributions if available, fallback to request-level
                 if (!empty($topic->difficulty_distribution)) {
                     $topicconfig['difficulty_distribution'] = json_decode($topic->difficulty_distribution, true);
@@ -157,7 +157,7 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                 if (!empty($topic->blooms_distribution)) {
                     $topicconfig['blooms_distribution'] = json_decode($topic->blooms_distribution, true);
                 }
-                
+
                 // CRITICAL FIX: Extract this topic's slice from the global question types array
                 // This ensures each topic gets its correct share of each question type
                 $topicquestiontypes = [];

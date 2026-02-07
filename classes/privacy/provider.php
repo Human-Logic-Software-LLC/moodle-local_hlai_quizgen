@@ -26,6 +26,8 @@
 
 namespace local_hlai_quizgen\privacy;
 
+defined('MOODLE_INTERNAL') || die();
+
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;

@@ -142,28 +142,28 @@ class question_refiner {
 
             // Update question text if provided.
             if (!empty($improvements['questiontext'])) {
-                $DB->set_field('hlai_quizgen_questions', 'questiontext', 
+                $DB->set_field('hlai_quizgen_questions', 'questiontext',
                     $improvements['questiontext'], ['id' => $questionid]);
                 $changes[] = 'Updated question text';
             }
 
             // Update difficulty if provided.
             if (!empty($improvements['difficulty'])) {
-                $DB->set_field('hlai_quizgen_questions', 'difficulty', 
+                $DB->set_field('hlai_quizgen_questions', 'difficulty',
                     $improvements['difficulty'], ['id' => $questionid]);
                 $changes[] = 'Updated difficulty level';
             }
 
             // Update Bloom's level if provided.
             if (!empty($improvements['blooms_level'])) {
-                $DB->set_field('hlai_quizgen_questions', 'blooms_level', 
+                $DB->set_field('hlai_quizgen_questions', 'blooms_level',
                     $improvements['blooms_level'], ['id' => $questionid]);
                 $changes[] = 'Updated Bloom\'s taxonomy level';
             }
 
             // Update feedback if provided.
             if (!empty($improvements['generalfeedback'])) {
-                $DB->set_field('hlai_quizgen_questions', 'generalfeedback', 
+                $DB->set_field('hlai_quizgen_questions', 'generalfeedback',
                     $improvements['generalfeedback'], ['id' => $questionid]);
                 $changes[] = 'Updated general feedback';
             }
@@ -317,7 +317,7 @@ class question_refiner {
 
         foreach ($answers as $idx => $answer) {
             $status = $answer->is_correct ? '[CORRECT]' : '[DISTRACTOR]';
-            $selected = isset($distractorperformance[$idx]) ? 
+            $selected = isset($distractorperformance[$idx]) ?
                 " (Selected by {$distractorperformance[$idx]->selection_count} students)" : '';
             $prompt .= "{$status} {$answer->answer}{$selected}\n";
         }

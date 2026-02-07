@@ -70,7 +70,7 @@ $userid = $USER->id;
 
 // Quick stats
 $total_quizzes = $DB->count_records_sql(
-    "SELECT COUNT(DISTINCT id) FROM {hlai_quizgen_requests} 
+    "SELECT COUNT(DISTINCT id) FROM {hlai_quizgen_requests}
      WHERE userid = ? AND status = 'completed'",
     [$userid]
 );
@@ -98,7 +98,7 @@ $pending_questions = $DB->count_records('hlai_quizgen_questions', [
 ]);
 
 $avg_quality = $DB->get_field_sql(
-    "SELECT AVG(validation_score) FROM {hlai_quizgen_questions} 
+    "SELECT AVG(validation_score) FROM {hlai_quizgen_questions}
      WHERE userid = ? AND validation_score IS NOT NULL",
     [$userid]
 );
@@ -106,7 +106,7 @@ $avg_quality = $avg_quality ? round($avg_quality, 1) : 0;
 
 // Calculate acceptance rate (approved + deployed vs rejected)
 $total_reviewed = $DB->count_records_sql(
-    "SELECT COUNT(*) FROM {hlai_quizgen_questions} 
+    "SELECT COUNT(*) FROM {hlai_quizgen_questions}
      WHERE userid = ? AND status IN ('approved', 'deployed', 'rejected')",
     [$userid]
 );
@@ -114,7 +114,7 @@ $acceptance_rate = $total_reviewed > 0 ? round(($approved_questions / $total_rev
 
 // First-time acceptance rate (questions approved/deployed without regeneration out of all reviewed questions)
 $first_time_approved = $DB->count_records_sql(
-    "SELECT COUNT(*) FROM {hlai_quizgen_questions} 
+    "SELECT COUNT(*) FROM {hlai_quizgen_questions}
      WHERE userid = ? AND status IN ('approved', 'deployed') AND (regeneration_count = 0 OR regeneration_count IS NULL)",
     [$userid]
 );
@@ -142,14 +142,14 @@ $course_questions = $DB->count_records('hlai_quizgen_questions', [
 ]);
 
 $course_quizzes = $DB->count_records_sql(
-    "SELECT COUNT(DISTINCT id) FROM {hlai_quizgen_requests} 
+    "SELECT COUNT(DISTINCT id) FROM {hlai_quizgen_requests}
      WHERE userid = ? AND courseid = ? AND status = 'completed'",
     [$userid, $courseid]
 );
 
 // Question type distribution for this course
 $type_distribution = $DB->get_records_sql(
-    "SELECT questiontype, COUNT(*) as count 
+    "SELECT questiontype, COUNT(*) as count
      FROM {hlai_quizgen_questions}
      WHERE userid = ? AND courseid = ?
      GROUP BY questiontype",
@@ -177,12 +177,12 @@ echo $OUTPUT->header();
         <div class="level-right">
             <div class="level-item">
                 <div class="buttons">
-                    <a href="<?php echo new moodle_url('/local/hlai_quizgen/wizard.php', ['courseid' => $courseid]); ?>" 
+                    <a href="<?php echo new moodle_url('/local/hlai_quizgen/wizard.php', ['courseid' => $courseid]); ?>"
                        class="button is-primary">
                         <span class="icon"><i>+</i></span>
                         <span><?php echo get_string('create_new_quiz', 'local_hlai_quizgen'); ?></span>
                     </a>
-                    <a href="<?php echo new moodle_url('/local/hlai_quizgen/analytics.php', ['courseid' => $courseid]); ?>" 
+                    <a href="<?php echo new moodle_url('/local/hlai_quizgen/analytics.php', ['courseid' => $courseid]); ?>"
                        class="button is-light">
                         <span><i class="fa fa-bar-chart" style="color: #3B82F6;"></i></span>
                         <span><?php echo get_string('view_analytics', 'local_hlai_quizgen'); ?></span>
@@ -219,7 +219,7 @@ echo $OUTPUT->header();
                 <p class="title is-3 mb-1"><?php echo $avg_quality > 0 ? $avg_quality . '/100' : 'N/A'; ?></p>
                 <p class="heading"><?php echo get_string('avg_quality_score', 'local_hlai_quizgen'); ?></p>
                 <p class="help <?php echo $avg_quality > 0 ? ($avg_quality >= 70 ? 'has-text-success' : 'has-text-danger') : 'has-text-grey'; ?>">
-                    <?php 
+                    <?php
                     if ($avg_quality > 0) {
                         echo $avg_quality >= 70 ? get_string('quality_good', 'local_hlai_quizgen') : get_string('quality_needs_attention', 'local_hlai_quizgen');
                     } else {
@@ -245,28 +245,28 @@ echo $OUTPUT->header();
     <div class="columns">
         <!-- Left Column: Charts -->
         <div class="column is-two-thirds">
-            
+
             <!-- First-Time Acceptance Rate Chart -->
             <div class="box mb-4">
                 <p class="title is-5"><i class="fa fa-bullseye" style="color: #10B981;"></i> <?php echo get_string('first_time_acceptance_rate', 'local_hlai_quizgen'); ?></p>
                 <p class="subtitle is-6 has-text-grey"><?php echo get_string('questions_approved_without_regen', 'local_hlai_quizgen'); ?></p>
                 <div id="ftar-gauge-chart" style="height: 280px;"></div>
                 <div class="has-text-centered mt-3">
-                    <?php 
+                    <?php
                     $ftar_status = '';
                     $ftar_class = '';
-                    if ($ftar >= 75) { 
-                        $ftar_status = get_string('ftar_excellent', 'local_hlai_quizgen'); 
-                        $ftar_class = 'is-success'; 
-                    } else if ($ftar >= 60) { 
-                        $ftar_status = get_string('ftar_good', 'local_hlai_quizgen'); 
-                        $ftar_class = 'is-warning'; 
-                    } else if ($ftar >= 45) { 
-                        $ftar_status = get_string('ftar_fair', 'local_hlai_quizgen'); 
-                        $ftar_class = 'is-warning'; 
-                    } else { 
-                        $ftar_status = get_string('ftar_needs_attention', 'local_hlai_quizgen'); 
-                        $ftar_class = 'is-danger'; 
+                    if ($ftar >= 75) {
+                        $ftar_status = get_string('ftar_excellent', 'local_hlai_quizgen');
+                        $ftar_class = 'is-success';
+                    } else if ($ftar >= 60) {
+                        $ftar_status = get_string('ftar_good', 'local_hlai_quizgen');
+                        $ftar_class = 'is-warning';
+                    } else if ($ftar >= 45) {
+                        $ftar_status = get_string('ftar_fair', 'local_hlai_quizgen');
+                        $ftar_class = 'is-warning';
+                    } else {
+                        $ftar_status = get_string('ftar_needs_attention', 'local_hlai_quizgen');
+                        $ftar_class = 'is-danger';
                     }
                     ?>
                     <span class="tag <?php echo $ftar_class; ?> is-medium">
@@ -292,7 +292,7 @@ echo $OUTPUT->header();
                             <div class="has-text-centered py-6">
                                 <span style="font-size: 3rem;"><i class="fa fa-bar-chart" style="color: #CBD5E1;"></i></span>
                                 <p class="has-text-grey mt-3"><?php echo get_string('no_questions_yet', 'local_hlai_quizgen'); ?></p>
-                                <a href="<?php echo new moodle_url('/local/hlai_quizgen/wizard.php', ['courseid' => $courseid]); ?>" 
+                                <a href="<?php echo new moodle_url('/local/hlai_quizgen/wizard.php', ['courseid' => $courseid]); ?>"
                                    class="button is-primary is-outlined is-small mt-3">
                                     <?php echo get_string('create_first_quiz', 'local_hlai_quizgen'); ?>
                                 </a>
@@ -329,7 +329,7 @@ echo $OUTPUT->header();
 
         <!-- Right Column: Actions & Activity -->
         <div class="column is-one-third">
-            
+
             <!-- Quick Actions -->
             <div class="panel mb-4">
                 <p class="panel-heading"><i class="fa fa-bolt" style="color: #F59E0B;"></i> <?php echo get_string('quick_actions', 'local_hlai_quizgen'); ?></p>
@@ -359,24 +359,24 @@ echo $OUTPUT->header();
                     </div>
                 </div>
                 <?php else: ?>
-                <?php foreach ($recent_requests as $request): 
+                <?php foreach ($recent_requests as $request):
                     $status_icon = '';
                     $status_class = '';
                     switch ($request->status) {
-                        case 'completed': 
-                            $status_icon = '<i class="fa fa-check-circle" style="color: #10B981;"></i>'; 
+                        case 'completed':
+                            $status_icon = '<i class="fa fa-check-circle" style="color: #10B981;"></i>';
                             $status_class = 'is-success';
                             break;
-                        case 'processing': 
-                            $status_icon = '<i class="fa fa-spinner fa-spin" style="color: #F59E0B;"></i>'; 
+                        case 'processing':
+                            $status_icon = '<i class="fa fa-spinner fa-spin" style="color: #F59E0B;"></i>';
                             $status_class = 'is-warning';
                             break;
-                        case 'failed': 
-                            $status_icon = '<i class="fa fa-times-circle" style="color: #EF4444;"></i>'; 
+                        case 'failed':
+                            $status_icon = '<i class="fa fa-times-circle" style="color: #EF4444;"></i>';
                             $status_class = 'is-danger';
                             break;
-                        default: 
-                            $status_icon = '<i class="fa fa-file" style="color: #64748B;"></i>'; 
+                        default:
+                            $status_icon = '<i class="fa fa-file" style="color: #64748B;"></i>';
                             $status_class = 'is-info';
                     }
                     $timeago = format_time(time() - $request->timecreated);

@@ -43,9 +43,9 @@ if (file_exists($logfile)) {
     $quizgenlines = array_filter($lines, function($line) {
         return strpos($line, 'HLAI QuizGen') !== false;
     });
-    
+
     $recent = array_slice($quizgenlines, -50); // Last 50 lines
-    
+
     if (empty($recent)) {
         echo '<div class="notification is-info is-light">No HLAI QuizGen log entries found yet. Try submitting the form.</div>';
     } else {
@@ -55,7 +55,7 @@ if (file_exists($logfile)) {
         echo '</pre>';
         echo '</div>';
     }
-    
+
     echo '<div class="buttons mt-3">';
     echo '<a href="javascript:location.reload();" class="button is-primary">Refresh Logs</a>';
     echo '<a href="wizard.php?courseid=3" class="button is-light">Back to Wizard</a>';
@@ -63,7 +63,7 @@ if (file_exists($logfile)) {
 } else {
     echo '<div class="notification is-warning is-light">Log file not found at: ' . htmlspecialchars($logfile) . '</div>';
     echo '<p>Trying alternate location...</p>';
-    
+
     $altlog = ini_get('error_log');
     echo '<p>PHP error_log setting: ' . htmlspecialchars($altlog) . '</p>';
 }

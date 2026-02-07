@@ -64,7 +64,7 @@ class content_extractor {
 
         foreach ($sources as $source) {
             $type = $source['type'] ?? '';
-            
+
             try {
                 if ($type === 'file') {
                     $result = self::extract_from_file($source['path']);
@@ -514,7 +514,7 @@ class content_extractor {
 
         return $text;
     }
-    
+
     /**
      * Extract content from URL.
      *
@@ -528,11 +528,11 @@ class content_extractor {
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
             throw new \moodle_exception('error:invalidurl', 'local_hlai_quizgen');
         }
-        
+
         try {
             // Use Moodle's curl wrapper.
             require_once(dirname(__DIR__, 3) . '/lib/filelib.php');
-            
+
             $curl = new \curl();
             $curl->setopt([
                 'CURLOPT_TIMEOUT' => 30,
@@ -540,48 +540,48 @@ class content_extractor {
                 'CURLOPT_MAXREDIRS' => 5,
                 'CURLOPT_SSL_VERIFYPEER' => true,
             ]);
-            
+
             $content = $curl->get($url);
-            
+
             if (empty($content)) {
                 throw new \Exception('Empty response from URL');
             }
-            
+
             // Extract title.
             $title = '';
             if (preg_match('/<title[^>]*>(.*?)<\/title>/is', $content, $matches)) {
                 $title = trim(strip_tags($matches[1]));
             }
-            
+
             // Remove script and style tags.
             $content = preg_replace('/<script[^>]*>.*?<\/script>/is', '', $content);
             $content = preg_replace('/<style[^>]*>.*?<\/style>/is', '', $content);
-            
+
             // Strip all HTML tags.
             $text = strip_tags($content);
-            
+
             // Clean up whitespace.
             $text = preg_replace('/\s+/', ' ', $text);
             $text = trim($text);
-            
+
             // Limit length.
             if (strlen($text) > $maxlength) {
                 $text = substr($text, 0, $maxlength) . '... (content truncated)';
             }
-            
+
             $wordcount = str_word_count($text);
-            
+
             return [
                 'text' => $text,
                 'word_count' => $wordcount,
                 'title' => $title ?: parse_url($url, PHP_URL_HOST),
             ];
-            
+
         } catch (\Exception $e) {
             throw new \moodle_exception('error:urlextraction', 'local_hlai_quizgen', '', 'Failed to extract content from URL: ' . $e->getMessage());
         }
     }
-    
+
     /**
      * Extract content from Moodle activity.
      *
@@ -652,7 +652,7 @@ class content_extractor {
         global $DB;
 
         $page = $DB->get_record('page', ['id' => $cm->instance], '*', MUST_EXIST);
-        
+
         $text = "# " . $page->name . "\n\n";
         if (!empty($page->intro)) {
             $text .= self::html_to_structured_text($page->intro) . "\n\n";
@@ -724,7 +724,7 @@ class content_extractor {
         global $DB;
 
         $resource = $DB->get_record('resource', ['id' => $cm->instance], '*', MUST_EXIST);
-        
+
         // Get file from file storage.
         $fs = get_file_storage();
         $context = \context_module::instance($cm->id);
@@ -737,7 +737,7 @@ class content_extractor {
         $file = reset($files);
         $filepath = $file->copy_content_to_temp();
         $originalfilename = $file->get_filename();
-        
+
         try {
             $result = self::extract_from_file($filepath, $originalfilename);
             unlink($filepath);  // Clean up temp file.
@@ -761,21 +761,21 @@ class content_extractor {
         global $DB;
 
         $url = $DB->get_record('url', ['id' => $cm->instance], '*', MUST_EXIST);
-        
+
         // Get URL details.
         $text = '';
-        
+
         if (!empty($url->name)) {
             $text .= "# " . $url->name . "\n\n";
         }
-        
+
         if (!empty($url->intro)) {
             $text .= self::html_to_structured_text($url->intro) . "\n\n";
         }
-        
+
         if (!empty($url->externalurl)) {
             $text .= "URL: " . $url->externalurl . "\n\n";
-            
+
             // Try to fetch and extract content from the URL if possible.
             try {
                 $content = self::fetch_url_content($url->externalurl);
@@ -786,7 +786,7 @@ class content_extractor {
                 // If URL fetch fails, continue with what we have.
             }
         }
-        
+
         return $text;
     }
 
@@ -800,17 +800,17 @@ class content_extractor {
         global $DB;
 
         $folder = $DB->get_record('folder', ['id' => $cm->instance], '*', MUST_EXIST);
-        
+
         $text = '';
-        
+
         if (!empty($folder->name)) {
             $text .= "# " . $folder->name . "\n\n";
         }
-        
+
         if (!empty($folder->intro)) {
             $text .= self::html_to_structured_text($folder->intro) . "\n\n";
         }
-        
+
         // Get files from folder.
         $fs = get_file_storage();
         $context = \context_module::instance($cm->id);
@@ -820,11 +820,11 @@ class content_extractor {
             foreach ($files as $file) {
                 $filename = $file->get_filename();
                 $text .= "## File: " . $filename . "\n\n";
-                
+
                 // Try to extract content from supported file types.
                 $filepath = $file->copy_content_to_temp();
                 $originalfilename = $file->get_filename();
-                
+
                 try {
                     $result = self::extract_from_file($filepath, $originalfilename);
                     $text .= $result['text'] . "\n\n";
@@ -837,7 +837,7 @@ class content_extractor {
                 }
             }
         }
-        
+
         return $text;
     }
 
@@ -852,26 +852,26 @@ class content_extractor {
         if (!filter_var($url, FILTER_VALIDATE_URL)) {
             return '';
         }
-        
+
         // Only fetch from HTTP/HTTPS URLs.
         $scheme = parse_url($url, PHP_URL_SCHEME);
         if (!in_array($scheme, ['http', 'https'])) {
             return '';
         }
-        
+
         // Use Moodle's curl wrapper for security.
         $curl = new \curl();
         $curl->setopt(['CURLOPT_TIMEOUT' => 10, 'CURLOPT_FOLLOWLOCATION' => true]);
-        
+
         $content = $curl->get($url);
-        
+
         if (empty($content)) {
             return '';
         }
-        
+
         // Extract text from HTML.
         $text = self::html_to_structured_text($content);
-        
+
         return $text;
     }
 
@@ -884,10 +884,10 @@ class content_extractor {
     private static function clean_text(string $text): string {
         // Remove excessive whitespace.
         $text = preg_replace('/\s+/', ' ', $text);
-        
+
         // Remove multiple line breaks.
         $text = preg_replace('/\n{3,}/', "\n\n", $text);
-        
+
         // Trim.
         $text = trim($text);
 
@@ -970,10 +970,10 @@ class content_extractor {
 
         return $allcontent;
     }
-    
+
     /**
      * Extract content from SCORM package.
-     * 
+     *
      * Extracts text from SCORM packages by:
      * 1. Locating the SCORM package ZIP file
      * 2. Parsing imsmanifest.xml for content structure
@@ -984,57 +984,57 @@ class content_extractor {
      */
     private static function extract_from_scorm(\stdClass $cm): string {
         global $DB, $CFG;
-        
+
         require_once($CFG->dirroot . '/mod/scorm/lib.php');
-        
+
         $text = '';
-        
+
         try {
             // Get SCORM instance.
             $scorm = $DB->get_record('scorm', ['id' => $cm->instance], '*', MUST_EXIST);
-            
+
             // Get SCORM package directory.
             $fs = get_file_storage();
             $context = \context_module::instance($cm->id);
-            
+
             // Get package file.
             $files = $fs->get_area_files($context->id, 'mod_scorm', 'package', 0, 'itemid, filepath, filename', false);
-            
+
             if (empty($files)) {
                 return '';
             }
-            
+
             $packagefile = reset($files);
-            
+
             // Create temp directory.
             $tempdir = make_temp_directory('hlai_scorm_' . $cm->id);
             $zipfile = $tempdir . '/package.zip';
-            
+
             // Save package to temp file.
             $packagefile->copy_content_to($zipfile);
-            
+
             // Extract ZIP.
             $extractdir = $tempdir . '/extracted';
             if (!mkdir($extractdir, 0777, true)) {
                 return '';
             }
-            
+
             $zip = new \ZipArchive();
             if ($zip->open($zipfile) === true) {
                 $zip->extractTo($extractdir);
                 $zip->close();
-                
+
                 // Parse imsmanifest.xml for content files.
                 $manifestfile = $extractdir . '/imsmanifest.xml';
                 $contentfiles = [];
-                
+
                 if (file_exists($manifestfile)) {
                     $manifest = simplexml_load_file($manifestfile);
                     if ($manifest) {
                         // Extract resource hrefs from manifest.
                         $manifest->registerXPathNamespace('imscp', 'http://www.imsglobal.org/xsd/imscp_v1p1');
                         $manifest->registerXPathNamespace('adlcp', 'http://www.adlnet.org/xsd/adlcp_v1p3');
-                        
+
                         $resources = $manifest->xpath('//resource[@href]');
                         foreach ($resources as $resource) {
                             $href = (string)$resource['href'];
@@ -1042,7 +1042,7 @@ class content_extractor {
                                 $contentfiles[] = $href;
                             }
                         }
-                        
+
                         // Also check for file elements.
                         $files = $manifest->xpath('//file[@href]');
                         foreach ($files as $file) {
@@ -1053,7 +1053,7 @@ class content_extractor {
                         }
                     }
                 }
-                
+
                 // If no manifest or no files found, scan for HTML files.
                 if (empty($contentfiles)) {
                     $iterator = new \RecursiveIteratorIterator(
@@ -1069,28 +1069,28 @@ class content_extractor {
                         }
                     }
                 }
-                
+
                 // Extract text from HTML files.
                 foreach ($contentfiles as $contentfile) {
                     $filepath = $extractdir . '/' . $contentfile;
                     if (file_exists($filepath) && is_file($filepath)) {
                         $htmlcontent = file_get_contents($filepath);
-                        
+
                         // Strip HTML tags and extract text.
                         $plaintext = strip_tags($htmlcontent);
                         // Clean up whitespace.
                         $plaintext = preg_replace('/\s+/', ' ', $plaintext);
                         $plaintext = trim($plaintext);
-                        
+
                         if (!empty($plaintext)) {
                             $text .= $plaintext . "\n\n";
                         }
                     }
                 }
-                
+
                 // Clean up temp directory.
                 self::delete_directory($tempdir);
-                
+
             } else {
                 self::delete_directory($tempdir);
                 return '';
@@ -1099,10 +1099,10 @@ class content_extractor {
         } catch (\Exception $e) {
             // SCORM extraction failed - return whatever text we have.
         }
-        
+
         return $text;
     }
-    
+
     /**
      * Recursively delete a directory.
      *
@@ -1113,21 +1113,21 @@ class content_extractor {
         if (!file_exists($dir)) {
             return true;
         }
-        
+
         if (!is_dir($dir)) {
             return unlink($dir);
         }
-        
+
         foreach (scandir($dir) as $item) {
             if ($item == '.' || $item == '..') {
                 continue;
             }
-            
+
             if (!self::delete_directory($dir . DIRECTORY_SEPARATOR . $item)) {
                 return false;
             }
         }
-        
+
         return rmdir($dir);
     }
 
@@ -1209,27 +1209,27 @@ class content_extractor {
         $html = preg_replace('/<h4[^>]*>(.*?)<\/h4>/is', "\n\n#### $1\n\n", $html);
         $html = preg_replace('/<h5[^>]*>(.*?)<\/h5>/is', "\n\n##### $1\n\n", $html);
         $html = preg_replace('/<h6[^>]*>(.*?)<\/h6>/is', "\n\n###### $1\n\n", $html);
-        
+
         // Convert lists.
         $html = preg_replace('/<li[^>]*>(.*?)<\/li>/is', "- $1\n", $html);
         $html = preg_replace('/<\/ul>|<\/ol>/is', "\n", $html);
-        
+
         // Convert paragraphs.
         $html = preg_replace('/<p[^>]*>(.*?)<\/p>/is', "$1\n\n", $html);
-        
+
         // Convert line breaks.
         $html = preg_replace('/<br\s*\/?>/i', "\n", $html);
-        
+
         // Preserve strong/bold as emphasis.
         $html = preg_replace('/<(strong|b)[^>]*>(.*?)<\/\1>/is', "**$2**", $html);
-        
+
         // Remove remaining HTML tags.
         $text = strip_tags($html);
-        
+
         // Clean up whitespace.
         $text = preg_replace('/\n{4,}/', "\n\n\n", $text);
         $text = preg_replace('/ +/', ' ', $text);
-        
+
         return trim($text);
     }
 }

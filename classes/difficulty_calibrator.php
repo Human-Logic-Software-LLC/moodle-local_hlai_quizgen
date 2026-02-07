@@ -117,7 +117,7 @@ class difficulty_calibrator {
         global $DB;
 
         $questions = $DB->get_records('hlai_quizgen_questions', ['requestid' => $requestid]);
-        
+
         $results = [
             'total' => count($questions),
             'calibrated' => 0,
@@ -129,7 +129,7 @@ class difficulty_calibrator {
         foreach ($questions as $question) {
             if ($question->moodle_questionid) {
                 $calibration = self::calibrate_question($question->moodle_questionid);
-                
+
                 if ($calibration['calibrated']) {
                     $results['calibrated']++;
                     if ($calibration['mismatch']) {
@@ -156,7 +156,7 @@ class difficulty_calibrator {
         global $DB;
 
         // Query question attempt data.
-        $sql = "SELECT 
+        $sql = "SELECT
                     COUNT(*) as attempt_count,
                     SUM(CASE WHEN qa.responsesummary = qa.rightanswer THEN 1 ELSE 0 END) as correct_count,
                     SUM(CASE WHEN qa.fraction >= 0.5 THEN 1 ELSE 0 END) as partial_correct_count
@@ -199,13 +199,13 @@ class difficulty_calibrator {
         global $DB;
 
         // Get top 27% and bottom 27% of students by overall quiz performance.
-        $sql = "SELECT 
+        $sql = "SELECT
                     qa.userid,
                     qa.fraction as question_score,
                     quiz_totals.total_score
                 FROM {question_attempts} qa
                 JOIN (
-                    SELECT 
+                    SELECT
                         qua.userid,
                         AVG(qua.sumgrades / q.sumgrades) as total_score
                     FROM {quiz_attempts} qua
@@ -227,7 +227,7 @@ class difficulty_calibrator {
         $bottomcount = (int)ceil($count * 0.27);
 
         $attemptarray = array_values($attempts);
-        
+
         // Top group.
         $topgroup = array_slice($attemptarray, 0, $topcount);
         $topsuccess = array_sum(array_column($topgroup, 'question_score')) / $topcount;
@@ -268,7 +268,7 @@ class difficulty_calibrator {
      */
     private static function assess_question_quality(float $successrate, float $discrimination): string {
         // Ideal: 40-70% success rate, discrimination > 0.3.
-        
+
         if ($discrimination < 0) {
             return 'poor_discriminator'; // Question doesn't distinguish ability.
         }
@@ -376,8 +376,8 @@ class difficulty_calibrator {
             $recommendations[] = [
                 'issue' => 'difficulty_mismatch',
                 'severity' => 'low',
-                'message' => sprintf('Actual difficulty (%s) differs from intended (%s)', 
-                    $calibration['actual_difficulty'], 
+                'message' => sprintf('Actual difficulty (%s) differs from intended (%s)',
+                    $calibration['actual_difficulty'],
                     $calibration['original_difficulty']),
                 'suggestions' => [
                     'Update difficulty classification',
@@ -389,13 +389,13 @@ class difficulty_calibrator {
 
         // Overall assessment.
         $quality = $calibration['quality_indicator'];
-        
+
         return [
             'type' => 'analysis',
             'quality' => $quality,
             'calibration' => $calibration,
             'recommendations' => $recommendations,
-            'overall_status' => empty($recommendations) ? 'excellent' : 
+            'overall_status' => empty($recommendations) ? 'excellent' :
                 (count($recommendations) > 2 ? 'needs_improvement' : 'good')
         ];
     }
@@ -415,8 +415,8 @@ class difficulty_calibrator {
                 'calibrated' => $calibration['calibrated'],
                 'insufficient_data' => $calibration['insufficient_data'],
                 'difficulty_mismatches' => $calibration['mismatches'],
-                'calibration_rate' => $calibration['total'] > 0 
-                    ? round($calibration['calibrated'] / $calibration['total'] * 100, 1) 
+                'calibration_rate' => $calibration['total'] > 0
+                    ? round($calibration['calibrated'] / $calibration['total'] * 100, 1)
                     : 0
             ],
             'questions' => [],
@@ -477,7 +477,7 @@ class difficulty_calibrator {
             }
 
             $quality = $data['quality_indicator'] ?? 'unknown';
-            
+
             if ($quality === 'excellent') {
                 $excellentcount++;
             } else if (in_array($quality, ['good_discriminator', 'acceptable'])) {

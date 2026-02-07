@@ -29,7 +29,8 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @param navigation_node $navigation Navigation node
  * @param stdClass $course Course object
- * @param context $context Course context
+ * @param context_course $context Course context
+ * @return void
  */
 function local_hlai_quizgen_extend_navigation_course(navigation_node $navigation, stdClass $course, context_course $context) {
     if (has_capability('local/hlai_quizgen:generatequestions', $context)) {
@@ -75,7 +76,7 @@ function local_hlai_quizgen_before_http_headers() {
  * @param array $args Extra arguments
  * @param bool $forcedownload Force download
  * @param array $options Additional options
- * @return bool False if file not found, does not return if found - just send the file
+ * @return bool False if file not found, does not return if found
  */
 function local_hlai_quizgen_pluginfile($course, $cm, $context, $filearea, $args, $forcedownload, array $options = []) {
     global $DB, $USER;

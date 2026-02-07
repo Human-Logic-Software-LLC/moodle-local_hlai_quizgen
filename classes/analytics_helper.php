@@ -133,7 +133,7 @@ class analytics_helper {
         $stats->rejected_questions = $DB->count_records_sql($sql, $params);
 
         // Average quality score
-        $sql = "SELECT AVG(validation_score) FROM {hlai_quizgen_questions} 
+        $sql = "SELECT AVG(validation_score) FROM {hlai_quizgen_questions}
                 WHERE userid = ? AND validation_score IS NOT NULL";
         $params = [$this->userid];
         if ($this->courseid) {
@@ -148,7 +148,7 @@ class analytics_helper {
         $stats->avg_quality = $avg ? round($avg, 1) : 0;
 
         // First-time acceptance rate
-        $sql = "SELECT COUNT(*) FROM {hlai_quizgen_questions} 
+        $sql = "SELECT COUNT(*) FROM {hlai_quizgen_questions}
                 WHERE userid = ? AND status = 'approved' AND regeneration_count = 0";
         $params = [$this->userid];
         if ($this->courseid) {
@@ -179,22 +179,22 @@ class analytics_helper {
             $params[] = $this->timefilter;
         }
         $stats->total_regenerations = $DB->get_field_sql($sql, $params) ?: 0;
-        $stats->avg_regenerations = $stats->total_questions > 0 
-            ? round($stats->total_regenerations / $stats->total_questions, 2) 
+        $stats->avg_regenerations = $stats->total_questions > 0
+            ? round($stats->total_regenerations / $stats->total_questions, 2)
             : 0;
 
         return $stats;
     }
 
     /**
-     * Get question type distribution
+     * Get question type distribution.
      *
      * @return array Distribution data keyed by question type
      */
     public function get_question_type_distribution() {
         global $DB;
 
-        $sql = "SELECT questiontype, COUNT(*) as count 
+        $sql = "SELECT questiontype, COUNT(*) as count
                 FROM {hlai_quizgen_questions}
                 WHERE userid = ?";
         $params = [$this->userid];
@@ -221,7 +221,7 @@ class analytics_helper {
     public function get_difficulty_distribution() {
         global $DB;
 
-        $sql = "SELECT difficulty, COUNT(*) as count 
+        $sql = "SELECT difficulty, COUNT(*) as count
                 FROM {hlai_quizgen_questions}
                 WHERE userid = ?";
         $params = [$this->userid];
@@ -257,14 +257,14 @@ class analytics_helper {
     }
 
     /**
-     * Get Bloom's taxonomy distribution
+     * Get Bloom's taxonomy distribution.
      *
      * @return array Distribution data keyed by Bloom's level
      */
     public function get_blooms_distribution() {
         global $DB;
 
-        $sql = "SELECT blooms_level, COUNT(*) as count 
+        $sql = "SELECT blooms_level, COUNT(*) as count
                 FROM {hlai_quizgen_questions}
                 WHERE userid = ? AND blooms_level IS NOT NULL";
         $params = [$this->userid];
@@ -303,7 +303,7 @@ class analytics_helper {
     }
 
     /**
-     * Get acceptance trend data over time
+     * Get acceptance trend data over time.
      *
      * @param int $days Number of days to look back
      * @return array Trend data with labels, acceptance_rates, and ftar_rates
@@ -328,7 +328,7 @@ class analytics_helper {
             $data['labels'][] = date('M j', $periodstart);
 
             // Get stats for this period
-            $sql = "SELECT 
+            $sql = "SELECT
                         COUNT(*) as total,
                         SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
                         SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected,
@@ -345,11 +345,11 @@ class analytics_helper {
             $row = $DB->get_record_sql($sql, $params);
 
             $reviewed = ($row->approved ?? 0) + ($row->rejected ?? 0);
-            $data['acceptance_rates'][] = $reviewed > 0 
-                ? round(($row->approved / $reviewed) * 100, 1) 
+            $data['acceptance_rates'][] = $reviewed > 0
+                ? round(($row->approved / $reviewed) * 100, 1)
                 : 0;
-            $data['ftar_rates'][] = $row->total > 0 
-                ? round(($row->first_time / $row->total) * 100, 1) 
+            $data['ftar_rates'][] = $row->total > 0
+                ? round(($row->first_time / $row->total) * 100, 1)
                 : 0;
         }
 
@@ -357,14 +357,14 @@ class analytics_helper {
     }
 
     /**
-     * Get regeneration statistics by question type
+     * Get regeneration statistics by question type.
      *
      * @return array Regeneration stats keyed by question type
      */
     public function get_regeneration_by_type() {
         global $DB;
 
-        $sql = "SELECT questiontype, 
+        $sql = "SELECT questiontype,
                        COUNT(*) as total,
                        SUM(regeneration_count) as total_regens,
                        AVG(regeneration_count) as avg_regenerations
@@ -400,7 +400,7 @@ class analytics_helper {
     }
 
     /**
-     * Get quality score distribution
+     * Get quality score distribution.
      *
      * @return array Distribution in ranges (0-20, 21-40, 41-60, 61-80, 81-100)
      */
@@ -438,7 +438,7 @@ class analytics_helper {
     }
 
     /**
-     * Get recent requests/activity
+     * Get recent requests/activity.
      *
      * @param int $limit Maximum number of records
      * @return array Recent requests with course info
@@ -492,7 +492,7 @@ class analytics_helper {
     }
 
     /**
-     * Get course-specific analytics
+     * Get course-specific analytics.
      *
      * @return array Course analytics data
      */
@@ -503,7 +503,7 @@ class analytics_helper {
             return [];
         }
 
-        $sql = "SELECT 
+        $sql = "SELECT
                     c.id as courseid,
                     c.fullname as coursename,
                     COUNT(q.id) as total_questions,

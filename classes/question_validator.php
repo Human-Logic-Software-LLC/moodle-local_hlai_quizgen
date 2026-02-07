@@ -593,11 +593,11 @@ class question_validator {
      */
     public static function validate_batch(array $questions): array {
         $results = [];
-        
+
         foreach ($questions as $questiondata) {
             $question = $questiondata['question'] ?? null;
             $answers = $questiondata['answers'] ?? [];
-            
+
             if ($question) {
                 $results[] = self::validate_question($question, $answers);
             }

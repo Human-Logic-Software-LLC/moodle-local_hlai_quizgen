@@ -43,7 +43,14 @@ require_sesskey();
 // Set JSON header.
 header('Content-Type: application/json; charset=utf-8');
 
-// Response helper.
+/**
+ * Send JSON response helper.
+ *
+ * @param bool $success Success status
+ * @param array $data Response data
+ * @param string $message Response message
+ * @return void
+ */
 function send_response($success, $data = [], $message = '') {
     echo json_encode([
         'success' => $success,
@@ -54,6 +61,13 @@ function send_response($success, $data = [], $message = '') {
     exit;
 }
 
+/**
+ * Send error response.
+ *
+ * @param string $message Error message
+ * @param int $code HTTP status code
+ * @return void
+ */
 function send_error($message, $code = 400) {
     http_response_code($code);
     send_response(false, [], $message);
@@ -75,65 +89,65 @@ try {
         case 'dashboardstats':
             // Get quick stats for dashboard cards
             $userid = $USER->id;
-            
+
             // Total quizzes created by user
             $total_quizzes = $DB->count_records_sql(
-                "SELECT COUNT(DISTINCT r.id) 
-                 FROM {hlai_quizgen_requests} r 
+                "SELECT COUNT(DISTINCT r.id)
+                 FROM {hlai_quizgen_requests} r
                  WHERE r.userid = ? AND r.status = 'completed'",
                 [$userid]
             );
-            
+
             // Total questions generated
             $total_questions = $DB->count_records_sql(
-                "SELECT COUNT(q.id) 
-                 FROM {hlai_quizgen_questions} q 
+                "SELECT COUNT(q.id)
+                 FROM {hlai_quizgen_questions} q
                  WHERE q.userid = ?",
                 [$userid]
             );
-            
+
             // Questions approved
             $approved_questions = $DB->count_records_sql(
-                "SELECT COUNT(q.id) 
-                 FROM {hlai_quizgen_questions} q 
+                "SELECT COUNT(q.id)
+                 FROM {hlai_quizgen_questions} q
                  WHERE q.userid = ? AND q.status = 'approved'",
                 [$userid]
             );
-            
+
             // Average quality score
             $avg_quality = $DB->get_field_sql(
-                "SELECT AVG(q.validation_score) 
-                 FROM {hlai_quizgen_questions} q 
+                "SELECT AVG(q.validation_score)
+                 FROM {hlai_quizgen_questions} q
                  WHERE q.userid = ? AND q.validation_score IS NOT NULL",
                 [$userid]
             );
-            
+
             // Acceptance rate
             $total_reviewed = $DB->count_records_sql(
-                "SELECT COUNT(q.id) 
-                 FROM {hlai_quizgen_questions} q 
+                "SELECT COUNT(q.id)
+                 FROM {hlai_quizgen_questions} q
                  WHERE q.userid = ? AND q.status IN ('approved', 'rejected')",
                 [$userid]
             );
             $acceptance_rate = $total_reviewed > 0 ? round(($approved_questions / $total_reviewed) * 100, 1) : 0;
-            
+
             // First-time acceptance rate
             $first_time_approved = $DB->count_records_sql(
-                "SELECT COUNT(q.id) 
-                 FROM {hlai_quizgen_questions} q 
+                "SELECT COUNT(q.id)
+                 FROM {hlai_quizgen_questions} q
                  WHERE q.userid = ? AND q.status = 'approved' AND q.regeneration_count = 0",
                 [$userid]
             );
             $ftar = $approved_questions > 0 ? round(($first_time_approved / $approved_questions) * 100, 1) : 0;
-            
+
             // Average regeneration count
             $avg_regen = $DB->get_field_sql(
-                "SELECT AVG(q.regeneration_count) 
-                 FROM {hlai_quizgen_questions} q 
+                "SELECT AVG(q.regeneration_count)
+                 FROM {hlai_quizgen_questions} q
                  WHERE q.userid = ?",
                 [$userid]
             );
-            
+
             send_response(true, [
                 'total_quizzes' => (int)$total_quizzes,
                 'total_questions' => (int)$total_questions,
@@ -149,30 +163,30 @@ try {
             // Get question type distribution for charts
             $userid = $USER->id;
             $filter_courseid = optional_param('filtercourseid', 0, PARAM_INT);
-            
+
             $params = [$userid];
             $course_filter = '';
             if ($filter_courseid > 0) {
                 $course_filter = ' AND q.courseid = ?';
                 $params[] = $filter_courseid;
             }
-            
+
             $types = $DB->get_records_sql(
-                "SELECT q.questiontype, COUNT(q.id) as count 
-                 FROM {hlai_quizgen_questions} q 
+                "SELECT q.questiontype, COUNT(q.id) as count
+                 FROM {hlai_quizgen_questions} q
                  WHERE q.userid = ? $course_filter
-                 GROUP BY q.questiontype 
+                 GROUP BY q.questiontype
                  ORDER BY count DESC",
                 $params
             );
-            
+
             $labels = [];
             $values = [];
             foreach ($types as $type) {
                 $labels[] = ucfirst(str_replace('_', ' ', $type->questiontype));
                 $values[] = (int)$type->count;
             }
-            
+
             send_response(true, [
                 'labels' => $labels,
                 'values' => $values
@@ -182,37 +196,37 @@ try {
         case 'difficultydist':
             // Get difficulty distribution
             $userid = $USER->id;
-            
+
             $difficulties = $DB->get_records_sql(
-                "SELECT q.difficulty, COUNT(q.id) as count 
-                 FROM {hlai_quizgen_questions} q 
+                "SELECT q.difficulty, COUNT(q.id) as count
+                 FROM {hlai_quizgen_questions} q
                  WHERE q.userid = ?
                  GROUP BY q.difficulty",
                 [$userid]
             );
-            
+
             $dist = ['easy' => 0, 'medium' => 0, 'hard' => 0];
             foreach ($difficulties as $d) {
                 if (isset($dist[$d->difficulty])) {
                     $dist[$d->difficulty] = (int)$d->count;
                 }
             }
-            
+
             send_response(true, $dist);
             break;
 
         case 'bloomsdist':
             // Get Bloom's taxonomy distribution
             $userid = $USER->id;
-            
+
             $blooms = $DB->get_records_sql(
-                "SELECT q.blooms_level, COUNT(q.id) as count 
-                 FROM {hlai_quizgen_questions} q 
+                "SELECT q.blooms_level, COUNT(q.id) as count
+                 FROM {hlai_quizgen_questions} q
                  WHERE q.userid = ? AND q.blooms_level IS NOT NULL
                  GROUP BY q.blooms_level",
                 [$userid]
             );
-            
+
             $dist = [
                 'remember' => 0,
                 'understand' => 0,
@@ -227,7 +241,7 @@ try {
                     $dist[$level] = (int)$b->count;
                 }
             }
-            
+
             send_response(true, $dist);
             break;
 
@@ -235,31 +249,31 @@ try {
             // Get acceptance rate trend over last N quiz generations
             $userid = $USER->id;
             $limit = optional_param('limit', 10, PARAM_INT);
-            
+
             $requests = $DB->get_records_sql(
                 "SELECT r.id, r.timecreated,
                         (SELECT COUNT(*) FROM {hlai_quizgen_questions} q WHERE q.requestid = r.id AND q.status = 'approved') as approved,
                         (SELECT COUNT(*) FROM {hlai_quizgen_questions} q WHERE q.requestid = r.id AND q.status IN ('approved', 'rejected')) as total
-                 FROM {hlai_quizgen_requests} r 
+                 FROM {hlai_quizgen_requests} r
                  WHERE r.userid = ? AND r.status = 'completed'
                  ORDER BY r.timecreated ASC
                  LIMIT ?",
                 [$userid, $limit]
             );
-            
+
             $labels = [];
             $acceptance_rates = [];
             $ftar_rates = [];
             $i = 1;
-            
+
             foreach ($requests as $r) {
                 $labels[] = 'Gen ' . $i;
                 $rate = $r->total > 0 ? round(($r->approved / $r->total) * 100, 1) : 0;
                 $acceptance_rates[] = $rate;
-                
+
                 // Calculate FTAR for this generation
                 $first_time = $DB->count_records_sql(
-                    "SELECT COUNT(*) FROM {hlai_quizgen_questions} 
+                    "SELECT COUNT(*) FROM {hlai_quizgen_questions}
                      WHERE requestid = ? AND status = 'approved' AND regeneration_count = 0",
                     [$r->id]
                 );
@@ -267,7 +281,7 @@ try {
                 $ftar_rates[] = $ftar;
                 $i++;
             }
-            
+
             send_response(true, [
                 'labels' => $labels,
                 'acceptance_rates' => $acceptance_rates,
@@ -278,18 +292,18 @@ try {
         case 'regenbytype':
             // Get regeneration statistics by question type
             $userid = $USER->id;
-            
+
             $stats = $DB->get_records_sql(
                 "SELECT q.questiontype,
                         COUNT(q.id) as total,
                         SUM(CASE WHEN q.regeneration_count > 0 THEN 1 ELSE 0 END) as regenerated,
                         AVG(q.regeneration_count) as avg_regens
-                 FROM {hlai_quizgen_questions} q 
+                 FROM {hlai_quizgen_questions} q
                  WHERE q.userid = ?
                  GROUP BY q.questiontype",
                 [$userid]
             );
-            
+
             // Return object keyed by question type for dashboard.js compatibility
             $data = [];
             foreach ($stats as $s) {
@@ -300,14 +314,14 @@ try {
                     'avg_regenerations' => round((float)$s->avg_regens, 2)
                 ];
             }
-            
+
             send_response(true, $data);
             break;
 
         case 'qualitydist':
             // Get quality score distribution (histogram data)
             $userid = $USER->id;
-            
+
             $ranges = [
                 '0-10' => [0, 10],
                 '11-20' => [11, 20],
@@ -320,17 +334,17 @@ try {
                 '81-90' => [81, 90],
                 '91-100' => [91, 100]
             ];
-            
+
             $distribution = [];
             foreach ($ranges as $label => $range) {
                 $count = $DB->count_records_sql(
-                    "SELECT COUNT(*) FROM {hlai_quizgen_questions} 
+                    "SELECT COUNT(*) FROM {hlai_quizgen_questions}
                      WHERE userid = ? AND validation_score >= ? AND validation_score <= ?",
                     [$userid, $range[0], $range[1]]
                 );
                 $distribution[] = (int)$count;
             }
-            
+
             send_response(true, [
                 'labels' => array_keys($ranges),
                 'values' => $distribution
@@ -341,7 +355,7 @@ try {
             // Get recent quiz generation requests for dashboard
             $userid = $USER->id;
             $limit = optional_param('limit', 5, PARAM_INT);
-            
+
             $requests = $DB->get_records_sql(
                 "SELECT r.id, r.courseid, r.status, r.total_questions, r.questions_generated,
                         r.timecreated, r.timecompleted,
@@ -353,14 +367,14 @@ try {
                  LIMIT ?",
                 [$userid, $limit]
             );
-            
+
             $items = [];
             foreach ($requests as $r) {
                 $approved = $DB->count_records('hlai_quizgen_questions', [
                     'requestid' => $r->id,
                     'status' => 'approved'
                 ]);
-                
+
                 $items[] = [
                     'id' => $r->id,
                     'courseid' => $r->courseid,
@@ -373,7 +387,7 @@ try {
                     'timeago' => format_time(time() - $r->timecreated)
                 ];
             }
-            
+
             send_response(true, ['requests' => $items]);
             break;
 
@@ -386,17 +400,17 @@ try {
             if (!$requestid) {
                 send_error('Request ID required');
             }
-            
+
             $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
-            
+
             // Verify user owns this request
             if ($request->userid != $USER->id) {
                 send_error('Access denied', 403);
             }
-            
+
             // Get questions generated so far
             $questions = $DB->get_records_sql(
-                "SELECT q.id, q.questiontype, q.difficulty, q.blooms_level, q.status, 
+                "SELECT q.id, q.questiontype, q.difficulty, q.blooms_level, q.status,
                         q.validation_score, t.title as topic_title
                  FROM {hlai_quizgen_questions} q
                  LEFT JOIN {hlai_quizgen_topics} t ON t.id = q.topicid
@@ -405,7 +419,7 @@ try {
                  LIMIT 5",
                 [$requestid]
             );
-            
+
             // Get topic progress
             $topics = $DB->get_records_sql(
                 "SELECT t.id, t.title, t.num_questions as target,
@@ -415,7 +429,7 @@ try {
                  ORDER BY t.id",
                 [$requestid]
             );
-            
+
             // Build activity log from recent questions
             $activities = [];
             foreach ($questions as $q) {
@@ -426,7 +440,7 @@ try {
                     'blooms' => $q->blooms_level
                 ];
             }
-            
+
             // Calculate current topic being processed
             $current_topic = null;
             foreach ($topics as $t) {
@@ -440,7 +454,7 @@ try {
                     break;
                 }
             }
-            
+
             send_response(true, [
                 'status' => $request->status,
                 'progress' => round((float)$request->progress, 1),
@@ -464,63 +478,63 @@ try {
             if (!$questionid) {
                 send_error('Question ID required');
             }
-            
+
             $question = $DB->get_record('hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
-            
+
             // Verify user owns this question
             if ($question->userid != $USER->id) {
                 send_error('Access denied', 403);
             }
-            
+
             $field = required_param('field', PARAM_ALPHA);
             $value = required_param('value', PARAM_RAW);
-            
+
             $allowed_fields = ['questiontext', 'difficulty', 'blooms_level', 'generalfeedback'];
             if (!in_array($field, $allowed_fields)) {
                 send_error('Invalid field');
             }
-            
+
             // Sanitize based on field type
             if ($field === 'questiontext' || $field === 'generalfeedback') {
                 $value = clean_param($value, PARAM_TEXT);
             } else {
                 $value = clean_param($value, PARAM_ALPHANUMEXT);
             }
-            
+
             $DB->set_field('hlai_quizgen_questions', $field, $value, ['id' => $questionid]);
             $DB->set_field('hlai_quizgen_questions', 'timemodified', time(), ['id' => $questionid]);
-            
+
             send_response(true, ['field' => $field, 'value' => $value]);
             break;
 
         case 'updateanswer':
             // Update answer text inline
             $answerid = required_param('answerid', PARAM_INT);
-            
+
             $answer = $DB->get_record('hlai_quizgen_answers', ['id' => $answerid], '*', MUST_EXIST);
             $question = $DB->get_record('hlai_quizgen_questions', ['id' => $answer->questionid], '*', MUST_EXIST);
-            
+
             // Verify user owns the question
             if ($question->userid != $USER->id) {
                 send_error('Access denied', 403);
             }
-            
+
             $field = required_param('field', PARAM_ALPHA);
             $value = required_param('value', PARAM_RAW);
-            
+
             $allowed_fields = ['answer', 'feedback', 'fraction'];
             if (!in_array($field, $allowed_fields)) {
                 send_error('Invalid field');
             }
-            
+
             if ($field === 'fraction') {
                 $value = (float)$value;
             } else {
                 $value = clean_param($value, PARAM_TEXT);
             }
-            
+
             $DB->set_field('hlai_quizgen_answers', $field, $value, ['id' => $answerid]);
-            
+
             send_response(true, ['field' => $field, 'value' => $value]);
             break;
 
@@ -529,26 +543,26 @@ try {
             if (!$questionid) {
                 send_error('Question ID required');
             }
-            
+
             $question = $DB->get_record('hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
             if ($question->userid != $USER->id) {
                 send_error('Access denied', 403);
             }
-            
+
             $order = required_param('order', PARAM_RAW);
             $order = json_decode($order, true);
-            
+
             if (!is_array($order)) {
                 send_error('Invalid order format');
             }
-            
+
             foreach ($order as $sortorder => $answerid) {
                 $DB->set_field('hlai_quizgen_answers', 'sortorder', $sortorder, [
                     'id' => (int)$answerid,
                     'questionid' => $questionid
                 ]);
             }
-            
+
             send_response(true, ['reordered' => count($order)]);
             break;
 
@@ -557,17 +571,17 @@ try {
             if (!$questionid) {
                 send_error('Question ID required');
             }
-            
+
             $question = $DB->get_record('hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
             if ($question->userid != $USER->id) {
                 send_error('Access denied', 403);
             }
-            
+
             $confidence = optional_param('confidence', 0, PARAM_INT);
-            
+
             $DB->set_field('hlai_quizgen_questions', 'status', 'approved', ['id' => $questionid]);
             $DB->set_field('hlai_quizgen_questions', 'timemodified', time(), ['id' => $questionid]);
-            
+
             // Log approval with confidence if provided
             if ($confidence > 0 && $confidence <= 5) {
                 // Store confidence - would need a review record or new field
@@ -582,7 +596,7 @@ try {
                     'timecreated' => time()
                 ]);
             }
-            
+
             send_response(true, ['status' => 'approved']);
             break;
 
@@ -591,18 +605,18 @@ try {
             if (!$questionid) {
                 send_error('Question ID required');
             }
-            
+
             $question = $DB->get_record('hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
             if ($question->userid != $USER->id) {
                 send_error('Access denied', 403);
             }
-            
+
             $reason = optional_param('reason', '', PARAM_TEXT);
             $feedback = optional_param('feedback', '', PARAM_TEXT);
-            
+
             $DB->set_field('hlai_quizgen_questions', 'status', 'rejected', ['id' => $questionid]);
             $DB->set_field('hlai_quizgen_questions', 'timemodified', time(), ['id' => $questionid]);
-            
+
             // Log rejection with reason
             $DB->insert_record('hlai_quizgen_logs', [
                 'requestid' => $question->requestid,
@@ -617,7 +631,7 @@ try {
                 'status' => 'success',
                 'timecreated' => time()
             ]);
-            
+
             send_response(true, ['status' => 'rejected', 'reason' => $reason]);
             break;
 
@@ -625,11 +639,11 @@ try {
             // Bulk approve multiple questions
             $questionids = required_param('questionids', PARAM_RAW);
             $questionids = json_decode($questionids, true);
-            
+
             if (!is_array($questionids) || empty($questionids)) {
                 send_error('No questions specified');
             }
-            
+
             $approved = 0;
             foreach ($questionids as $qid) {
                 $qid = (int)$qid;
@@ -640,7 +654,7 @@ try {
                     $approved++;
                 }
             }
-            
+
             send_response(true, ['approved' => $approved]);
             break;
 
@@ -649,11 +663,11 @@ try {
             $questionids = required_param('questionids', PARAM_RAW);
             $questionids = json_decode($questionids, true);
             $reason = optional_param('reason', '', PARAM_TEXT);
-            
+
             if (!is_array($questionids) || empty($questionids)) {
                 send_error('No questions specified');
             }
-            
+
             $rejected = 0;
             foreach ($questionids as $qid) {
                 $qid = (int)$qid;
@@ -664,7 +678,7 @@ try {
                     $rejected++;
                 }
             }
-            
+
             send_response(true, ['rejected' => $rejected, 'reason' => $reason]);
             break;
 
@@ -675,17 +689,17 @@ try {
         case 'updatetopic':
             // Update topic title inline
             $topicid = required_param('topicid', PARAM_INT);
-            
+
             $topic = $DB->get_record('hlai_quizgen_topics', ['id' => $topicid], '*', MUST_EXIST);
             $request = $DB->get_record('hlai_quizgen_requests', ['id' => $topic->requestid], '*', MUST_EXIST);
-            
+
             if ($request->userid != $USER->id) {
                 send_error('Access denied', 403);
             }
-            
+
             $title = required_param('title', PARAM_TEXT);
             $DB->set_field('hlai_quizgen_topics', 'title', $title, ['id' => $topicid]);
-            
+
             send_response(true, ['title' => $title]);
             break;
 
@@ -693,40 +707,40 @@ try {
             // Merge two topics into one
             $topicid1 = required_param('topicid1', PARAM_INT);
             $topicid2 = required_param('topicid2', PARAM_INT);
-            
+
             $topic1 = $DB->get_record('hlai_quizgen_topics', ['id' => $topicid1], '*', MUST_EXIST);
             $topic2 = $DB->get_record('hlai_quizgen_topics', ['id' => $topicid2], '*', MUST_EXIST);
-            
+
             // Verify same request and user owns it
             if ($topic1->requestid != $topic2->requestid) {
                 send_error('Topics must be from same request');
             }
-            
+
             $request = $DB->get_record('hlai_quizgen_requests', ['id' => $topic1->requestid]);
             if ($request->userid != $USER->id) {
                 send_error('Access denied', 403);
             }
-            
+
             // Merge: combine titles, sum questions, keep first topic
             $new_title = $topic1->title . ' + ' . $topic2->title;
             $new_questions = $topic1->num_questions + $topic2->num_questions;
-            
+
             // Merge content excerpts
             $new_content = trim($topic1->content_excerpt . "\n\n" . $topic2->content_excerpt);
-            
+
             $DB->update_record('hlai_quizgen_topics', [
                 'id' => $topicid1,
                 'title' => $new_title,
                 'num_questions' => $new_questions,
                 'content_excerpt' => $new_content
             ]);
-            
+
             // Move any questions from topic2 to topic1
             $DB->set_field('hlai_quizgen_questions', 'topicid', $topicid1, ['topicid' => $topicid2]);
-            
+
             // Delete topic2
             $DB->delete_records('hlai_quizgen_topics', ['id' => $topicid2]);
-            
+
             send_response(true, [
                 'merged_into' => $topicid1,
                 'deleted' => $topicid2,
@@ -738,18 +752,18 @@ try {
         case 'deletetopic':
             // Delete a topic
             $topicid = required_param('topicid', PARAM_INT);
-            
+
             $topic = $DB->get_record('hlai_quizgen_topics', ['id' => $topicid], '*', MUST_EXIST);
             $request = $DB->get_record('hlai_quizgen_requests', ['id' => $topic->requestid]);
-            
+
             if ($request->userid != $USER->id) {
                 send_error('Access denied', 403);
             }
-            
+
             // Delete associated questions first
             $DB->delete_records('hlai_quizgen_questions', ['topicid' => $topicid]);
             $DB->delete_records('hlai_quizgen_topics', ['id' => $topicid]);
-            
+
             send_response(true, ['deleted' => $topicid]);
             break;
 
@@ -762,10 +776,10 @@ try {
             if (!$courseid) {
                 send_error('Course ID required');
             }
-            
+
             $context = context_course::instance($courseid);
             require_capability('local/hlai_quizgen:generatequestions', $context);
-            
+
             // Questions by type in this course
             $types = $DB->get_records_sql(
                 "SELECT questiontype, COUNT(*) as count,
@@ -777,7 +791,7 @@ try {
                  GROUP BY questiontype",
                 [$courseid]
             );
-            
+
             // Questions by difficulty
             $difficulties = $DB->get_records_sql(
                 "SELECT difficulty, COUNT(*) as count,
@@ -787,7 +801,7 @@ try {
                  GROUP BY difficulty",
                 [$courseid]
             );
-            
+
             // Recent generation trend
             $recent = $DB->get_records_sql(
                 "SELECT DATE(FROM_UNIXTIME(timecreated)) as date, COUNT(*) as count
@@ -797,7 +811,7 @@ try {
                  ORDER BY date",
                 [$courseid, time() - (30 * 24 * 60 * 60)]  // Last 30 days
             );
-            
+
             send_response(true, [
                 'by_type' => array_values($types),
                 'by_difficulty' => array_values($difficulties),
@@ -808,7 +822,7 @@ try {
         case 'teacherconfidence':
             // Get teacher confidence trend data
             $userid = $USER->id;
-            
+
             // Get confidence ratings from logs
             $logs = $DB->get_records_sql(
                 "SELECT l.id, l.details, l.timecreated
@@ -818,7 +832,7 @@ try {
                  LIMIT 100",
                 [$userid]
             );
-            
+
             $confidences = [];
             foreach ($logs as $log) {
                 $details = json_decode($log->details, true);
@@ -826,7 +840,7 @@ try {
                     $confidences[] = (int)$details['confidence'];
                 }
             }
-            
+
             // Calculate rolling average (groups of 10)
             $averages = [];
             $chunk_size = 10;
@@ -837,9 +851,9 @@ try {
                     'avg' => round(array_sum($chunk) / count($chunk), 2)
                 ];
             }
-            
+
             $overall_avg = count($confidences) > 0 ? round(array_sum($confidences) / count($confidences), 2) : 0;
-            
+
             send_response(true, [
                 'overall_average' => $overall_avg,
                 'total_ratings' => count($confidences),
@@ -856,38 +870,38 @@ try {
             if (!$courseid) {
                 send_error('Course ID required');
             }
-            
+
             $context = context_course::instance($courseid);
             require_capability('local/hlai_quizgen:generatequestions', $context);
-            
+
             if (empty($_FILES['file'])) {
                 send_error('No file uploaded');
             }
-            
+
             $file = $_FILES['file'];
-            
+
             // Validate file
-            $allowed_types = ['application/pdf', 'application/msword', 
+            $allowed_types = ['application/pdf', 'application/msword',
                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
                 'application/vnd.ms-powerpoint',
                 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
                 'text/plain'];
-            
+
             $max_size = 50 * 1024 * 1024; // 50MB
-            
+
             if ($file['size'] > $max_size) {
                 send_error('File too large (max 50MB)');
             }
-            
+
             // Get file info
             $filename = clean_param($file['name'], PARAM_FILE);
             $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-            
+
             $allowed_extensions = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt'];
             if (!in_array($extension, $allowed_extensions)) {
                 send_error('File type not allowed');
             }
-            
+
             // Store in Moodle file area
             $fs = get_file_storage();
             $fileinfo = [
@@ -898,9 +912,9 @@ try {
                 'filepath' => '/',
                 'filename' => $filename
             ];
-            
+
             $storedfile = $fs->create_file_from_pathname($fileinfo, $file['tmp_name']);
-            
+
             send_response(true, [
                 'filename' => $filename,
                 'size' => $file['size'],
@@ -913,19 +927,19 @@ try {
         case 'removefile':
             // Remove an uploaded file
             $itemid = required_param('itemid', PARAM_INT);
-            
+
             if (!$courseid) {
                 send_error('Course ID required');
             }
-            
+
             $context = context_course::instance($courseid);
             $fs = get_file_storage();
-            
+
             $files = $fs->get_area_files($context->id, 'local_hlai_quizgen', 'content', $itemid);
             foreach ($files as $file) {
                 $file->delete();
             }
-            
+
             send_response(true, ['removed' => $itemid]);
             break;
 
@@ -937,12 +951,12 @@ try {
             // Save current configuration as template
             $name = required_param('name', PARAM_TEXT);
             $config = required_param('config', PARAM_RAW);
-            
+
             $config_data = json_decode($config, true);
             if (!$config_data) {
                 send_error('Invalid configuration');
             }
-            
+
             // Save as user setting
             $DB->insert_record('hlai_quizgen_settings', [
                 'userid' => $USER->id,
@@ -956,20 +970,20 @@ try {
                 'timecreated' => time(),
                 'timemodified' => time()
             ]);
-            
+
             send_response(true, ['saved' => $name]);
             break;
 
         case 'gettemplates':
             // Get user's saved templates
             $templates = $DB->get_records_sql(
-                "SELECT id, setting_name, setting_value 
+                "SELECT id, setting_name, setting_value
                  FROM {hlai_quizgen_settings}
                  WHERE userid = ? AND setting_name LIKE 'template_%'
                  ORDER BY timecreated DESC",
                 [$USER->id]
             );
-            
+
             $items = [];
             foreach ($templates as $t) {
                 $data = json_decode($t->setting_value, true);
@@ -982,21 +996,21 @@ try {
                     ];
                 }
             }
-            
+
             send_response(true, ['templates' => $items]);
             break;
 
         case 'deletetemplate':
             // Delete a template
             $templateid = required_param('templateid', PARAM_INT);
-            
+
             $template = $DB->get_record('hlai_quizgen_settings', ['id' => $templateid]);
             if (!$template || $template->userid != $USER->id) {
                 send_error('Template not found or access denied', 403);
             }
-            
+
             $DB->delete_records('hlai_quizgen_settings', ['id' => $templateid]);
-            
+
             send_response(true, ['deleted' => $templateid]);
             break;
 
@@ -1009,20 +1023,20 @@ try {
             if (!$courseid) {
                 send_error('Course ID required');
             }
-            
+
             $step = required_param('step', PARAM_INT);
             $state = required_param('state', PARAM_RAW);
-            
+
             $state_data = json_decode($state, true);
             if (!$state_data) {
                 $state_data = [];
             }
-            
+
             $existing = $DB->get_record('hlai_quizgen_wizard_state', [
                 'userid' => $USER->id,
                 'courseid' => $courseid
             ]);
-            
+
             if ($existing) {
                 $DB->update_record('hlai_quizgen_wizard_state', [
                     'id' => $existing->id,
@@ -1042,7 +1056,7 @@ try {
                     'timemodified' => time()
                 ]);
             }
-            
+
             send_response(true, ['step' => $step]);
             break;
 
@@ -1051,12 +1065,12 @@ try {
             if (!$courseid) {
                 send_error('Course ID required');
             }
-            
+
             $state = $DB->get_record('hlai_quizgen_wizard_state', [
                 'userid' => $USER->id,
                 'courseid' => $courseid
             ]);
-            
+
             if (!$state) {
                 send_response(true, ['hasstate' => false]);
             } else {

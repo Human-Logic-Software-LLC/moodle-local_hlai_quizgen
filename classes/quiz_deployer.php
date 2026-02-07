@@ -208,7 +208,7 @@ class quiz_deployer {
         $moduleinfo->groupingid = 0;
 
         $cmid = add_course_module($moduleinfo);
-        
+
         $moduleinfo->coursemodule = $cmid;
         $sectionid = course_add_cm_to_section($courseid, $cmid, 0);
 
@@ -220,7 +220,7 @@ class quiz_deployer {
         $quizsection->firstslot = 1;
         $quizsection->heading = '';
         $quizsection->shufflequestions = 0;
-        
+
         $DB->insert_record('quiz_sections', $quizsection);
 
         // Add questions to quiz.
@@ -335,7 +335,7 @@ class quiz_deployer {
                 debugging("DEBUG: Created top category for course context, ID: " . $topcategory->id, DEBUG_DEVELOPER);
             }
         }
-        
+
         // Create new category as child of top category.
         $category = new \stdClass();
         $category->name = $name;
@@ -552,7 +552,7 @@ class quiz_deployer {
 
         return $questionid;
     }
-    
+
     /**
      * Tag a question with AI-generated, topic, difficulty, and Bloom's level tags.
      *
@@ -582,10 +582,10 @@ class quiz_deployer {
         }
 
         $tags = [];
-        
+
         // 1. AI-generated tag.
         $tags[] = 'ai-generated';
-        
+
         // 2. Topic tag (if available).
         if (!empty($genquestion->topicid)) {
             $topic = $DB->get_record('hlai_quizgen_topics', ['id' => $genquestion->topicid], 'title');
@@ -600,33 +600,33 @@ class quiz_deployer {
                 }
             }
         }
-        
+
         // 3. Difficulty level tag.
         if (!empty($genquestion->difficulty)) {
             $tags[] = 'difficulty:' . strtolower($genquestion->difficulty);
         }
-        
+
         // 4. Bloom's taxonomy level tag.
         if (!empty($genquestion->blooms_level)) {
             $bloomslevel = strtolower($genquestion->blooms_level);
             $tags[] = 'blooms:' . $bloomslevel;
-            
+
             // Also add cognitive domain category.
             $cognitivedomain = self::get_cognitive_domain($bloomslevel);
             if ($cognitivedomain) {
                 $tags[] = 'cognitive:' . $cognitivedomain;
             }
         }
-        
+
         // 5. Question type tag.
         if (!empty($genquestion->questiontype)) {
             $tags[] = 'qtype:' . $genquestion->questiontype;
         }
-        
+
         // Apply tags to the question.
         \core_tag_tag::set_item_tags('core_question', 'question', $questionid, $context, $tags);
     }
-    
+
     /**
      * Get cognitive domain for Bloom's level.
      *
@@ -642,7 +642,7 @@ class quiz_deployer {
             'evaluate' => 'higher',
             'create' => 'higher',
         ];
-        
+
         return $domains[$bloomslevel] ?? null;
     }
 
@@ -698,10 +698,10 @@ class quiz_deployer {
 
         // Get answers and create answer records.
         $answers = $DB->get_records('hlai_quizgen_answers', ['questionid' => $genquestion->id], 'sortorder ASC');
-        
+
         $trueid = 0;
         $falseid = 0;
-        
+
         foreach ($answers as $answer) {
             $answerrecord = new \stdClass();
             $answerrecord->question = $questionid;
@@ -712,7 +712,7 @@ class quiz_deployer {
             $answerrecord->feedbackformat = FORMAT_MOODLE;
 
             $answerid = $DB->insert_record('question_answers', $answerrecord);
-            
+
             // Track which answer is true vs false.
             if (stripos($answer->answer, 'true') !== false) {
                 $trueid = $answerid;
@@ -720,14 +720,14 @@ class quiz_deployer {
                 $falseid = $answerid;
             }
         }
-        
+
         // Create the truefalse question record.
         $tfrecord = new \stdClass();
         $tfrecord->question = $questionid;
         $tfrecord->trueanswer = $trueid;
         $tfrecord->falseanswer = $falseid;
         $tfrecord->showstandardinstruction = 1;
-        
+
         $DB->insert_record('question_truefalse', $tfrecord);
     }
 
@@ -901,18 +901,18 @@ class quiz_deployer {
 
         $added = 0;
         $questionsperpage = $quiz->questionsperpage ?? 1;
-        
+
         foreach ($questionids as $questionid) {
             // Get question bank entry for this question.
             $qversion = $DB->get_record_sql(
-                "SELECT qv.questionbankentryid 
-                 FROM {question_versions} qv 
-                 WHERE qv.questionid = ? 
-                 ORDER BY qv.version DESC 
+                "SELECT qv.questionbankentryid
+                 FROM {question_versions} qv
+                 WHERE qv.questionid = ?
+                 ORDER BY qv.version DESC
                  LIMIT 1",
                 [$questionid]
             );
-            
+
             if (!$qversion) {
                 continue;
             }
@@ -940,7 +940,7 @@ class quiz_deployer {
 
             $added++;
             $slot++;
-            
+
             // Increment page based on questions per page setting.
             if ($questionsperpage > 0 && ($added % $questionsperpage == 0)) {
                 $page++;

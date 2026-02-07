@@ -96,14 +96,14 @@ $total_users_with_capability = $DB->count_records_sql(
     ['local/hlai_quizgen:generatequestions']
 );
 
-$adoption_rate = $total_users_with_capability > 0 
-    ? round(($active_teachers / $total_users_with_capability) * 100, 1) 
+$adoption_rate = $total_users_with_capability > 0
+    ? round(($active_teachers / $total_users_with_capability) * 100, 1)
     : 0;
 
 // Count all courses except site course (id = 1)
 $total_courses = $DB->count_records_select('course', 'id > ?', [1]);
-$course_coverage = $total_courses > 0 
-    ? round(($active_courses / $total_courses) * 100, 1) 
+$course_coverage = $total_courses > 0
+    ? round(($active_courses / $total_courses) * 100, 1)
     : 0;
 
 // 3. Usage Trends (Last 30 days) - Use PHP for date grouping for database compatibility
@@ -202,7 +202,7 @@ $recent_errors = $DB->count_records_sql(
 );
 
 // Check AI provider configuration
-$ai_provider_configured = !empty(get_config('local_hlai_quizgen', 'azure_endpoint')) 
+$ai_provider_configured = !empty(get_config('local_hlai_quizgen', 'azure_endpoint'))
                          && !empty(get_config('local_hlai_quizgen', 'azure_api_key'));
 
 // ================= OUTPUT HTML =================
@@ -519,7 +519,7 @@ echo $OUTPUT->header();
 </style>
 
 <div class="container is-fluid">
-    
+
     <!-- Page Title -->
     <div class="page-title-section">
         <h1>
@@ -534,7 +534,7 @@ echo $OUTPUT->header();
     <div class="section-header">
         <h2><i class="fa fa-bar-chart"></i> Site-Wide Overview</h2>
     </div>
-    
+
     <div class="columns is-multiline">
         <!-- Total Questions Generated -->
         <div class="column is-4">
@@ -762,15 +762,15 @@ echo $OUTPUT->header();
                     <i class="fa fa-cog"></i> Quick Configuration Links
                 </h3>
                 <div class="config-buttons">
-                    <a href="<?php echo new moodle_url('/admin/settings.php', ['section' => 'local_hlai_quizgen']); ?>" 
+                    <a href="<?php echo new moodle_url('/admin/settings.php', ['section' => 'local_hlai_quizgen']); ?>"
                        class="config-button">
                         <i class="fa fa-wrench"></i> Plugin Settings
                     </a>
-                    <a href="<?php echo new moodle_url('/admin/roles/check.php', ['capability' => 'local/hlai_quizgen:generatequestions']); ?>" 
+                    <a href="<?php echo new moodle_url('/admin/roles/check.php', ['capability' => 'local/hlai_quizgen:generatequestions']); ?>"
                        class="config-button">
                         <i class="fa fa-users"></i> User Capabilities
                     </a>
-                    <a href="<?php echo new moodle_url('/local/hlai_quizgen/view_logs.php'); ?>" 
+                    <a href="<?php echo new moodle_url('/local/hlai_quizgen/view_logs.php'); ?>"
                        class="config-button">
                         <i class="fa fa-file-text-o"></i> View Error Logs
                     </a>
@@ -839,11 +839,11 @@ var adoptionOptions = {
     },
     labels: ['Active Teachers', 'Inactive Teachers'],
     colors: ['#10B981', '#BFDBFE'],
-    legend: { 
+    legend: {
         position: 'bottom',
         fontSize: '13px'
     },
-    dataLabels: { 
+    dataLabels: {
         enabled: true,
         style: {
             fontSize: '14px',

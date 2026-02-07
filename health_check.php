@@ -55,7 +55,7 @@ try {
         'status' => 'ok',
         'message' => 'Database connection successful'
     ];
-    
+
     // Check 2: AI provider availability (hlai_hub or hlai_hubproxy).
     $gatewayurl = \local_hlai_quizgen\gateway_client::get_gateway_url();
     $providerready = \local_hlai_quizgen\gateway_client::is_ready();
@@ -78,7 +78,7 @@ try {
         ];
         $health['status'] = 'unhealthy';
     }
-    
+
     // Check 3: Database tables exist.
     $requiredtables = [
         'hlai_quizgen_requests',
@@ -88,14 +88,14 @@ try {
         'hlai_quizgen_error_log',
         'hlai_quizgen_cache'
     ];
-    
+
     $missingtables = [];
     foreach ($requiredtables as $table) {
         if (!$DB->get_manager()->table_exists($table)) {
             $missingtables[] = $table;
         }
     }
-    
+
     if (empty($missingtables)) {
         $health['checks']['database_schema'] = [
             'status' => 'ok',
@@ -108,35 +108,35 @@ try {
         ];
         $health['status'] = 'unhealthy';
     }
-    
+
     // Check 4: Recent generation activity.
     $recentrequests = $DB->count_records_select(
         'hlai_quizgen_requests',
         'timecreated > ?',
         [time() - (24 * 3600)]
     );
-    
+
     $health['checks']['recent_activity'] = [
         'status' => 'ok',
         'requests_24h' => $recentrequests
     ];
-    
+
     // Check 5: Error rate.
     $totalrecent = $DB->count_records_select(
         'hlai_quizgen_requests',
         'timecreated > ?',
         [time() - (24 * 3600)]
     );
-    
+
     $failedrecent = $DB->count_records_select(
         'hlai_quizgen_requests',
         'status = ? AND timecreated > ?',
         ['failed', time() - (24 * 3600)]
     );
-    
+
     if ($totalrecent > 0) {
         $errorrate = ($failedrecent / $totalrecent) * 100;
-        
+
         if ($errorrate > 50) {
             $health['checks']['error_rate'] = [
                 'status' => 'error',
@@ -166,11 +166,11 @@ try {
             'message' => 'No recent requests'
         ];
     }
-    
+
     // Check 6: Cache performance.
     if (\local_hlai_quizgen\cache_manager::is_caching_enabled()) {
         $cachestats = \local_hlai_quizgen\cache_manager::get_cache_statistics();
-        
+
         $health['checks']['cache'] = [
             'status' => 'ok',
             'total_entries' => $cachestats['total_entries'],
@@ -178,7 +178,7 @@ try {
             'hit_rate' => $cachestats['overall_hit_rate'],
             'storage_mb' => $cachestats['storage_mb']
         ];
-        
+
         // Warn if cache is getting large.
         if ($cachestats['storage_mb'] > 100) {
             $health['checks']['cache']['status'] = 'warning';
@@ -190,13 +190,13 @@ try {
             'message' => 'Caching is disabled'
         ];
     }
-    
+
     // Check 7: Scheduled tasks.
     $tasks = [
         'local_hlai_quizgen\task\cleanup_old_requests',
         'local_hlai_quizgen\task\process_generation_queue'
     ];
-    
+
     $taskstatuses = [];
     foreach ($tasks as $taskclass) {
         $task = \core\task\manager::get_scheduled_task($taskclass);
@@ -208,25 +208,25 @@ try {
             ];
         }
     }
-    
+
     $health['checks']['scheduled_tasks'] = [
         'status' => 'ok',
         'tasks' => $taskstatuses
     ];
-    
+
     // Check 8: File permissions.
     $writabledirs = [
         $CFG->dataroot . '/temp',
         $CFG->dataroot . '/local_hlai_quizgen'
     ];
-    
+
     $permissionissues = [];
     foreach ($writabledirs as $dir) {
         if (!is_writable($dir)) {
             $permissionissues[] = $dir;
         }
     }
-    
+
     if (empty($permissionissues)) {
         $health['checks']['file_permissions'] = [
             'status' => 'ok',
@@ -242,7 +242,7 @@ try {
             $health['status'] = 'degraded';
         }
     }
-    
+
     // Set appropriate HTTP status code.
     if ($health['status'] === 'unhealthy') {
         http_response_code(503);
@@ -251,7 +251,7 @@ try {
     } else {
         http_response_code(200);
     }
-    
+
 } catch (\Exception $e) {
     $health['status'] = 'error';
     $health['message'] = 'Health check failed: ' . $e->getMessage();

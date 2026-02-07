@@ -65,7 +65,7 @@ class api {
 
         $allowedtransitions = self::REQUEST_STATUSES[$oldstatus];
         if (!in_array($newstatus, $allowedtransitions) && $oldstatus !== $newstatus) {
-            throw new \moodle_exception('error:invalidstatustransition', 'local_hlai_quizgen', '', 
+            throw new \moodle_exception('error:invalidstatustransition', 'local_hlai_quizgen', '',
                 "Cannot transition from {$oldstatus} to {$newstatus}");
         }
 
@@ -111,11 +111,11 @@ class api {
         // Check rate limit first.
         if (rate_limiter::is_rate_limiting_enabled() && !rate_limiter::is_user_exempt($USER->id)) {
             $ratelimitcheck = rate_limiter::check_rate_limit($USER->id, $courseid);
-            
+
             if (!$ratelimitcheck['allowed']) {
                 // Record violation.
                 rate_limiter::record_violation($USER->id, $ratelimitcheck['limit_type'] ?? 'unknown', $ratelimitcheck);
-                
+
                 throw new \moodle_exception(
                     'error:rate_limit_exceeded',
                     'local_hlai_quizgen',
@@ -167,7 +167,7 @@ class api {
         global $DB;
 
         $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
-        
+
         // Decode JSON fields.
         $request->content_sources = json_decode($request->content_sources, true);
         $request->difficulty_distribution = json_decode($request->difficulty_distribution, true);
@@ -195,11 +195,11 @@ class api {
 
         // Load answers for each question.
         foreach ($questions as $question) {
-            $question->answers = $DB->get_records('hlai_quizgen_answers', 
-                ['questionid' => $question->id], 
+            $question->answers = $DB->get_records('hlai_quizgen_answers',
+                ['questionid' => $question->id],
                 'sortorder ASC'
             );
-            
+
             // Add validation badge if available.
             if (!empty($question->quality_rating)) {
                 $question->quality_badge = get_string('quality_' . $question->quality_rating, 'local_hlai_quizgen');

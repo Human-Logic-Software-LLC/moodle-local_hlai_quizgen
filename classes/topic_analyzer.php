@@ -733,7 +733,7 @@ class topic_analyzer {
             $newtopic->timecreated = time();
 
             $newid = $DB->insert_record('hlai_quizgen_topics', $newtopic);
-            
+
             // Store mapping if this was a parent.
             if (isset($topic['id'])) {
                 $parentmap[$topic['id']] = $newid;
@@ -756,7 +756,7 @@ class topic_analyzer {
             }
 
             if ($originalparent > 0 && isset($parentmap[$originalparent])) {
-                $DB->set_field('hlai_quizgen_topics', 'parent_topic_id', 
+                $DB->set_field('hlai_quizgen_topics', 'parent_topic_id',
                     $parentmap[$originalparent], ['id' => $topic->id]);
             }
         }

@@ -69,8 +69,8 @@ class cache_manager {
 
             // Update hit counter.
             $DB->execute(
-                "UPDATE {hlai_quizgen_cache} 
-                 SET hits = hits + 1, lastaccessed = ? 
+                "UPDATE {hlai_quizgen_cache}
+                 SET hits = hits + 1, lastaccessed = ?
                  WHERE id = ?",
                 [time(), $cache->id]
             );
@@ -250,8 +250,8 @@ class cache_manager {
         }
 
         // Calculate overall hit rate.
-        $stats['overall_hit_rate'] = $stats['total_entries'] > 0 
-            ? round($stats['total_hits'] / $stats['total_entries'], 2) 
+        $stats['overall_hit_rate'] = $stats['total_entries'] > 0
+            ? round($stats['total_hits'] / $stats['total_entries'], 2)
             : 0;
 
         // Calculate storage size.
@@ -336,7 +336,7 @@ class cache_manager {
         global $DB;
 
         $records = $DB->get_records('hlai_quizgen_cache', ['cachetype' => $cachetype]);
-        
+
         if (empty($records)) {
             return 0.0;
         }
