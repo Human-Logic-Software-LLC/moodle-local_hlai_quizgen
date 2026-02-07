@@ -136,7 +136,7 @@ class process_generation_queue extends \core\task\scheduled_task {
         ];
 
         $totalgenerated = 0;
-        $globalquestionindex = 0; // Track question index across ALL topics
+        $globalquestionindex = 0; // Track question index across ALL topics.
 
         // Process each topic.
         foreach ($topics as $topic) {
@@ -160,7 +160,7 @@ class process_generation_queue extends \core\task\scheduled_task {
                 $topicconfig = $config;
                 $topicconfig['difficulty'] = $difficulty;
                 $topicconfig['num_questions'] = $count;
-                $topicconfig['global_question_index'] = $globalquestionindex; // Pass global index
+                $topicconfig['global_question_index'] = $globalquestionindex; // Pass global index.
 
                 // Generate questions.
                 $questions = \local_hlai_quizgen\question_generator::generate_for_topic(

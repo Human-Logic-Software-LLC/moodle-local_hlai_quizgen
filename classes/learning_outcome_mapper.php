@@ -460,12 +460,12 @@ class learning_outcome_mapper {
 
             // Target distribution: more lower levels, fewer higher levels.
             $target = match ($order) {
-                1 => 15, // Remember 15%
-                2 => 25, // Understand 25%
-                3 => 30, // Apply 30%
-                4 => 20, // Analyze 20%
-                5 => 7, // Evaluate 7%
-                6 => 3, // Create 3%
+                1 => 15, // Remember 15%.
+                2 => 25, // Understand 25%.
+                3 => 30, // Apply 30%.
+                4 => 20, // Analyze 20%.
+                5 => 7, // Evaluate 7%.
+                6 => 3, // Create 3%.
                 default => 15
             };
 

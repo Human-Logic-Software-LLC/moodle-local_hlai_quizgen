@@ -60,8 +60,9 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         $table->add_field('description', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $table->add_field('parent_topic_id', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
         $table->add_field('level', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1');
-        $table->add_field('selected', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0');  // Default to unselected
-        $table->add_field('num_questions', XMLDB_TYPE_INTEGER, '5', null, XMLDB_NOTNULL, null, '1');  // Default 1 question per topic
+        $table->add_field('selected', XMLDB_TYPE_INTEGER, '1', null, XMLDB_NOTNULL, null, '0'); // Default to unselected.
+        // Default 1 question per topic.
+        $table->add_field('num_questions', XMLDB_TYPE_INTEGER, '5', null, XMLDB_NOTNULL, null, '1');
         $table->add_field('content_excerpt', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $table->add_field('learning_objectives', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
@@ -845,15 +846,14 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         }
 
         $field = new xmldb_field(
-                          'similarity_score',
-                          XMLDB_TYPE_NUMBER,
-                          '10,
-                          2',
-                          null,
-                          XMLDB_NOTNULL,
-                          null,
-                          '0.0',
-                          'alignment_score'
+            'similarity_score',
+            XMLDB_TYPE_NUMBER,
+            '10, 2',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0.0',
+            'alignment_score'
         );
         if ($dbman->field_exists($table, $field)) {
             $dbman->change_field_precision($table, $field);
@@ -863,30 +863,28 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         $table = new xmldb_table('local_hlai_quizgen_calibration');
 
         $field = new xmldb_field(
-                          'average_score',
-                          XMLDB_TYPE_NUMBER,
-                          '10,
-                          2',
-                          null,
-                          XMLDB_NOTNULL,
-                          null,
-                          '0.0',
-                          'attempts_analyzed'
+            'average_score',
+            XMLDB_TYPE_NUMBER,
+            '10, 2',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0.0',
+            'attempts_analyzed'
         );
         if ($dbman->field_exists($table, $field)) {
             $dbman->change_field_precision($table, $field);
         }
 
         $field = new xmldb_field(
-                          'discrimination_index',
-                          XMLDB_TYPE_NUMBER,
-                          '10,
-                          3',
-                          null,
-                          XMLDB_NOTNULL,
-                          null,
-                          '0.0',
-                          'average_score'
+            'discrimination_index',
+            XMLDB_TYPE_NUMBER,
+            '10, 3',
+            null,
+            XMLDB_NOTNULL,
+            null,
+            '0.0',
+            'average_score'
         );
         if ($dbman->field_exists($table, $field)) {
             $dbman->change_field_precision($table, $field);
@@ -1255,8 +1253,14 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
             // Populate for existing approved questions: first try if regeneration_count = 0.
-            $DB->execute("UPDATE {local_hlai_quizgen_questions} SET accepted_on_first_try = 1 WHERE status = 'approved' AND regeneration_count = 0");
-            $DB->execute("UPDATE {local_hlai_quizgen_questions} SET accepted_on_first_try = 0 WHERE status = 'approved' AND regeneration_count > 0");
+            $DB->execute(
+                "UPDATE {local_hlai_quizgen_questions} SET accepted_on_first_try = 1 " .
+                "WHERE status = 'approved' AND regeneration_count = 0"
+            );
+            $DB->execute(
+                "UPDATE {local_hlai_quizgen_questions} SET accepted_on_first_try = 0 " .
+                "WHERE status = 'approved' AND regeneration_count > 0"
+            );
         }
 
         // Add time_approved field (timestamp when question was approved).

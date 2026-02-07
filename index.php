@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// phpcs:disable moodle.Commenting.MissingDocblock
+// Phpcs:disable moodle.Commenting.MissingDocblock.
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
@@ -119,7 +119,7 @@ $firsttimeapproved = $DB->count_records_sql(
 );
 $ftar = $totalreviewed > 0 ? round(($firsttimeapproved / $totalreviewed) * 100, 1) : 0;
 
-// DEBUG: Temporarily log FTAR calculation
+// DEBUG: Temporarily log FTAR calculation.
 debugging(
            "FTAR Debug - User: $userid,
            Total Reviewed: $totalreviewed,

@@ -33,7 +33,8 @@ if ($hassiteconfig) {
 
     // Show warning if gateway is not configured.
     if (!$gatewayready) {
-        $warningmsg = 'AI Service gateway not configured. Please configure the AI Service URL and API Key below to enable quiz generation.';
+        $warningmsg = 'AI Service gateway not configured. Please configure the AI Service URL ' .
+            'and API Key below to enable quiz generation.';
         $settings->add(new admin_setting_heading(
             'local_hlai_quizgen/gateway_warning',
             '',
@@ -45,7 +46,8 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_heading(
         'local_hlai_quizgen/gateway_heading',
         'Human Logic AI Service Configuration',
-        'Configure your Human Logic AI service gateway endpoint and API key. This plugin requires a commercial license to function. Contact Human Logic Software LLC for access.'
+        'Configure your Human Logic AI service gateway endpoint and API key. ' .
+        'This plugin requires a commercial license to function. Contact Human Logic Software LLC for access.'
     ));
 
     // Gateway URL setting (locked).
@@ -158,7 +160,7 @@ if ($hassiteconfig) {
         'local_hlai_quizgen/enable_provider_fallback',
         get_string('enable_provider_fallback', 'local_hlai_quizgen'),
         get_string('enable_provider_fallback_desc', 'local_hlai_quizgen'),
-        1  // Enabled by default
+        1 // Enabled by default.
     ));
 
     // Content hash deduplication.
@@ -166,7 +168,7 @@ if ($hassiteconfig) {
         'local_hlai_quizgen/enable_content_deduplication',
         get_string('enable_content_deduplication', 'local_hlai_quizgen'),
         get_string('enable_content_deduplication_desc', 'local_hlai_quizgen'),
-        1  // Enabled by default
+        1 // Enabled by default.
     ));
 
     // Question validation.
@@ -174,7 +176,7 @@ if ($hassiteconfig) {
         'local_hlai_quizgen/enable_question_validation',
         get_string('enable_question_validation', 'local_hlai_quizgen'),
         get_string('enable_question_validation_desc', 'local_hlai_quizgen'),
-        1  // Enabled by default
+        1 // Enabled by default.
     ));
 
     // Phase 6: Production Hardening Settings.
@@ -189,7 +191,7 @@ if ($hassiteconfig) {
         'local_hlai_quizgen/enable_caching',
         get_string('enable_caching', 'local_hlai_quizgen'),
         get_string('enable_caching_desc', 'local_hlai_quizgen'),
-        1  // Enabled by default
+        1 // Enabled by default.
     ));
 
     // Enable rate limiting.
@@ -197,7 +199,7 @@ if ($hassiteconfig) {
         'local_hlai_quizgen/enable_rate_limiting',
         get_string('enable_rate_limiting', 'local_hlai_quizgen'),
         get_string('enable_rate_limiting_desc', 'local_hlai_quizgen'),
-        1  // Enabled by default
+        1 // Enabled by default.
     ));
 
     // Rate limit per hour (per user).
@@ -232,7 +234,7 @@ if ($hassiteconfig) {
         'local_hlai_quizgen/health_check_token',
         get_string('health_check_token', 'local_hlai_quizgen'),
         get_string('health_check_token_desc', 'local_hlai_quizgen'),
-        bin2hex(random_bytes(16)), // Generate random token
+        bin2hex(random_bytes(16)), // Generate random token.
         PARAM_ALPHANUMEXT
     ));
 

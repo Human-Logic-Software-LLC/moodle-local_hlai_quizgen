@@ -49,13 +49,13 @@ class quiz_deployer {
      * @return array Array of deployed question IDs in question bank
      * @throws \moodle_exception If deployment fails
      */
-    public static function deploy_to_question_bank(array $questionids, int $courseid, string $categoryname = null): array {
+    public static function deploy_to_question_bank(array $questionids, int $courseid, ?string $categoryname = null): array {
         global $DB, $USER;
 
         debugging(
-           "DEBUG deploy_to_question_bank: Starting with " . count($questionids) . " questions,
-           courseid=$courseid",
-           DEBUG_DEVELOPER
+            "DEBUG deploy_to_question_bank: Starting with " . count($questionids) .
+            " questions, courseid=$courseid",
+            DEBUG_DEVELOPER
         );
 
         $context = \context_course::instance($courseid);
@@ -85,9 +85,9 @@ class quiz_deployer {
                 // Get question from our table.
                 $genquestion = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
                 debugging(
-           "DEBUG deploy_to_question_bank: Loaded genquestion,
-           type=" . ($genquestion->questiontype ?? 'null'),
-           DEBUG_DEVELOPER
+                    "DEBUG deploy_to_question_bank: Loaded genquestion, type=" .
+                    ($genquestion->questiontype ?? 'null'),
+                    DEBUG_DEVELOPER
                 );
 
                 // Convert to Moodle question format.
@@ -113,8 +113,9 @@ class quiz_deployer {
                 } catch (\Exception $logex) {
                     // Logging failure shouldn't stop deployment.
                     debugging(
-           "DEBUG deploy_to_question_bank: Warning - log_action failed: " . $logex->getMessage(),
-           DEBUG_DEVELOPER
+                        "DEBUG deploy_to_question_bank: Warning - log_action failed: " .
+                        $logex->getMessage(),
+                        DEBUG_DEVELOPER
                     );
                 }
             } catch (\Exception $e) {
@@ -125,9 +126,9 @@ class quiz_deployer {
         }
 
         debugging(
-           "DEBUG deploy_to_question_bank: Completed. Deployed: " . count($deployedids) . ",
-           Errors: " . count($errors),
-           DEBUG_DEVELOPER
+            "DEBUG deploy_to_question_bank: Completed. Deployed: " . count($deployedids) .
+            ", Errors: " . count($errors),
+            DEBUG_DEVELOPER
         );
 
         // If no questions were deployed successfully, throw an exception with details.
@@ -283,7 +284,7 @@ class quiz_deployer {
      * @param string|null $name Category name
      * @return \stdClass Category object
      */
-    private static function get_or_create_category(int $courseid, string $name = null): \stdClass {
+    private static function get_or_create_category(int $courseid, ?string $name = null): \stdClass {
         global $DB, $CFG;
 
         require_once($CFG->libdir . '/questionlib.php');
@@ -427,7 +428,7 @@ class quiz_deployer {
 
         // Format question name: Extract clean text snippet for better readability.
         $questionsnippet = strip_tags($genquestion->questiontext ?? '');
-        $questionsnippet = preg_replace('/\s+/', ' ', $questionsnippet); // Remove extra whitespace
+        $questionsnippet = preg_replace('/\s+/', ' ', $questionsnippet); // Remove extra whitespace.
         $questionsnippet = trim($questionsnippet);
 
         if (!empty($categoryname)) {
@@ -588,9 +589,9 @@ class quiz_deployer {
 
         // Also log what the user should look for.
         debugging(
-           "DEBUG: To find this question,
-           go to Course Question Bank (not Quiz) and look for category: " . ($verifycat->name ?? 'unknown'),
-           DEBUG_DEVELOPER
+            "DEBUG: To find this question, go to Course Question Bank (not Quiz) " .
+            "and look for category: " . ($verifycat->name ?? 'unknown'),
+            DEBUG_DEVELOPER
         );
 
         return $questionid;

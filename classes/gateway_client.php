@@ -248,7 +248,7 @@ class gateway_client {
             case 'generate_distractors':
                 return '/generate_distractors';
             default:
-                return '/generate'; // Fallback generic endpoint
+                return '/generate'; // Fallback generic endpoint.
         }
     }
 }

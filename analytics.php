@@ -22,14 +22,14 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// phpcs:disable moodle.Commenting.MissingDocblock
-// phpcs:disable moodle.Commenting.FileExpectedTags
+// Phpcs:disable moodle.Commenting.MissingDocblock.
+// phpcs:disable moodle.Commenting.FileExpectedTags.
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
 $courseid = required_param('courseid', PARAM_INT);
-$timerange = optional_param('timerange', '30', PARAM_ALPHA); // 7, 30, 90, all
+$timerange = optional_param('timerange', '30', PARAM_ALPHA); // 7, 30, 90, all.
 
 require_login($courseid);
 $context = context_course::instance($courseid);
@@ -76,7 +76,7 @@ switch ($timerange) {
         $timefilter = time() - (90 * 24 * 60 * 60);
         break;
     default:
-        $timefilter = 0; // All time
+        $timefilter = 0; // All time.
 }
 
 /**
@@ -191,16 +191,16 @@ $sql = get_filtered_sql(
 $bloomsstats = $DB->get_records_sql($sql . " GROUP BY blooms_level", [$userid, $courseid]);
 
 // ===== REJECTION REASONS =====.
-// Note: rejection_reason column doesn't exist in database yet
+// Note: rejection_reason column doesn't exist in database yet.
 // Commenting out until schema is updated.
-// $sql = get_filtered_sql(
+// $sql = get_filtered_sql(.
 // "SELECT COALESCE(rejection_reason, 'Not specified') as reason, COUNT(*) as count.
 // FROM {local_hlai_quizgen_questions}.
 // WHERE userid = ? AND courseid = ? AND status = 'rejected'",.
-// $timefilter
+// $timefilter.
 // );.
 // $rejection_reasons = $DB->get_records_sql($sql . " GROUP BY rejection_reason ORDER BY count DESC LIMIT 10", [$userid, $courseid]);
-$rejectionreasons = []; // Empty array for now
+$rejectionreasons = []; // Empty array for now.
 
 // Output starts here.
 echo $OUTPUT->header();

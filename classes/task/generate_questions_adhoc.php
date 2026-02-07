@@ -128,10 +128,10 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                 'processing_mode' => $request->processing_mode ?? 'balanced',
                 'difficulty_distribution' => json_decode($request->difficulty_distribution ?? '{}', true),
                 'blooms_distribution' => json_decode($request->blooms_distribution ?? '{}', true),
-                'question_type_distribution' => $questiontypedist, // Store as distribution
+                'question_type_distribution' => $questiontypedist, // Store as distribution.
                 'custom_instructions' => $request->custom_instructions ?? '',
                 'global_question_index' => 0,
-                'global_question_types' => $globalquestiontypes, // Pass the expanded global array
+                'global_question_types' => $globalquestiontypes, // Pass the expanded global array.
             ];
 
             // Generate questions for each topic with progress updates.
@@ -182,8 +182,8 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                 );
 
                 $questionsgenerated = count($questions);
-                $currentquestion += $topic->num_questions;  // Use requested count for progress
-                $totalquestionsgenerated += $questionsgenerated;  // Track actual generated
+                $currentquestion += $topic->num_questions; // Use requested count for progress.
+                $totalquestionsgenerated += $questionsgenerated; // Track actual generated.
 
                 // Delete excess questions if more were generated than requested.
                 if ($questionsgenerated > $topic->num_questions) {
@@ -234,10 +234,10 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
 
             // Mark as completed.
             self::update_progress(
-                       $requestid,
-                       'completed',
-                       100,
-                       "Generation complete: {$totalquestionsgenerated} questions created"
+                $requestid,
+                'completed',
+                100,
+                "Generation complete: {$totalquestionsgenerated} questions created"
             );
 
             // Update request status.

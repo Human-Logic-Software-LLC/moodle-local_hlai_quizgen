@@ -44,7 +44,7 @@ if (file_exists($logfile)) {
         return strpos($line, 'HLAI QuizGen') !== false;
     });
 
-    $recent = array_slice($quizgenlines, -50); // Last 50 lines
+    $recent = array_slice($quizgenlines, -50); // Last 50 lines.
 
     if (empty($recent)) {
         echo '<div class="notification is-info is-light">No HLAI QuizGen log entries found yet. Try submitting the form.</div>';

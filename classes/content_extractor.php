@@ -306,7 +306,7 @@ class content_extractor {
             }
 
             // Clean up extracted text.
-            $text = preg_replace('/[^\x20-\x7E\s]/', '', $text); // Remove non-printable
+            $text = preg_replace('/[^\x20-\x7E\s]/', '', $text); // Remove non-printable.
             $text = preg_replace('/\s+/', ' ', $text);
             return trim($text);
         } catch (\Exception $e) {
@@ -395,7 +395,7 @@ class content_extractor {
                 $xml = $zip->getFromName($slidename);
 
                 if ($xml === false) {
-                    break; // No more slides
+                    break; // No more slides.
                 }
 
                 $text .= "--- Slide {$i} ---\n";
@@ -465,7 +465,7 @@ class content_extractor {
                 return self::extract_xlsx_native($filepath);
             }
 
-            // XLS (old Excel format) not supported without libraries
+            // XLS (old Excel format) not supported without libraries.
             if ($extension === 'xls') {
                 throw new \moodle_exception(
                     'error:contentextraction',
@@ -619,10 +619,10 @@ class content_extractor {
             ];
         } catch (\Exception $e) {
             throw new \moodle_exception(
-                             'error:urlextraction',
-                             'local_hlai_quizgen',
-                             '',
-                             'Failed to extract content from URL: ' . $e->getMessage()
+                'error:urlextraction',
+                'local_hlai_quizgen',
+                '',
+                'Failed to extract content from URL: ' . $e->getMessage()
             );
         }
     }

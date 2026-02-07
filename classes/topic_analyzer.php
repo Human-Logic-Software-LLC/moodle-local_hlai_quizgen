@@ -542,9 +542,9 @@ class topic_analyzer {
 
         // Also handle variations like "SCORM - " or "SCORM: " with spaces.
         $title = preg_replace(
-                       '/^(SCORM|SECTION|COURSE|LESSON|FORUM|PAGE|BOOK|RESOURCE|MODULE|ACTIVITY|TOPIC)\s*[:>\-]\s*/i',
-                       '',
-                       $title
+            '/^(SCORM|SECTION|COURSE|LESSON|FORUM|PAGE|BOOK|RESOURCE|MODULE|ACTIVITY|TOPIC)\s*[:>\-]\s*/i',
+            '',
+            $title
         );
 
         // If the cleaned title is now empty or just the original prefix, keep original.
@@ -718,7 +718,7 @@ class topic_analyzer {
 
             $newtopic = new \stdClass();
             $newtopic->requestid = $requestid;
-            $newtopic->title = $cleanedtitle; // Use cleaned title
+            $newtopic->title = $cleanedtitle; // Use cleaned title.
             $newtopic->description = $topic['description'] ?? '';
             $newtopic->content_excerpt = $topic['content_excerpt'] ?? '';
             // Ensure learning_objectives is always a JSON string.
@@ -784,7 +784,7 @@ class topic_analyzer {
     private static function chunk_content(string $content, int $maxlength = 8000, int $overlap = 500): array {
         // Memory safety: Limit maximum content size to prevent memory exhaustion.
         // 10MB is a reasonable limit for text content analysis.
-        $maxcontentsize = 10 * 1024 * 1024; // 10MB
+        $maxcontentsize = 10 * 1024 * 1024; // 10MB.
         if (strlen($content) > $maxcontentsize) {
             $content = substr($content, 0, $maxcontentsize);
         }

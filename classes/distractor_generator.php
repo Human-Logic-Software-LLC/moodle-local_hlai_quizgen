@@ -60,7 +60,7 @@ class distractor_generator {
         $payload = [
             'question_text' => $questiontext,
             'correct_answer' => $correctanswer,
-            'difficulty' => 'medium', // Default difficulty
+            'difficulty' => 'medium', // Default difficulty.
             'num_distractors' => $numdistractors,
         ];
 

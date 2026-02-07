@@ -36,8 +36,8 @@ class api {
         'analyzing' => ['topics_ready', 'failed'],
         'topics_ready' => ['processing', 'pending', 'failed'],
         'processing' => ['completed', 'failed'],
-        'completed' => ['pending'], // Allow regeneration
-        'failed' => ['pending'], // Allow retry
+        'completed' => ['pending'], // Allow regeneration.
+        'failed' => ['pending'], // Allow retry.
     ];
 
     /**
@@ -184,7 +184,7 @@ class api {
      * @param string $status Filter by status (optional)
      * @return array Array of question objects
      */
-    public static function get_questions(int $requestid, string $status = null): array {
+    public static function get_questions(int $requestid, ?string $status = null): array {
         global $DB;
 
         $params = ['requestid' => $requestid];
@@ -310,8 +310,8 @@ class api {
      */
     public static function log_action(
         string $action,
-        int $requestid = null,
-        int $userid = null,
+        ?int $requestid = null,
+        ?int $userid = null,
         array $details = [],
         string $status = 'success',
         string $error = ''
@@ -338,7 +338,7 @@ class api {
      * @param int $userid User ID (optional, defaults to current user)
      * @return array Array of request objects
      */
-    public static function get_request_history(int $courseid, int $userid = null): array {
+    public static function get_request_history(int $courseid, ?int $userid = null): array {
         global $DB, $USER;
 
         $params = ['courseid' => $courseid];
@@ -366,7 +366,7 @@ class api {
      * @param int $courseid Course ID (optional)
      * @return array Statistics
      */
-    public static function get_statistics(int $courseid = null): array {
+    public static function get_statistics(?int $courseid = null): array {
         global $DB;
 
         $stats = [
