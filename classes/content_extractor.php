@@ -187,6 +187,9 @@ class content_extractor {
 
     /**
      * Extract PDF using pdftotext command.
+     *
+     * @param string $filepath Path to the PDF file
+     * @return string Extracted text content
      */
     private static function extract_pdf_pdftotext(string $filepath): string {
         $pdftotext = trim(shell_exec('which pdftotext 2>/dev/null') ?? '');
@@ -215,6 +218,9 @@ class content_extractor {
 
     /**
      * Extract PDF using Ghostscript (gs) command.
+     *
+     * @param string $filepath Path to the PDF file
+     * @return string Extracted text content
      */
     private static function extract_pdf_ghostscript(string $filepath): string {
         $gs = trim(shell_exec('which gs 2>/dev/null') ?? '');
@@ -246,6 +252,9 @@ class content_extractor {
     /**
      * Extract PDF using pure PHP (basic extraction for simple PDFs).
      * Works without any external dependencies.
+     *
+     * @param string $filepath Path to the PDF file
+     * @return string Extracted text content
      */
     private static function extract_pdf_native(string $filepath): string {
         try {
@@ -607,7 +616,8 @@ class content_extractor {
      * Extract content from Moodle activity.
      *
      * @param int $cmid Course module ID
-     * @param string $moduletype Module type (page, book, lesson, etc.)\n     * @param int $courseid Course ID
+     * @param string $moduletype Module type (page, book, lesson, etc.)
+     * @param int $courseid Course ID
      * @return array ['text' => string, 'name' => string, 'word_count' => int]
      * @throws \moodle_exception If extraction fails
      */

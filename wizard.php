@@ -675,65 +675,38 @@ function handle_content_upload(int $courseid, context $context) {
 /**
  * Handle create request from step 1.
  *
- * @param int $courseid Course ID
- * @return void
- */
-function handle_create_request(int $courseid) {
-    // Implementation exists but was cut off from reading.
-}
-
-/**
- * Handle topic selection update from step 2.
- * Note: Request must already exist (created in step 1).
+ * Creates a new quiz generation request for the given course.
  *
  * @param int $courseid Course ID
  * @return void
  */
 function handle_create_request(int $courseid) {
-    global $DB;
+    global $DB, $USER;
 
-    $requestid = required_param('requestid', PARAM_INT);
+    $requestid = optional_param('requestid', 0, PARAM_INT);
 
-    // Verify request exists.
-    $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
-
-    // Verify user owns this request.
-    if ($request->userid != $globals['USER']->id) {
-        throw new \moodle_exception('error:nopermission', 'local_hlai_quizgen');
+    if ($requestid) {
+        // Request already exists, redirect to step 2.
+        redirect(new moodle_url('/local/hlai_quizgen/wizard.php', [
+            'courseid' => $courseid,
+            'requestid' => $requestid,
+            'step' => 2,
+        ]));
     }
 
-    $selectedtopics = optional_param_array('topics', [], PARAM_INT);
-    $topicquestions = optional_param_array('topic_questions', [], PARAM_INT);
+    // Create a new request.
+    $record = new \stdClass();
+    $record->courseid = $courseid;
+    $record->userid = $USER->id;
+    $record->status = 'pending';
+    $record->timecreated = time();
+    $record->timemodified = time();
+    $requestid = $DB->insert_record('hlai_quizgen_requests', $record);
 
-    // Update all topics to deselected first.
-    $DB->set_field('hlai_quizgen_topics', 'selected', 0, ['requestid' => $requestid]);
-    $DB->set_field('hlai_quizgen_topics', 'num_questions', 0, ['requestid' => $requestid]);
-
-    // Update selected topics.
-    foreach ($selectedtopics as $topicid) {
-        // Verify topic belongs to this request.
-        $topic = $DB->get_record('hlai_quizgen_topics', ['id' => $topicid, 'requestid' => $requestid]);
-        if (!$topic) {
-            continue; // Skip invalid topic IDs.
-        }
-
-        $numqs = isset($topicquestions[$topicid]) ? (int)$topicquestions[$topicid] : 5;
-        if ($numqs < 1) {
-            $numqs = 1;
-        }
-        if ($numqs > 50) {
-            $numqs = 50;
-        }
-
-        $DB->set_field('hlai_quizgen_topics', 'selected', 1, ['id' => $topicid]);
-        $DB->set_field('hlai_quizgen_topics', 'num_questions', $numqs, ['id' => $topicid]);
-    }
-
-    // Redirect to step 3.
     redirect(new moodle_url('/local/hlai_quizgen/wizard.php', [
         'courseid' => $courseid,
         'requestid' => $requestid,
-        'step' => 3,
+        'step' => 2,
     ]));
 }
 
@@ -796,42 +769,6 @@ function handle_save_topic_selection(int $requestid) {
     }
 
     // Redirect to step 3.
-    redirect(new moodle_url('/local/hlai_quizgen/wizard.php', [
-        'courseid' => $courseid,
-        'requestid' => $requestid,
-        'step' => 3,
-    ]));
-}
-
-/**
- * Handle save question distribution (Step 3 - question distribution).
- *
- * @param int $requestid Request ID
- */
-function handle_save_question_distribution(int $requestid) {
-    global $DB;
-
-    $courseid = required_param('courseid', PARAM_INT);
-    $topicquestions = optional_param_array('topic_questions', [], PARAM_INT);
-
-    // Update question counts for each topic.
-    foreach ($topicquestions as $topicid => $numqs) {
-        $numqs = (int)$numqs;
-        if ($numqs < 0) {
-            $numqs = 0;
-        }
-        if ($numqs > 50) {
-            $numqs = 50;
-        }
-
-        $DB->set_field('hlai_quizgen_topics', 'num_questions', $numqs, ['id' => $topicid]);
-    }
-
-    // Update total question count on request.
-    $totalquestions = array_sum($topicquestions);
-    $DB->set_field('hlai_quizgen_requests', 'total_questions', $totalquestions, ['id' => $requestid]);
-
-    // Redirect to step 3 to show configuration (don't auto-generate).
     redirect(new moodle_url('/local/hlai_quizgen/wizard.php', [
         'courseid' => $courseid,
         'requestid' => $requestid,

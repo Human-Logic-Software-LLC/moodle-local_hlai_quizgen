@@ -562,6 +562,9 @@ class question_refiner {
 
     /**
      * Parse alternative questions.
+     *
+     * @param string $response The AI response to parse
+     * @return array Parsed alternative questions
      */
     private static function parse_alternatives(string $response): array {
         preg_match('/\[[\s\S]*\]/', $response, $matches);
@@ -570,6 +573,9 @@ class question_refiner {
 
     /**
      * Parse distractor improvements.
+     *
+     * @param string $response The AI response to parse
+     * @return array Parsed distractor improvements
      */
     private static function parse_distractor_improvements(string $response): array {
         preg_match('/\{[\s\S]*\}/', $response, $matches);
@@ -578,6 +584,9 @@ class question_refiner {
 
     /**
      * Parse feedback enhancements.
+     *
+     * @param string $response The AI response to parse
+     * @return array Parsed feedback enhancements
      */
     private static function parse_feedback_enhancements(string $response): array {
         preg_match('/\{[\s\S]*\}/', $response, $matches);
@@ -586,6 +595,9 @@ class question_refiner {
 
     /**
      * Parse auto-fix suggestions.
+     *
+     * @param string $response The AI response to parse
+     * @return array Parsed auto-fix suggestions
      */
     private static function parse_auto_fixes(string $response): array {
         preg_match('/\{[\s\S]*\}/', $response, $matches);
@@ -594,6 +606,11 @@ class question_refiner {
 
     /**
      * Store refinement suggestions.
+     *
+     * @param int $questionid The question ID
+     * @param string $type The refinement type
+     * @param array $suggestions The suggestions to store
+     * @return void
      */
     private static function store_refinement_suggestions(int $questionid, string $type, array $suggestions): void {
         global $DB, $USER;

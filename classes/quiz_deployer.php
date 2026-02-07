@@ -265,7 +265,7 @@ class quiz_deployer {
      * Get or create question category.
      *
      * @param int $courseid Course ID
-     * @param string $name Category name
+     * @param string|null $name Category name
      * @return \stdClass Category object
      */
     private static function get_or_create_category(int $courseid, string $name = null): \stdClass {

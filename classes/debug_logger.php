@@ -220,8 +220,8 @@ class debug_logger {
      *
      * @param int $requestid Request ID
      * @param int $topicid Topic ID
-     * @param int $questionsGenerated Number of questions generated
-     * @param int $questionsRequested Number of questions requested
+     * @param int $questionsgenerated Number of questions generated
+     * @param int $questionsrequested Number of questions requested
      * @param array $types Question types
      */
     public static function question_generation(

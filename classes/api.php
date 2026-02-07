@@ -303,8 +303,8 @@ class api {
      * Log an action.
      *
      * @param string $action Action type
-     * @param int $requestid Request ID
-     * @param int $userid User ID
+     * @param int|null $requestid Request ID
+     * @param int|null $userid User ID
      * @param array $details Additional details
      * @param string $status Status (success/error)
      * @param string $error Error message

@@ -86,6 +86,9 @@ class question_generator {
         return 'understand'; // Fallback
     }
 
+    /** @var array Static cache for content to avoid repeated fetching. */
+    private static $contentcache = [];
+
     /**
      * Generate questions for a topic.
      *
@@ -99,17 +102,6 @@ class question_generator {
      *        - 'custom_instructions' => optional custom instructions
      * @return array Array of generated question objects
      * @throws \moodle_exception If generation fails
-     */
-    /** @var array Static cache for content to avoid repeated fetching */
-    private static $contentcache = [];
-
-    /**
-     * Generate questions for a given topic.
-     *
-     * @param string $topic The topic to generate questions for.
-     * @param int $count Number of questions to generate.
-     * @param array $options Additional options for generation.
-     * @return array Generated questions.
      */
     public static function generate_for_topic(int $topicid, int $requestid, array $config): array {
         global $DB;
@@ -379,7 +371,7 @@ class question_generator {
      * @param string $response AI response
      * @param array $types Expected question types
      * @return array Array of question objects
-     * @throws \\moodle_exception If parsing fails
+     * @throws \moodle_exception If parsing fails
      */
     private static function parse_batch_response(string $response, array $types): array {
         $response = trim($response);

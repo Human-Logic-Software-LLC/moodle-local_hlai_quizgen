@@ -32,6 +32,8 @@ defined('MOODLE_INTERNAL') || die();
 class generate_questions_adhoc extends \core\task\adhoc_task {
     /**
      * Execute the task.
+     *
+     * @return void
      */
     public function execute() {
         global $DB;

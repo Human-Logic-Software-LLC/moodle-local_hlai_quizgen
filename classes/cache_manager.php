@@ -30,16 +30,13 @@ defined('MOODLE_INTERNAL') || die();
  * Manages caching of AI responses to reduce API calls and costs.
  */
 class cache_manager {
-    /** Cache duration for topic analysis (7 days). */
-    /** CACHE_TTL_TOPICS constant. */
+    /** @var int Cache duration for topic analysis (7 days). */
     const CACHE_TTL_TOPICS = 604800;
 
-    /** Cache duration for question generation (3 days). */
-    /** CACHE_TTL_QUESTIONS constant. */
+    /** @var int Cache duration for question generation (3 days). */
     const CACHE_TTL_QUESTIONS = 259200;
 
-    /** Cache duration for distractor generation (3 days). */
-    /** CACHE_TTL_DISTRACTORS constant. */
+    /** @var int Cache duration for distractor generation (3 days). */
     const CACHE_TTL_DISTRACTORS = 259200;
 
     /**

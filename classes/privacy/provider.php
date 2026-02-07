@@ -200,7 +200,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
     /**
      * Delete user data for approved contexts.
      *
-     * @param approved_contextlist $contextlist Approved contexts
+     * @param \context $context The context to delete data for
      */
     public static function delete_data_for_all_users_in_context(\context $context): void {
         global $DB;

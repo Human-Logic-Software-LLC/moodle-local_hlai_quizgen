@@ -127,18 +127,6 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2025111303, 'local', 'hlai_quizgen');
     }
 
-    // Ensure regeneration_count exists on questions (some sites may have missed it).
-    if ($oldversion < 2025120901) {
-        $table = new xmldb_table('hlai_quizgen_questions');
-        $field = new xmldb_field('regeneration_count', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, '0', 'status');
-
-        if ($dbman->table_exists($table) && !$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        upgrade_plugin_savepoint(true, 2025120901, 'local', 'hlai_quizgen');
-    }
-
     if ($oldversion < 2025111304) {
         // Add content_hash field to hlai_quizgen_requests table for deduplication.
         $table = new xmldb_table('hlai_quizgen_requests');
@@ -1126,6 +1114,18 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // No database schema changes.
 
         upgrade_plugin_savepoint(true, 2025120802, 'local', 'hlai_quizgen');
+    }
+
+    // Ensure regeneration_count exists on questions (some sites may have missed it).
+    if ($oldversion < 2025120901) {
+        $table = new xmldb_table('hlai_quizgen_questions');
+        $field = new xmldb_field('regeneration_count', XMLDB_TYPE_INTEGER, '3', null, XMLDB_NOTNULL, null, '0', 'status');
+
+        if ($dbman->table_exists($table) && !$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2025120901, 'local', 'hlai_quizgen');
     }
 
     if ($oldversion < 2025120903) {
