@@ -213,7 +213,10 @@ echo html_writer::start_div('hlai-quizgen-wizard local-hlai-iksha ' . $stepclass
 
 // Wizard header.
 echo html_writer::start_div('has-text-centered mb-5');
-echo html_writer::tag('h2', get_string('wizard_title', 'local_hlai_quizgen'), ['class' => 'has-text-weight-bold', 'style' => 'font-size: 1.75rem; color: var(--hlai-gray-800);']);
+echo html_writer::tag('h2', get_string('wizard_title', 'local_hlai_quizgen'), [
+    'class' => 'has-text-weight-bold',
+    'style' => 'font-size: 1.75rem; color: var(--hlai-gray-800);']),
+]);
 echo html_writer::tag('p', get_string('wizard_subtitle', 'local_hlai_quizgen'), ['class' => 'has-text-grey']);
 echo html_writer::end_div(); // has-text-centered
 
@@ -609,7 +612,10 @@ function handle_content_upload(int $courseid, context $context) {
             if (!file_exists($tmpfile)) {
                 redirect(
                     new moodle_url('/local/hlai_quizgen/wizard.php', ['courseid' => $courseid, 'step' => 1]),
-                    get_string('error:fileupload', 'local_hlai_quizgen', ['filename' => $filename, 'error' => 'Temporary file not found']),
+                    get_string('error:fileupload', 'local_hlai_quizgen', [
+                        'filename' => $filename,
+                        'error' => 'Temporary file not found',
+                    ]),
                     null,
                     \core\output\notification::NOTIFY_ERROR
                 );
@@ -1212,7 +1218,9 @@ function render_step1(int $courseid, int $requestid): string {
 
     $html = html_writer::start_div('hlai-step-content');
     $html .= html_writer::tag('h2', get_string('step1_title', 'local_hlai_quizgen'), ['class' => 'title is-4 mb-0']);
-    $html .= html_writer::tag('p', get_string('step1_description', 'local_hlai_quizgen'), ['class' => 'subtitle is-6 has-text-grey mt-1 mb-4']);
+    $html .= html_writer::tag('p', get_string('step1_description', 'local_hlai_quizgen'), [
+        'class' => 'subtitle is-6 has-text-grey mt-1 mb-4']),
+    ]);
     $html .= html_writer::tag('hr', '', ['class' => 'mt-0 mb-5']);
 
     // Start form.
@@ -1254,7 +1262,9 @@ function render_step1(int $courseid, int $requestid): string {
 
     // GROUP 1: Add Your Own Content.
     $html .= html_writer::start_div('hlai-source-group mb-5');
-    $html .= html_writer::tag('h5', '<i class="fa fa-pencil" style="color: #F59E0B;"></i> Add Your Own Content', ['class' => 'hlai-source-group-title']);
+    $html .= html_writer::tag('h5', '<i class="fa fa-pencil" style="color: #F59E0B;"></i> Add Your Own Content', [
+        'class' => 'hlai-source-group-title']),
+    ]);
     $html .= html_writer::start_div('columns is-multiline');
 
     // Option 1: Manual Text Entry.
@@ -1319,7 +1329,9 @@ function render_step1(int $courseid, int $requestid): string {
 
     // GROUP 2: Use Course Content.
     $html .= html_writer::start_div('hlai-source-group');
-    $html .= html_writer::tag('h5', '<i class="fa fa-book" style="color: #10B981;"></i> Use Course Content', ['class' => 'hlai-source-group-title']);
+    $html .= html_writer::tag('h5', '<i class="fa fa-book" style="color: #10B981;"></i> Use Course Content', [
+        'class' => 'hlai-source-group-title']),
+    ]);
     $html .= html_writer::start_div('columns is-multiline');
 
     // Option 4: Course Activities (Browse & Select).
@@ -1334,11 +1346,15 @@ function render_step1(int $courseid, int $requestid): string {
         'onchange' => 'toggleContentSection("activities")',
     ]);
     $html .= html_writer::start_div('hlai-source-content');
-    $html .= html_writer::tag('span', '<i class="fa fa-book" style="color: #3B82F6;"></i>', ['class' => 'hlai-source-icon hlai-icon-lg']);
+    $html .= html_writer::tag('span', '<i class="fa fa-book" style="color: #3B82F6;"></i>', [
+        'class' => 'hlai-source-icon hlai-icon-lg']),
+    ]);
     $html .= html_writer::start_div('hlai-source-text');
     $html .= html_writer::tag('strong', get_string('source_activities', 'local_hlai_quizgen'), ['class' => 'hlai-source-title']);
     $html .= html_writer::tag('p', get_string('source_activities_desc', 'local_hlai_quizgen'), ['class' => 'hlai-source-desc']);
-    $html .= html_writer::tag('span', '<i class="fa fa-star" style="color: #F59E0B;"></i> Recommended', ['class' => 'hlai-source-badge']);
+    $html .= html_writer::tag('span', '<i class="fa fa-star" style="color: #F59E0B;"></i> Recommended', [
+        'class' => 'hlai-source-badge']),
+    ]);
     $html .= html_writer::end_div();
     $html .= html_writer::end_div();
     $html .= html_writer::end_tag('label');
@@ -1356,7 +1372,9 @@ function render_step1(int $courseid, int $requestid): string {
         'onchange' => 'toggleContentSection("scan_course")',
     ]);
     $html .= html_writer::start_div('hlai-source-content');
-    $html .= html_writer::tag('span', '<i class="fa fa-graduation-cap" style="color: #10B981;"></i>', ['class' => 'hlai-source-icon']);
+    $html .= html_writer::tag('span', '<i class="fa fa-graduation-cap" style="color: #10B981;"></i>', [
+        'class' => 'hlai-source-icon']),
+    ]);
     $html .= html_writer::tag('strong', 'Scan Entire Course', ['class' => 'hlai-source-title']);
     $html .= html_writer::tag('p', 'Course summary + all sections', ['class' => 'hlai-source-desc']);
     $html .= html_writer::end_div();
@@ -1405,7 +1423,10 @@ function render_step1(int $courseid, int $requestid): string {
     $html .= html_writer::end_div(); // hlai-source-group
 
     // Display selected sources.
-    $html .= html_writer::start_div('notification is-info is-light mt-4', ['id' => 'selected-sources-display', 'style' => 'display:none;']);
+    $html .= html_writer::start_div('notification is-info is-light mt-4', [
+        'id' => 'selected-sources-display',
+        'style' => 'display:none;']),
+    ]);
     $html .= html_writer::tag('strong', get_string('selected_sources', 'local_hlai_quizgen') . ': ');
     $html .= html_writer::tag('span', '', ['id' => 'selected-sources-list', 'class' => 'tag is-primary is-medium ml-2']);
     $html .= html_writer::end_div();
@@ -1419,7 +1440,11 @@ function render_step1(int $courseid, int $requestid): string {
 
     // Manual text entry section (initially hidden).
     $html .= html_writer::start_div('field mb-5', ['id' => 'section-manual', 'style' => 'display:none;']);
-    $html .= html_writer::tag('label', '<i class="fa fa-pencil" style="color: #F59E0B;"></i> ' . get_string('manual_text_entry', 'local_hlai_quizgen'), ['class' => 'label']);
+    $html .= html_writer::tag(
+        'label',
+        '<i class="fa fa-pencil" style="color: #F59E0B;"></i> ' . get_string('manual_text_entry', 'local_hlai_quizgen'),
+        ['class' => 'label']
+    );
     $html .= html_writer::tag('p', get_string('manual_text_entry_help', 'local_hlai_quizgen'), ['class' => 'help mb-3']);
     $html .= html_writer::start_div('control');
     $html .= html_writer::tag('textarea', '', [
@@ -1434,7 +1459,11 @@ function render_step1(int $courseid, int $requestid): string {
 
     // File upload section (initially hidden).
     $html .= html_writer::start_div('field mb-5', ['id' => 'section-upload', 'style' => 'display:none;']);
-    $html .= html_writer::tag('label', '<i class="fa fa-folder-open" style="color: #8B5CF6;"></i> ' . get_string('upload_files', 'local_hlai_quizgen'), ['class' => 'label']);
+    $html .= html_writer::tag(
+        'label',
+        '<i class="fa fa-folder-open" style="color: #8B5CF6;"></i> ' . get_string('upload_files', 'local_hlai_quizgen'),
+        ['class' => 'label']
+    );
     $html .= html_writer::tag('p', get_string('upload_files_help', 'local_hlai_quizgen'), ['class' => 'help mb-3']);
 
     $html .= html_writer::start_div('file has-name is-boxed is-fullwidth');
@@ -1478,7 +1507,9 @@ function render_step1(int $courseid, int $requestid): string {
 
     // URL extraction section (initially hidden).
     $html .= html_writer::start_div('field mb-5', ['id' => 'section-url', 'style' => 'display:none;']);
-    $html .= html_writer::tag('label', '<i class="fa fa-globe" style="color: #06B6D4;"></i> Extract from URL', ['class' => 'label']);
+    $html .= html_writer::tag('label', '<i class="fa fa-globe" style="color: #06B6D4;"></i> Extract from URL', [
+        'class' => 'label']),
+    ]);
     $html .= html_writer::tag('p', 'Enter one or more URLs to extract content from web pages.', ['class' => 'help mb-3']);
 
     $html .= html_writer::start_div('control');
@@ -1501,7 +1532,9 @@ function render_step1(int $courseid, int $requestid): string {
     $html .= html_writer::tag('span', '<i class="fa fa-book" style="color: #06B6D4;"></i>', ['class' => 'hlai-activities-icon']);
     $html .= html_writer::start_div('hlai-activities-header-text');
     $html .= html_writer::tag('h3', get_string('select_activities', 'local_hlai_quizgen'), ['class' => 'hlai-activities-title']);
-    $html .= html_writer::tag('p', get_string('select_activities_help', 'local_hlai_quizgen'), ['class' => 'hlai-activities-subtitle']);
+    $html .= html_writer::tag('p', get_string('select_activities_help', 'local_hlai_quizgen'), [
+        'class' => 'hlai-activities-subtitle']),
+    ]);
     $html .= html_writer::end_div();
     $html .= html_writer::end_div();
 
@@ -1604,7 +1637,10 @@ function render_step1(int $courseid, int $requestid): string {
         // Selected count indicator.
         $html .= html_writer::start_div('hlai-activities-selected-bar');
         $html .= html_writer::tag('span', '<i class="fa fa-check-circle"></i>', ['class' => 'hlai-selected-icon']);
-        $html .= html_writer::tag('span', '0 activities selected', ['id' => 'selected-activities-count', 'class' => 'hlai-selected-text']);
+        $html .= html_writer::tag('span', '0 activities selected', [
+            'id' => 'selected-activities-count',
+            'class' => 'hlai-selected-text']),
+        ]);
         $html .= html_writer::end_div();
     } else {
         $html .= html_writer::div(
@@ -1646,17 +1682,31 @@ function render_step1(int $courseid, int $requestid): string {
          * @return {boolean} True if valid, false otherwise
          */
         function validateForm() {
-            var manualChecked = document.getElementById('source_manual') ? document.getElementById('source_manual').checked : false;
-            var uploadChecked = document.getElementById('source_upload') ? document.getElementById('source_upload').checked : false;
-            var urlChecked = document.getElementById('source_url') ? document.getElementById('source_url').checked : false;
-            var activitiesChecked = document.getElementById('source_activities') ? document.getElementById('source_activities').checked : false;
-            var scanCourseChecked = document.getElementById('source_scan_course') ? document.getElementById('source_scan_course').checked : false;
-            var scanResourcesChecked = document.getElementById('source_scan_resources') ? document.getElementById('source_scan_resources').checked : false;
-            var scanActivitiesChecked = document.getElementById('source_scan_activities') ? document.getElementById('source_scan_activities').checked : false;
+            var el = document.getElementById('source_manual');
+            var manualChecked = el ? el.checked : false;
+            el = document.getElementById('source_upload');
+            var uploadChecked = el ? el.checked : false;
+            el = document.getElementById('source_url');
+            var urlChecked = el ? el.checked : false;
+            el = document.getElementById('source_activities');
+            var activitiesChecked = el ? el.checked : false;
+            el = document.getElementById('source_scan_course');
+            var scanCourseChecked = el ? el.checked : false;
+            el = document.getElementById('source_scan_resources');
+            var scanResourcesChecked = el ? el.checked : false;
+            el = document.getElementById('source_scan_activities');
+            var scanActivitiesChecked = el ? el.checked : false;
 
             console.log('Validating form...');
             console.log('Manual:', manualChecked, 'Upload:', uploadChecked, 'URL:', urlChecked, 'Activities:', activitiesChecked);
-            console.log('Bulk Scans - Course:', scanCourseChecked, 'Resources:', scanResourcesChecked, 'Activities:', scanActivitiesChecked);
+            console.log(
+             'Bulk Scans - Course:',
+             scanCourseChecked,
+             'Resources:',
+             scanResourcesChecked,
+             'Activities:',
+             scanActivitiesChecked
+            );
 
             // Check if at least one content source is selected.
             if (!manualChecked && !uploadChecked && !urlChecked && !activitiesChecked &&
@@ -1788,9 +1838,12 @@ function render_step1(int $courseid, int $requestid): string {
                     if (file.size > maxFileSizeBytes) {
                         hasOversizedFiles = true;
                         oversizedFileNames.push(file.name + ' (' + fileSizeMB + ' MB)');
-                        fileNames += '<li class=\"text-danger\">' + safeFileName.innerHTML + ' <span class=\"' + sizeClass + '\">(' + fileSizeMB + ' MB) - TOO LARGE!</span></li>';
+                        fileNames += '<li class=\"text-danger\">' + safeFileName.innerHTML +
+                            ' <span class=\"' + sizeClass + '\">(' + fileSizeMB +
+                            ' MB) - TOO LARGE!</span></li>';
                     } else {
-                        fileNames += '<li>' + safeFileName.innerHTML + ' <span class=\"' + sizeClass + '\">(' + fileSizeMB + ' MB)</span></li>';
+                        fileNames += '<li>' + safeFileName.innerHTML +
+                            ' <span class=\"' + sizeClass + '\">(' + fileSizeMB + ' MB)</span></li>';
                     }
                 });
                 fileNames += '</ul></div>';
@@ -1907,7 +1960,9 @@ function render_step2(int $courseid, int $requestid): string {
 
     $html = html_writer::start_div('hlai-step-content');
     $html .= html_writer::tag('h2', get_string('step2_title', 'local_hlai_quizgen'), ['class' => 'title is-4 mb-0']);
-    $html .= html_writer::tag('p', get_string('step2_description', 'local_hlai_quizgen'), ['class' => 'subtitle is-6 has-text-grey mt-1 mb-4']);
+    $html .= html_writer::tag('p', get_string('step2_description', 'local_hlai_quizgen'), [
+        'class' => 'subtitle is-6 has-text-grey mt-1 mb-4']),
+    ]);
     $html .= html_writer::tag('hr', '', ['class' => 'mt-0 mb-5']);
 
     $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
@@ -1977,7 +2032,10 @@ function render_step2(int $courseid, int $requestid): string {
 
                     if (!empty($activityids)) {
                         try {
-                            $activitycontent = \local_hlai_quizgen\content_extractor::extract_from_activities($courseid, $activityids);
+                            $activitycontent = \local_hlai_quizgen\content_extractor::extract_from_activities(
+                                                                                   $courseid,
+                                                                                   $activityids
+                            );
                             if (!empty(trim($activitycontent))) {
                                 $allcontent .= $activitycontent . "\n\n";
                             }
@@ -1996,7 +2054,9 @@ function render_step2(int $courseid, int $requestid): string {
                             $allcontent .= $scanresult['text'] . "\n\n";
                         }
                     } catch (Exception $e) {
-                        $html .= '<div class="notification is-danger is-light">Scan Entire Course failed: ' . htmlspecialchars($e->getMessage()) . '</div>';
+                        $html .= '<div class="notification is-danger is-light">Scan Entire Course failed: ' .
+                            htmlspecialchars($e->getMessage()) .
+                            '</div>';
                     }
                     // Handle bulk scan all resources.
                 } else if ($source === 'bulk_scan:all_resources') {
@@ -2008,7 +2068,9 @@ function render_step2(int $courseid, int $requestid): string {
                             $allcontent .= $scanresult['text'] . "\n\n";
                         }
                     } catch (Exception $e) {
-                        $html .= '<div class="notification is-danger is-light">Scan All Resources failed: ' . htmlspecialchars($e->getMessage()) . '</div>';
+                        $html .= '<div class="notification is-danger is-light">Scan All Resources failed: ' .
+                            htmlspecialchars($e->getMessage()) .
+                            '</div>';
                     }
                     // Handle bulk scan all activities.
                 } else if ($source === 'bulk_scan:all_activities') {
@@ -2020,7 +2082,9 @@ function render_step2(int $courseid, int $requestid): string {
                             $allcontent .= $scanresult['text'] . "\n\n";
                         }
                     } catch (Exception $e) {
-                        $html .= '<div class="notification is-danger is-light">Bulk scan failed: ' . htmlspecialchars($e->getMessage()) . '</div>';
+                        $html .= '<div class="notification is-danger is-light">Bulk scan failed: ' .
+                            htmlspecialchars($e->getMessage()) .
+                            '</div>';
                     }
                 }
             }
@@ -2160,7 +2224,9 @@ function render_step2(int $courseid, int $requestid): string {
             ]);
             $html .= html_writer::tag('span', '', ['class' => 'hlai-topic-checkmark']);
             $html .= html_writer::start_div('hlai-topic-content');
-            $html .= html_writer::tag('span', '<i class="fa fa-book" style="color: #3B82F6;"></i>', ['class' => 'hlai-topic-emoji']);
+            $html .= html_writer::tag('span', '<i class="fa fa-book" style="color: #3B82F6;"></i>', [
+                'class' => 'hlai-topic-emoji']),
+            ]);
             $html .= html_writer::start_div('hlai-topic-text');
             $html .= html_writer::tag('span', format_string($topic->title), ['class' => 'hlai-topic-title']);
             if (!empty($topic->description)) {
@@ -2250,7 +2316,9 @@ function render_step2(int $courseid, int $requestid): string {
         ");
     } else {
         $html .= html_writer::div(
-            html_writer::tag('span', '<i class="fa fa-hourglass-2" style="color: #F59E0B;"></i>', ['style' => 'font-size: 1.5rem; margin-right: 0.5rem;']) .
+            html_writer::tag('span', '<i class="fa fa-hourglass-2" style="color: #F59E0B;"></i>', [
+                'style' => 'font-size: 1.5rem; margin-right: 0.5rem;']) .,
+            ]);
             get_string('analyzing_content', 'local_hlai_quizgen'),
             'notification is-info'
         );
@@ -2462,7 +2530,9 @@ function render_step3(int $courseid, int $requestid): string {
     // Bloom's Taxonomy - Visual with colored levels.
     $html .= html_writer::start_div('hlai-section hlai-section-blooms mt-5');
     $html .= html_writer::start_div('hlai-section-header');
-    $html .= html_writer::tag('span', '<i class="fa fa-lightbulb-o" style="color: #3B82F6;"></i>', ['class' => 'hlai-section-icon']);
+    $html .= html_writer::tag('span', '<i class="fa fa-lightbulb-o" style="color: #3B82F6;"></i>', [
+        'class' => 'hlai-section-icon']),
+    ]);
     $html .= html_writer::start_div('hlai-section-title-wrap');
     $html .= html_writer::tag('h4', "Bloom's Taxonomy", ['class' => 'hlai-section-label']);
     $html .= html_writer::tag('p', 'Cognitive level distribution (should total 100%)', ['class' => 'hlai-section-hint']);
@@ -2483,8 +2553,13 @@ function render_step3(int $courseid, int $requestid): string {
         $sliderfill = $info['default'];
         $html .= html_writer::start_div('hlai-blooms-item', ['data-level' => $level]);
         $html .= html_writer::start_div('hlai-blooms-label-wrap', ['style' => 'display: flex; align-items: center;']);
-        $html .= html_writer::tag('span', '', ['class' => 'hlai-blooms-dot', 'style' => 'background: ' . $info['color'] . '; display: flex; align-items: center;']);
-        $html .= html_writer::tag('span', $info['label'], ['class' => 'hlai-blooms-name', 'style' => 'display: flex; align-items: center;']);
+        $html .= html_writer::tag('span', '', ['class' => 'hlai-blooms-dot', 'style' => 'background: ' . $info[
+            'color'] . '; display: flex; align-items: center;']),
+        ]);
+        $html .= html_writer::tag('span', $info['label'], [
+            'class' => 'hlai-blooms-name',
+            'style' => 'display: flex; align-items: center;']),
+        ]);
         $html .= html_writer::end_div();
         $html .= html_writer::start_div('hlai-blooms-control');
         $html .= html_writer::empty_tag('input', [
@@ -2501,7 +2576,11 @@ function render_step3(int $courseid, int $requestid): string {
                 '#e2e8f0 ' . $sliderfill . '%, #e2e8f0 100%);',
             'oninput' => 'updateSliderColor(this); updateBloomsTotal();',
         ]);
-        $html .= html_writer::tag('span', $info['default'] . '%', ['id' => 'blooms_' . $level . '_value', 'class' => 'hlai-slider-val', 'style' => 'color: ' . $info['color']]);
+        $html .= html_writer::tag('span', $info['default'] . '%', [
+            'id' => 'blooms_' . $level . '_value',
+            'class' => 'hlai-slider-val',
+            'style' => 'color: ' . $info['color'],
+        ]);
         $html .= html_writer::end_div();
         $html .= html_writer::end_div();
     }
@@ -2542,7 +2621,8 @@ function render_step3(int $courseid, int $requestid): string {
             var color = slider.dataset.color || '#6366f1';
             var valueEl = document.getElementById(id + '_value');
             if (valueEl) valueEl.textContent = value + '%';
-            slider.style.background = 'linear-gradient(to right, ' + color + ' 0%, ' + color + ' ' + value + '%, #e2e8f0 ' + value + '%, #e2e8f0 100%)';
+            slider.style.background = 'linear-gradient(to right, ' + color + ' 0%, ' + color +
+                ' ' + value + '%, #e2e8f0 ' + value + '%, #e2e8f0 100%)';
         }
 
         /**
@@ -2585,7 +2665,8 @@ function render_step3(int $courseid, int $requestid): string {
     );
     $html .= html_writer::end_div();
     $html .= html_writer::start_div('level-right');
-    $html .= html_writer::tag('button', '<i class="fa fa-rocket" style="color: #FFFFFF;"></i> ' . get_string('generate_questions', 'local_hlai_quizgen'), [
+    $html .= html_writer::tag('button', '<i class="fa fa-rocket" style="color: #FFFFFF;"></i> ' .
+        get_string('generate_questions', 'local_hlai_quizgen'), [
         'type' => 'submit',
         'class' => 'button is-primary',
         'id' => 'generate-btn',
@@ -2602,8 +2683,12 @@ function render_step3(int $courseid, int $requestid): string {
     ]);
     $html .= html_writer::start_div('hlai-generating-modal');
     $html .= html_writer::div('', 'loader');
-    $html .= html_writer::tag('h3', '<i class="fa fa-lightbulb-o" style="color: #3B82F6;"></i> Generating Questions...', ['class' => 'generating-title']);
-    $html .= html_writer::tag('p', 'Please wait while AI generates your questions. This may take 30-90 seconds.', ['class' => 'generating-subtitle']);
+    $html .= html_writer::tag('h3', '<i class="fa fa-lightbulb-o" style="color: #3B82F6;"></i> Generating Questions...', [
+        'class' => 'generating-title']),
+    ]);
+    $html .= html_writer::tag('p', 'Please wait while AI generates your questions. This may take 30-90 seconds.', [
+        'class' => 'generating-subtitle']),
+    ]);
     $html .= html_writer::tag('p', 'Do not close this window or press the back button.', ['class' => 'generating-warning']);
     $html .= html_writer::end_div(); // hlai-generating-modal
     $html .= html_writer::end_div(); // hlai-generating-overlay
@@ -2692,7 +2777,8 @@ function render_step3(int $courseid, int $requestid): string {
             }
 
             if (total !== totalRequired) {
-                alert('Question type total (' + total + ') must equal total questions (' + totalRequired + '). Please adjust the values.');
+                alert('Question type total (' + total + ') must equal total questions (' +
+                    totalRequired + '). Please adjust the values.');
                 return false;
             }
 
@@ -2860,8 +2946,14 @@ function render_step4(int $courseid, int $requestid): string {
     $html = html_writer::start_div('hlai-step-content');
 
     // Header.
-    $html .= html_writer::tag('h2', '<i class="fa fa-clipboard" style="color: #3B82F6;"></i> ' . get_string('step4_title', 'local_hlai_quizgen'), ['class' => 'title is-4 mb-2']);
-    $html .= html_writer::tag('p', get_string('step4_description', 'local_hlai_quizgen'), ['class' => 'subtitle is-6 has-text-grey mb-4']);
+    $html .= html_writer::tag('h2',
+        '<i class="fa fa-clipboard" style="color: #3B82F6;"></i> ' .
+        get_string('step4_title', 'local_hlai_quizgen'),
+        ['class' => 'title is-4 mb-2']
+    );
+    $html .= html_writer::tag('p', get_string('step4_description', 'local_hlai_quizgen'),
+        ['class' => 'subtitle is-6 has-text-grey mb-4']
+    );
     $html .= html_writer::tag('hr', '', ['class' => 'mt-0 mb-6']);
 
     $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
@@ -2875,9 +2967,15 @@ function render_step4(int $courseid, int $requestid): string {
         // Spinner (Styled by css .hlai-generating-modal .loader)
         $html .= html_writer::div('', 'loader');
 
-        $html .= html_writer::tag('h3', '<i class="fa fa-lightbulb-o" style="color: #3B82F6;"></i> Generating Questions...', ['class' => 'title is-5 mb-2']);
-        $html .= html_writer::tag('p', 'Please wait while AI generates your questions. This may take 30-90 seconds.', ['class' => 'has-text-grey is-size-6 mb-4']);
-        $html .= html_writer::tag('p', 'Do not close this window or press the back button.', ['class' => 'has-text-warning-dark is-size-7 has-text-weight-bold']);
+        $html .= html_writer::tag('h3', '<i class="fa fa-lightbulb-o" style="color: #3B82F6;"></i> Generating Questions...', [
+            'class' => 'title is-5 mb-2']),
+        ]);
+        $html .= html_writer::tag('p', 'Please wait while AI generates your questions. This may take 30-90 seconds.', [
+            'class' => 'has-text-grey is-size-6 mb-4']),
+        ]);
+        $html .= html_writer::tag('p', 'Do not close this window or press the back button.', [
+            'class' => 'has-text-warning-dark is-size-7 has-text-weight-bold']),
+        ]);
 
         $html .= html_writer::end_div(); // hlai-generating-modal
         $html .= html_writer::end_div(); // hlai-generating-overlay
@@ -3081,7 +3179,9 @@ function render_step4(int $courseid, int $requestid): string {
         ]);
 
         // CARD HEADER.
-        $html .= html_writer::start_div('card-header is-shadowless border-bottom-0', ['style' => 'box-shadow: none; border-bottom: 1px solid var(--hlai-gray-100);']);
+        $html .= html_writer::start_div('card-header is-shadowless border-bottom-0', [
+            'style' => 'box-shadow: none; border-bottom: 1px solid var(--hlai-gray-100);']),
+        ]);
 
         $html .= html_writer::start_div('card-header-title is-align-items-center py-2');
 
@@ -3109,7 +3209,8 @@ function render_step4(int $courseid, int $requestid): string {
         $typelabel = str_replace('multichoice', 'MCQ', $question->questiontype ?? 'mcq');
         $html .= html_writer::tag('span', strtoupper($typelabel), ['class' => 'tag is-light mr-2']);
 
-        $diffclass = $question->difficulty === 'easy' ? 'is-success' : ($question->difficulty === 'hard' ? 'is-danger' : 'is-warning');
+        $diffclass = $question->difficulty === 'easy' ? 'is-success' :
+            ($question->difficulty === 'hard' ? 'is-danger' : 'is-warning');
         $html .= html_writer::tag('span', ucfirst($question->difficulty), ['class' => 'tag is-light ' . $diffclass]);
         $html .= html_writer::end_div(); // card-header-title
 
@@ -3161,7 +3262,8 @@ function render_step4(int $courseid, int $requestid): string {
                 $letterlabel = 'A';
                 foreach ($answers as $answer) {
                     $iscorrect = $answer->fraction > 0;
-                    $answerstyle = 'padding: 0.5rem; border-radius: 4px; display: flex; align-items: flex-start; margin-bottom: 0.35rem;';
+                    $answerstyle = 'padding: 0.5rem; border-radius: 4px; display: flex; ' .
+                        'align-items: flex-start; margin-bottom: 0.35rem;';
 
                     // Use background utilities instead of custom classes if we can, but clean style needs some help.
                     if ($iscorrect) {
@@ -3200,7 +3302,9 @@ function render_step4(int $courseid, int $requestid): string {
                 'sesskey' => sesskey(),
                 'step' => 4,
             ]);
-            $html .= html_writer::link($approveurl, 'Approve', ['class' => 'card-footer-item has-text-success has-text-weight-bold']);
+            $html .= html_writer::link($approveurl, 'Approve', [
+                'class' => 'card-footer-item has-text-success has-text-weight-bold']),
+            ]);
         } else {
             // Already approved indicator.
             $html .= html_writer::span('Approved', 'card-footer-item has-text-grey-light');
@@ -3229,7 +3333,9 @@ function render_step4(int $courseid, int $requestid): string {
                 'sesskey' => sesskey(),
                 'step' => 4,
             ]);
-            $html .= html_writer::link($regenurl, 'Regenerate (' . $remainingregens . ')', ['class' => 'card-footer-item has-text-info']);
+            $html .= html_writer::link($regenurl, 'Regenerate (' . $remainingregens . ')', [
+                'class' => 'card-footer-item has-text-info']),
+            ]);
         }
 
         $html .= html_writer::end_div(); // card-footer
@@ -3396,8 +3502,14 @@ function render_step5(int $courseid, int $requestid): string {
     $html = html_writer::start_div('hlai-step-content');
 
     // Header.
-    $html .= html_writer::tag('h2', '<i class="fa fa-rocket" style="color: #3B82F6;"></i> ' . get_string('step5_title', 'local_hlai_quizgen'), ['class' => 'title is-4 mb-0']);
-    $html .= html_writer::tag('p', get_string('step5_description', 'local_hlai_quizgen'), ['class' => 'subtitle is-6 has-text-grey mt-1 mb-4']);
+    $html .= html_writer::tag('h2',
+        '<i class="fa fa-rocket" style="color: #3B82F6;"></i> ' .
+        get_string('step5_title', 'local_hlai_quizgen'),
+        ['class' => 'title is-4 mb-0']
+    );
+    $html .= html_writer::tag('p', get_string('step5_description', 'local_hlai_quizgen'), [
+        'class' => 'subtitle is-6 has-text-grey mt-1 mb-4']),
+    ]);
     $html .= html_writer::tag('hr', '', ['class' => 'mt-0 mb-5']);
 
     // Count approved questions only.
@@ -3424,7 +3536,8 @@ function render_step5(int $courseid, int $requestid): string {
 
     if ($approvedcount == 0) {
         $html .= html_writer::div(
-            "You have {$totalcount} generated questions, but none are approved yet. Please go back to Step 4 and approve questions before deployment.",
+            "You have {$totalcount} generated questions, but none are approved yet. " .
+            "Please go back to Step 4 and approve questions before deployment.",
             'notification is-warning'
         );
         $html .= html_writer::link(
@@ -3437,7 +3550,8 @@ function render_step5(int $courseid, int $requestid): string {
     }
 
     $html .= html_writer::div(
-        html_writer::tag('strong', "<i class='fa fa-check-circle'></i> {$approvedcount} approved questions") . " ready to deploy (out of {$totalcount} generated)",
+        html_writer::tag('strong', "<i class='fa fa-check-circle'></i> {$approvedcount} approved questions") .
+            " ready to deploy (out of {$totalcount} generated)",
         'notification is-success'
     );
 
@@ -3460,11 +3574,18 @@ function render_step5(int $courseid, int $requestid): string {
     ]);
 
     // Deployment type.
-    $html .= html_writer::tag('h4', '<i class="fa fa-cube" style="color: #3B82F6;"></i> ' . get_string('deployment_options', 'local_hlai_quizgen'), ['class' => 'title is-5 mb-4']);
+    $html .= html_writer::tag('h4',
+        '<i class="fa fa-cube" style="color: #3B82F6;"></i> ' .
+        get_string('deployment_options', 'local_hlai_quizgen'),
+        ['class' => 'title is-5 mb-4']
+    );
 
     // Option 1: Create new quiz.
     $html .= html_writer::start_div('field mb-4');
-    $html .= html_writer::start_tag('label', ['class' => 'radio', 'style' => 'display: flex; align-items: flex-start; gap: 0.5rem;']);
+    $html .= html_writer::start_tag('label', [
+        'class' => 'radio',
+        'style' => 'display: flex; align-items: flex-start; gap: 0.5rem;']),
+    ]);
     $html .= html_writer::empty_tag('input', [
         'type' => 'radio',
         'name' => 'deploy_type',
@@ -3483,7 +3604,10 @@ function render_step5(int $courseid, int $requestid): string {
 
     $html .= html_writer::start_div('ml-5 mb-4', ['id' => 'new_quiz_options']);
     $html .= html_writer::start_div('field');
-    $html .= html_writer::tag('label', get_string('quiz_name', 'local_hlai_quizgen'), ['for' => 'quiz_name', 'class' => 'label is-small']);
+    $html .= html_writer::tag('label', get_string('quiz_name', 'local_hlai_quizgen'), [
+        'for' => 'quiz_name',
+        'class' => 'label is-small']),
+    ]);
     $html .= html_writer::start_div('control');
     $html .= html_writer::empty_tag('input', [
         'type' => 'text',
@@ -3499,7 +3623,10 @@ function render_step5(int $courseid, int $requestid): string {
 
     // Option 2: Question bank only.
     $html .= html_writer::start_div('field mb-4');
-    $html .= html_writer::start_tag('label', ['class' => 'radio', 'style' => 'display: flex; align-items: flex-start; gap: 0.5rem;']);
+    $html .= html_writer::start_tag('label', [
+        'class' => 'radio',
+        'style' => 'display: flex; align-items: flex-start; gap: 0.5rem;']),
+    ]);
     $html .= html_writer::empty_tag('input', [
         'type' => 'radio',
         'name' => 'deploy_type',
@@ -3517,7 +3644,10 @@ function render_step5(int $courseid, int $requestid): string {
 
     $html .= html_writer::start_div('ml-5 mb-3', ['id' => 'qbank_options', 'style' => 'display:none;']);
     $html .= html_writer::start_div('field');
-    $html .= html_writer::tag('label', get_string('category_name', 'local_hlai_quizgen'), ['for' => 'category_name', 'class' => 'label is-small']);
+    $html .= html_writer::tag('label', get_string('category_name', 'local_hlai_quizgen'), [
+        'for' => 'category_name',
+        'class' => 'label is-small']),
+    ]);
     $html .= html_writer::start_div('control');
     $html .= html_writer::empty_tag('input', [
         'type' => 'text',
@@ -3540,7 +3670,8 @@ function render_step5(int $courseid, int $requestid): string {
     );
     $html .= html_writer::end_div();
     $html .= html_writer::start_div('level-right');
-    $html .= html_writer::tag('button', '<i class="fa fa-rocket" style="color: #FFFFFF;"></i> ' . get_string('deploy_questions', 'local_hlai_quizgen'), [
+    $html .= html_writer::tag('button', '<i class="fa fa-rocket" style="color: #FFFFFF;"></i> ' .
+        get_string('deploy_questions', 'local_hlai_quizgen'), [
         'type' => 'submit',
         'class' => 'button is-success',
     ]);

@@ -251,8 +251,10 @@ try {
 
             $requests = $DB->get_records_sql(
                 "SELECT r.id, r.timecreated,
-                        (SELECT COUNT(*) FROM {local_hlai_quizgen_questions} q WHERE q.requestid = r.id AND q.status = 'approved') as approved,
-                        (SELECT COUNT(*) FROM {local_hlai_quizgen_questions} q WHERE q.requestid = r.id AND q.status IN ('approved', 'rejected')) as total
+                        (SELECT COUNT(*) FROM {local_hlai_quizgen_questions} q
+                         WHERE q.requestid = r.id AND q.status = 'approved') as approved,
+                        (SELECT COUNT(*) FROM {local_hlai_quizgen_questions} q
+                         WHERE q.requestid = r.id AND q.status IN ('approved', 'rejected')) as total
                  FROM {local_hlai_quizgen_requests} r
                  WHERE r.userid = ? AND r.status = 'completed'
                  ORDER BY r.timecreated ASC
@@ -1283,8 +1285,10 @@ try {
                 }
             }
 
-            $result['message'] = "Found " . count($result['missing_type_data']) . " questions with missing type data. " .
-                                 "Found " . count($result['draft_status']) . " questions with non-ready status (repaired {$result['repaired_status']}).";
+            $result['message'] = "Found " . count($result['missing_type_data']) .
+                                 " questions with missing type data. Found " .
+                                 count($result['draft_status']) .
+                                 " questions with non-ready status (repaired {$result['repaired_status']}).";
 
             send_response(true, $result);
             break;
@@ -1403,7 +1407,8 @@ try {
                 // Get categories in course context.
                 $categories = $DB->get_records_sql(
                     "SELECT qc.id, qc.name, qc.contextid, qc.parent,
-                            (SELECT COUNT(*) FROM {question_bank_entries} qbe WHERE qbe.questioncategoryid = qc.id) as question_count
+                            (SELECT COUNT(*) FROM {question_bank_entries} qbe
+                             WHERE qbe.questioncategoryid = qc.id) as question_count
                      FROM {question_categories} qc
                      WHERE qc.contextid = ?
                      ORDER BY qc.id DESC",
