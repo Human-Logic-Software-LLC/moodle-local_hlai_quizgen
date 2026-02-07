@@ -32,11 +32,11 @@ namespace local_hlai_quizgen;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @covers     \local_hlai_quizgen\api
  */
-class api_test extends \advanced_testcase {
+final class api_test extends \advanced_testcase {
     /**
      * Test creating a generation request.
      */
-    public function test_create_request() {
+    public function test_create_request(): void {
         global $DB;
         $this->resetAfterTest(true);
 
@@ -68,7 +68,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test updating request status.
      */
-    public function test_update_request_status() {
+    public function test_update_request_status(): void {
         global $DB;
         $this->resetAfterTest(true);
 
@@ -102,7 +102,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test getting requests for a course.
      */
-    public function test_get_requests_for_course() {
+    public function test_get_requests_for_course(): void {
         global $DB;
         $this->resetAfterTest(true);
 
@@ -131,7 +131,7 @@ class api_test extends \advanced_testcase {
     /**
      * Test getting request by ID.
      */
-    public function test_get_request() {
+    public function test_get_request(): void {
         $this->resetAfterTest(true);
 
         // Create a test course.
