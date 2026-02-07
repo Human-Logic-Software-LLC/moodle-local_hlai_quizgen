@@ -40,7 +40,7 @@ if (isset($CFG)) {
     require_once($CFG->dirroot . '/mod/lesson/lib.php');
 }
 
-// NOTE: No Composer/vendor dependencies - all extraction uses native PHP or system commands
+// NOTE: No Composer/vendor dependencies - all extraction uses native PHP or system commands.
 
 /**
  * Content extractor class.

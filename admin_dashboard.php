@@ -703,7 +703,7 @@ echo $OUTPUT->header();
                                 <div>
                                     <strong class="performer-name"><?php echo fullname($teacher); ?></strong>
                                     <div class="performer-details">
-                                        <?php echo $teacher->approved_questions; ?>/<?php echo $teacher->total_questions; ?> approved
+                                        <?php echo $teacher->approved_questions . '/' . $teacher->total_questions; ?> approved
                                     </div>
                                 </div>
                             </div>
@@ -765,7 +765,9 @@ echo $OUTPUT->header();
                        class="config-button">
                         <i class="fa fa-wrench"></i> Plugin Settings
                     </a>
-                    <a href="<?php echo new moodle_url('/admin/roles/check.php', ['capability' => 'local/hlai_quizgen:generatequestions']); ?>"
+                    <?php $capurl = new moodle_url('/admin/roles/check.php',
+                        ['capability' => 'local/hlai_quizgen:generatequestions']); ?>
+                    <a href="<?php echo $capurl; ?>"
                        class="config-button">
                         <i class="fa fa-users"></i> User Capabilities
                     </a>

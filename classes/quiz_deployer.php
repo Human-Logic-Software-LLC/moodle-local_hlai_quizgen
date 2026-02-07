@@ -392,7 +392,12 @@ class quiz_deployer {
      * @return int Moodle question ID
      * @throws \moodle_exception If conversion fails
      */
-    private static function convert_to_moodle_question(\stdClass $genquestion, int $categoryid, string $categoryname = '', int $questionnumber = 1): int {
+    private static function convert_to_moodle_question(
+        \stdClass $genquestion,
+        int $categoryid,
+        string $categoryname = '',
+        int $questionnumber = 1
+    ): int {
         global $DB, $USER, $CFG;
 
         // DEBUG: Log the start of question conversion.

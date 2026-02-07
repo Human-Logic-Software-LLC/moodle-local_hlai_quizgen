@@ -140,7 +140,10 @@ class api {
         $request->total_questions = $config['total_questions'] ?? 0;
         $request->questions_generated = 0;
         $request->processing_mode = $config['processing_mode'] ?? get_config('local_hlai_quizgen', 'default_quality_mode');
-        $request->difficulty_distribution = json_encode($config['difficulty_distribution'] ?? ['easy' => 20, 'medium' => 60, 'hard' => 20]);
+        $defaultdifficulty = ['easy' => 20, 'medium' => 60, 'hard' => 20];
+        $request->difficulty_distribution = json_encode(
+            $config['difficulty_distribution'] ?? $defaultdifficulty
+        );
         $request->question_types = json_encode($config['question_types'] ?? ['multichoice']);
         $request->custom_instructions = $config['custom_instructions'] ?? '';
         $request->timecreated = time();
@@ -514,7 +517,8 @@ class api {
 
                         // Check if categories match.
                         if ($mq->category != $qbe->questioncategoryid) {
-                            $qinfo['issue'] = "Category mismatch: question.category={$mq->category}, bank_entry.categoryid={$qbe->questioncategoryid}";
+                            $qinfo['issue'] = "Category mismatch: question.category={$mq->category},"
+                                . " bank_entry.categoryid={$qbe->questioncategoryid}";
                             $result['issues'][] = $qinfo['issue'];
                         }
                         if ($qbe->version_status !== 'ready') {

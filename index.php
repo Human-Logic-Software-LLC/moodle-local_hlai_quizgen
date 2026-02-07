@@ -173,9 +173,12 @@ echo $OUTPUT->header();
             <div class="level-item">
                 <div>
                     <h1 class="title is-3 mb-1">
-                        <i class="fa fa-graduation-cap" style="color: #3B82F6;"></i> <?php echo get_string('dashboard_title', 'local_hlai_quizgen'); ?>
+                        <i class="fa fa-graduation-cap" style="color: #3B82F6;"></i>
+                        <?php echo get_string('dashboard_title', 'local_hlai_quizgen'); ?>
                     </h1>
-                    <p class="subtitle is-6 has-text-grey mt-2"><?php echo get_string('dashboard_subtitle', 'local_hlai_quizgen'); ?></p>
+                    <p class="subtitle is-6 has-text-grey mt-2">
+                        <?php echo get_string('dashboard_subtitle', 'local_hlai_quizgen'); ?>
+                    </p>
                 </div>
             </div>
         </div>
@@ -223,7 +226,12 @@ echo $OUTPUT->header();
                 <p class="is-size-3"><i class="fa fa-star" style="color: #F59E0B;"></i></p>
                 <p class="title is-3 mb-1"><?php echo $avgquality > 0 ? $avgquality . '/100' : 'N/A'; ?></p>
                 <p class="heading"><?php echo get_string('avg_quality_score', 'local_hlai_quizgen'); ?></p>
-                <p class="help <?php echo $avgquality > 0 ? ($avgquality >= 70 ? 'has-text-success' : 'has-text-danger') : 'has-text-grey'; ?>">
+                <?php
+                $qualityclass = $avgquality > 0
+                    ? ($avgquality >= 70 ? 'has-text-success' : 'has-text-danger')
+                    : 'has-text-grey';
+                ?>
+                <p class="help <?php echo $qualityclass; ?>">
                     <?php
                     if ($avgquality > 0) {
                         echo $avgquality >= 70 ? get_string(
@@ -257,8 +265,13 @@ echo $OUTPUT->header();
 
             <!-- First-Time Acceptance Rate Chart -->
             <div class="box mb-4">
-                <p class="title is-5"><i class="fa fa-bullseye" style="color: #10B981;"></i> <?php echo get_string('first_time_acceptance_rate', 'local_hlai_quizgen'); ?></p>
-                <p class="subtitle is-6 has-text-grey"><?php echo get_string('questions_approved_without_regen', 'local_hlai_quizgen'); ?></p>
+                <p class="title is-5">
+                    <i class="fa fa-bullseye" style="color: #10B981;"></i>
+                    <?php echo get_string('first_time_acceptance_rate', 'local_hlai_quizgen'); ?>
+                </p>
+                <p class="subtitle is-6 has-text-grey">
+                    <?php echo get_string('questions_approved_without_regen', 'local_hlai_quizgen'); ?>
+                </p>
                 <div id="ftar-gauge-chart" style="height: 280px;"></div>
                 <div class="has-text-centered mt-3">
                     <?php
@@ -286,8 +299,13 @@ echo $OUTPUT->header();
 
             <!-- Quality Trends Chart -->
             <div class="box mb-4">
-                <p class="title is-5"><i class="fa fa-line-chart" style="color: #3B82F6;"></i> <?php echo get_string('quality_trends', 'local_hlai_quizgen'); ?></p>
-                <p class="subtitle is-6 has-text-grey"><?php echo get_string('quality_trends_subtitle', 'local_hlai_quizgen'); ?></p>
+                <p class="title is-5">
+                    <i class="fa fa-line-chart" style="color: #3B82F6;"></i>
+                    <?php echo get_string('quality_trends', 'local_hlai_quizgen'); ?>
+                </p>
+                <p class="subtitle is-6 has-text-grey">
+                    <?php echo get_string('quality_trends_subtitle', 'local_hlai_quizgen'); ?>
+                </p>
                 <div id="acceptance-trend-chart" style="height: 300px;"></div>
             </div>
 
@@ -295,12 +313,17 @@ echo $OUTPUT->header();
             <div class="columns">
                 <div class="column is-half">
                     <div class="box">
-                        <p class="title is-5"><i class="fa fa-bar-chart" style="color: #64748B;"></i> <?php echo get_string('question_types', 'local_hlai_quizgen'); ?></p>
+                        <p class="title is-5">
+                            <i class="fa fa-bar-chart" style="color: #64748B;"></i>
+                            <?php echo get_string('question_types', 'local_hlai_quizgen'); ?>
+                        </p>
                         <div id="question-type-chart" style="height: 280px;">
                             <?php if (empty($typedistribution)) : ?>
                             <div class="has-text-centered py-6">
                                 <span style="font-size: 3rem;"><i class="fa fa-bar-chart" style="color: #CBD5E1;"></i></span>
-                                <p class="has-text-grey mt-3"><?php echo get_string('no_questions_yet', 'local_hlai_quizgen'); ?></p>
+                                <p class="has-text-grey mt-3">
+                                    <?php echo get_string('no_questions_yet', 'local_hlai_quizgen'); ?>
+                                </p>
                                 <a href="<?php echo new moodle_url('/local/hlai_quizgen/wizard.php', ['courseid' => $courseid]); ?>"
                                    class="button is-primary is-outlined is-small mt-3">
                                     <?php echo get_string('create_first_quiz', 'local_hlai_quizgen'); ?>
@@ -323,8 +346,13 @@ echo $OUTPUT->header();
 
             <!-- Bloom's Taxonomy Charts -->
             <div class="box mt-4">
-                <p class="title is-5"><i class="fa fa-lightbulb-o" style="color: #3B82F6;"></i> <?php echo get_string('blooms_coverage', 'local_hlai_quizgen'); ?></p>
-                <p class="subtitle is-6 has-text-grey"><?php echo get_string('blooms_coverage_subtitle', 'local_hlai_quizgen'); ?></p>
+                <p class="title is-5">
+                    <i class="fa fa-lightbulb-o" style="color: #3B82F6;"></i>
+                    <?php echo get_string('blooms_coverage', 'local_hlai_quizgen'); ?>
+                </p>
+                <p class="subtitle is-6 has-text-grey">
+                    <?php echo get_string('blooms_coverage_subtitle', 'local_hlai_quizgen'); ?>
+                </p>
                 <div class="columns">
                     <div class="column is-half">
                         <div id="blooms-radar-chart" style="height: 400px;"></div>
@@ -341,16 +369,22 @@ echo $OUTPUT->header();
 
             <!-- Quick Actions -->
             <div class="panel mb-4">
-                <p class="panel-heading"><i class="fa fa-bolt" style="color: #F59E0B;"></i> <?php echo get_string('quick_actions', 'local_hlai_quizgen'); ?></p>
-                <a href="<?php echo new moodle_url('/local/hlai_quizgen/wizard.php', ['courseid' => $courseid]); ?>" class="panel-block">
+                <p class="panel-heading">
+                    <i class="fa fa-bolt" style="color: #F59E0B;"></i>
+                    <?php echo get_string('quick_actions', 'local_hlai_quizgen'); ?>
+                </p>
+                <a href="<?php echo new moodle_url('/local/hlai_quizgen/wizard.php', ['courseid' => $courseid]); ?>"
+                   class="panel-block">
                     <span class="panel-icon has-text-primary">+</span>
                     <?php echo get_string('generate_new_questions', 'local_hlai_quizgen'); ?>
                 </a>
-                <a href="<?php echo new moodle_url('/local/hlai_quizgen/analytics.php', ['courseid' => $courseid]); ?>" class="panel-block">
+                <a href="<?php echo new moodle_url('/local/hlai_quizgen/analytics.php', ['courseid' => $courseid]); ?>"
+                   class="panel-block">
                     <span class="panel-icon" style="color: #06B6D4;"><i class="fa fa-bar-chart"></i></span>
                     <?php echo get_string('view_analytics', 'local_hlai_quizgen'); ?>
                 </a>
-                <a href="<?php echo new moodle_url('/local/hlai_quizgen/view_logs.php', ['courseid' => $courseid]); ?>" class="panel-block">
+                <a href="<?php echo new moodle_url('/local/hlai_quizgen/view_logs.php', ['courseid' => $courseid]); ?>"
+                   class="panel-block">
                     <span class="panel-icon" style="color: #64748B;"><i class="fa fa-list-alt"></i></span>
                     <?php echo get_string('view_activity_logs', 'local_hlai_quizgen'); ?>
                 </a>
@@ -358,12 +392,17 @@ echo $OUTPUT->header();
 
             <!-- Recent Activity -->
             <div class="panel mb-4">
-                <p class="panel-heading"><i class="fa fa-clock" style="color: #06B6D4;"></i> <?php echo get_string('recent_activity', 'local_hlai_quizgen'); ?></p>
+                <p class="panel-heading">
+                    <i class="fa fa-clock" style="color: #06B6D4;"></i>
+                    <?php echo get_string('recent_activity', 'local_hlai_quizgen'); ?>
+                </p>
                 <?php if (empty($recentrequests)) : ?>
                 <div class="panel-block">
                     <div class="has-text-centered py-4" style="width: 100%;">
                         <span style="font-size: 2rem;"><i class="fa fa-clipboard" style="color: #CBD5E1;"></i></span>
-                        <p class="has-text-weight-semibold mt-3"><?php echo get_string('no_recent_activity', 'local_hlai_quizgen'); ?></p>
+                        <p class="has-text-weight-semibold mt-3">
+                            <?php echo get_string('no_recent_activity', 'local_hlai_quizgen'); ?>
+                        </p>
                         <p class="has-text-grey is-size-7"><?php echo get_string('start_creating', 'local_hlai_quizgen'); ?></p>
                     </div>
                 </div>
@@ -411,8 +450,13 @@ echo $OUTPUT->header();
 
             <!-- Regeneration by Type -->
             <div class="box">
-                <p class="title is-5"><i class="fa fa-refresh" style="color: #F59E0B;"></i> <?php echo get_string('regeneration_by_type', 'local_hlai_quizgen'); ?></p>
-                <p class="subtitle is-6 has-text-grey"><?php echo get_string('regeneration_by_type_subtitle', 'local_hlai_quizgen'); ?></p>
+                <p class="title is-5">
+                    <i class="fa fa-refresh" style="color: #F59E0B;"></i>
+                    <?php echo get_string('regeneration_by_type', 'local_hlai_quizgen'); ?>
+                </p>
+                <p class="subtitle is-6 has-text-grey">
+                    <?php echo get_string('regeneration_by_type_subtitle', 'local_hlai_quizgen'); ?>
+                </p>
                 <div id="regen-by-type-chart" style="height: 250px;"></div>
             </div>
         </div>
@@ -421,7 +465,10 @@ echo $OUTPUT->header();
     <!-- Tips Section -->
     <div class="notification is-info is-light mt-5 mb-6">
         <button class="delete" onclick="this.closest('.notification').style.display='none';"></button>
-        <strong><i class="fa fa-lightbulb-o" style="color: #F59E0B;"></i> <?php echo get_string('tips_title', 'local_hlai_quizgen'); ?></strong>
+        <strong>
+            <i class="fa fa-lightbulb-o" style="color: #F59E0B;"></i>
+            <?php echo get_string('tips_title', 'local_hlai_quizgen'); ?>
+        </strong>
         <ul class="mt-2">
             <li><?php echo get_string('tip_detailed_content', 'local_hlai_quizgen'); ?></li>
             <li><?php echo get_string('tip_specific_topics', 'local_hlai_quizgen'); ?></li>

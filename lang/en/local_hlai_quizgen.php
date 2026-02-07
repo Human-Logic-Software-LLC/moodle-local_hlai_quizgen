@@ -256,7 +256,8 @@ $string['aiprovider_heading'] = 'AI Provider';
 $string['aiprovider_heading_desc'] = 'Configure which AI provider to use for question generation. ' .
     'Both hlai_hub (direct AI connection) and hlai_hubproxy (proxy server) are supported.';
 $string['aiprovider_select'] = 'Preferred AI Provider';
-$string['aiprovider_select_desc'] = 'Select which AI provider to use. "Auto" will prefer hlai_hub if available, otherwise use hlai_hubproxy.';
+$string['aiprovider_select_desc'] = 'Select which AI provider to use.' .
+    ' "Auto" will prefer hlai_hub if available, otherwise use hlai_hubproxy.';
 $string['aiprovider_auto'] = 'Auto (use first available)';
 $string['aiprovider_hub'] = 'hlai_hub (Direct AI Connection)';
 $string['aiprovider_proxy'] = 'hlai_hubproxy (Proxy Server)';
@@ -285,7 +286,8 @@ $string['enable_provider_fallback_desc'] = 'Automatically try alternative AI pro
 $string['enable_content_deduplication'] = 'Enable Content Deduplication';
 $string['enable_content_deduplication_desc'] = 'Reuse topic analysis for identical content to save processing time and tokens';
 $string['enable_question_validation'] = 'Enable Question Validation';
-$string['enable_question_validation_desc'] = 'Automatically validate generated questions for quality, correctness, and pedagogical soundness';
+$string['enable_question_validation_desc'] = 'Automatically validate generated questions' .
+    ' for quality, correctness, and pedagogical soundness';
 
 // Question quality ratings.
 $string['quality_excellent'] = 'Excellent';
@@ -376,12 +378,14 @@ $string['task:cleanupoldrequest'] = 'Clean up old generation requests';
 // Notifications.
 $string['messageprovider:generation_complete'] = 'Question generation complete';
 $string['notification:generation_complete_subject'] = 'AI Quiz Generator: Questions Ready for Review';
-$string['notification:generation_complete_body'] = 'Your quiz questions have been generated and are ready for review in course: {$a->coursename}';
+$string['notification:generation_complete_body'] = 'Your quiz questions have been generated' .
+    ' and are ready for review in course: {$a->coursename}';
 $string['notification:generation_failed_subject'] = 'AI Quiz Generator: Generation Failed';
 $string['notification:generation_failed_body'] = 'Question generation failed in course: {$a->coursename}. Error: {$a->error}';
 
 // Help.
-$string['help:wizard'] = 'The AI Quiz Generator wizard guides you through 5 steps to create quiz questions from your course content.';
+$string['help:wizard'] = 'The AI Quiz Generator wizard guides you through 5 steps' .
+    ' to create quiz questions from your course content.';
 $string['help:contentselection'] = 'Select existing course activities or upload new files to analyze.';
 $string['help:topicselection'] = 'Review the topics AI identified and choose which ones you want to assess.';
 $string['help:questionparams'] = 'Configure how many questions of each type and difficulty to generate.';

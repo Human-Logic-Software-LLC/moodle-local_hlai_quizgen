@@ -43,7 +43,10 @@ class course_scanner {
     const ACTIVITY_MODULES = ['lesson', 'scorm', 'forum'];
 
     /** @var array Section names to exclude (non-learning administrative sections) */
-    const EXCLUDED_SECTION_NAMES = ['assignment', 'assignments', 'assessment', 'assessments', 'certificate', 'certificates', 'completion certificate', 'course completion'];
+    const EXCLUDED_SECTION_NAMES = [
+        'assignment', 'assignments', 'assessment', 'assessments',
+        'certificate', 'certificates', 'completion certificate', 'course completion',
+    ];
 
     /**
      * Scan entire course including summary, sections, and all content.

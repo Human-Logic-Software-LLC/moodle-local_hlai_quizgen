@@ -303,7 +303,9 @@ class question_validator {
             // Check if it contains expected sections.
             $feedbacklower = strtolower($feedback);
             $haskeypoints = strpos($feedbacklower, 'key point') !== false || strpos($feedbacklower, 'should include') !== false;
-            $hasmodelorcriteria = strpos($feedbacklower, 'model') !== false || strpos($feedbacklower, 'criteria') !== false || strpos($feedbacklower, 'grading') !== false;
+            $hasmodelorcriteria = strpos($feedbacklower, 'model') !== false
+                || strpos($feedbacklower, 'criteria') !== false
+                || strpos($feedbacklower, 'grading') !== false;
             if (!$haskeypoints && !$hasmodelorcriteria) {
                 $result['warnings'][] = 'Essay feedback may not include proper grading guidance';
                 $result['score'] -= 5;

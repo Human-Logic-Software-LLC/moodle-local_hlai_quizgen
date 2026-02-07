@@ -132,7 +132,8 @@ $ftar = $reviewed > 0 ? round(($firsttimeapproved / $reviewed) * 100, 1) : 0;
 
 // Average quality score.
 $sql = get_filtered_sql(
-    "SELECT AVG(validation_score) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ? AND validation_score IS NOT NULL",
+    "SELECT AVG(validation_score) FROM {local_hlai_quizgen_questions}
+     WHERE userid = ? AND courseid = ? AND validation_score IS NOT NULL",
     $timefilter
 );
 $avgquality = $DB->get_field_sql($sql, [$userid, $courseid]);
@@ -199,7 +200,10 @@ $bloomsstats = $DB->get_records_sql($sql . " GROUP BY blooms_level", [$userid, $
 // WHERE userid = ? AND courseid = ? AND status = 'rejected'",.
 // $timefilter.
 // );.
-// $rejection_reasons = $DB->get_records_sql($sql . " GROUP BY rejection_reason ORDER BY count DESC LIMIT 10", [$userid, $courseid]);
+// $rejection_reasons = $DB->get_records_sql(
+//     $sql . " GROUP BY rejection_reason ORDER BY count DESC LIMIT 10",
+//     [$userid, $courseid]
+// );
 $rejectionreasons = []; // Empty array for now.
 
 // Output starts here.
@@ -351,7 +355,10 @@ echo $OUTPUT->header();
                                 <td class="has-text-right"><?php echo $stats->count; ?></td>
                                 <td class="has-text-right"><?php echo $stats->approved; ?></td>
                                 <td class="has-text-right">
-                                    <span class="tag <?php echo $rate >= 70 ? 'is-success' : ($rate >= 50 ? 'is-warning' : 'is-danger'); ?> is-light">
+                                    <?php
+                                    $rateclass = $rate >= 70 ? 'is-success' : ($rate >= 50 ? 'is-warning' : 'is-danger');
+                                    ?>
+                                    <span class="tag <?php echo $rateclass; ?> is-light">
                                         <?php echo $rate; ?>%
                                     </span>
                                 </td>
@@ -500,7 +507,8 @@ echo $OUTPUT->header();
                     'type' => 'info',
                     'icon' => '<i class="fa fa-info-circle"></i>',
                     'title' => 'Keep Generating!',
-                    'message' => 'Generate more questions to see detailed insights and recommendations based on your usage patterns.',
+                    'message' => 'Generate more questions to see detailed insights'
+                        . ' and recommendations based on your usage patterns.',
                 ];
             }
 
