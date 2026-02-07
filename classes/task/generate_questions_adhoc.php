@@ -233,7 +233,12 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
             }
 
             // Mark as completed.
-            self::update_progress($requestid, 'completed', 100, "Generation complete: {$totalquestionsgenerated} questions created");
+            self::update_progress(
+                       $requestid,
+                       'completed',
+                       100,
+                       "Generation complete: {$totalquestionsgenerated} questions created"
+            );
 
             // Update request status.
             \local_hlai_quizgen\api::update_request_status($requestid, 'completed');

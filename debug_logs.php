@@ -135,7 +135,9 @@ try {
         echo '</div>';
     }
 } catch (Exception $e) {
-    echo '<div class="notification is-danger is-light mb-0">Error checking AI provider: ' . htmlspecialchars($e->getMessage()) . '</div>';
+    echo '<div class="notification is-danger is-light mb-0">Error checking AI provider: ' .
+        htmlspecialchars($e->getMessage()) .
+        '</div>';
 }
 
 echo '</div>';

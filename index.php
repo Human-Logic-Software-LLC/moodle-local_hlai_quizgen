@@ -120,7 +120,13 @@ $firsttimeapproved = $DB->count_records_sql(
 $ftar = $totalreviewed > 0 ? round(($firsttimeapproved / $totalreviewed) * 100, 1) : 0;
 
 // DEBUG: Temporarily log FTAR calculation
-debugging("FTAR Debug - User: $userid, Total Reviewed: $totalreviewed, First-time Approved: $firsttimeapproved, Approved: $approvedquestions, FTAR: $ftar%");
+debugging(
+           "FTAR Debug - User: $userid,
+           Total Reviewed: $totalreviewed,
+           First-time Approved: $firsttimeapproved,
+           Approved: $approvedquestions,
+           FTAR: $ftar%"
+);
 
 // Recent requests.
 $recentrequests = $DB->get_records_sql(
@@ -220,7 +226,11 @@ echo $OUTPUT->header();
                 <p class="help <?php echo $avgquality > 0 ? ($avgquality >= 70 ? 'has-text-success' : 'has-text-danger') : 'has-text-grey'; ?>">
                     <?php
                     if ($avgquality > 0) {
-                        echo $avgquality >= 70 ? get_string('quality_good', 'local_hlai_quizgen') : get_string('quality_needs_attention', 'local_hlai_quizgen');
+                        echo $avgquality >= 70 ? get_string(
+                                     'quality_good',
+                                     'local_hlai_quizgen') : get_string('quality_needs_attention',
+                                     'local_hlai_quizgen'
+                        );
                     } else {
                         echo 'No quality scores available';
                     }

@@ -165,7 +165,10 @@ class topic_analyzer {
                 'local_hlai_quizgen',
                 '',
                 null,
-                'Failed to parse AI response as JSON: ' . json_last_error_msg() . ' | Response preview: ' . substr($response, 0, 200)
+                'Failed to parse AI response as JSON: ' .
+                    json_last_error_msg() .
+                    ' | Response preview: ' .
+                    substr($response, 0, 200)
             );
         }
 
@@ -538,7 +541,11 @@ class topic_analyzer {
         }
 
         // Also handle variations like "SCORM - " or "SCORM: " with spaces.
-        $title = preg_replace('/^(SCORM|SECTION|COURSE|LESSON|FORUM|PAGE|BOOK|RESOURCE|MODULE|ACTIVITY|TOPIC)\s*[:>\-]\s*/i', '', $title);
+        $title = preg_replace(
+                       '/^(SCORM|SECTION|COURSE|LESSON|FORUM|PAGE|BOOK|RESOURCE|MODULE|ACTIVITY|TOPIC)\s*[:>\-]\s*/i',
+                       '',
+                       $title
+        );
 
         // If the cleaned title is now empty or just the original prefix, keep original.
         if (empty(trim($title))) {

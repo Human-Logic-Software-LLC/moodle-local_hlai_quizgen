@@ -199,7 +199,12 @@ class content_extractor {
 
         try {
             $outputfile = tempnam(sys_get_temp_dir(), 'pdf_');
-            $cmd = escapeshellcmd($pdftotext) . ' -layout ' . escapeshellarg($filepath) . ' ' . escapeshellarg($outputfile) . ' 2>/dev/null';
+            $cmd = escapeshellcmd($pdftotext) .
+                ' -layout ' .
+                escapeshellarg($filepath) .
+                ' ' .
+                escapeshellarg($outputfile) .
+                ' 2>/dev/null';
             exec($cmd, $output, $returncode);
 
             if ($returncode === 0 && file_exists($outputfile)) {
@@ -232,7 +237,12 @@ class content_extractor {
             $outputfile = tempnam(sys_get_temp_dir(), 'pdf_') . '.txt';
 
             // Use Ghostscript to extract text.
-            $cmd = escapeshellcmd($gs) . ' -sDEVICE=txtwrite -o ' . escapeshellarg($outputfile) . ' ' . escapeshellarg($filepath) . ' 2>/dev/null';
+            $cmd = escapeshellcmd($gs) .
+                ' -sDEVICE=txtwrite -o ' .
+                escapeshellarg($outputfile) .
+                ' ' .
+                escapeshellarg($filepath) .
+                ' 2>/dev/null';
             exec($cmd, $output, $returncode);
 
             if ($returncode === 0 && file_exists($outputfile)) {
@@ -608,7 +618,12 @@ class content_extractor {
                 'title' => $title ?: parse_url($url, PHP_URL_HOST),
             ];
         } catch (\Exception $e) {
-            throw new \moodle_exception('error:urlextraction', 'local_hlai_quizgen', '', 'Failed to extract content from URL: ' . $e->getMessage());
+            throw new \moodle_exception(
+                             'error:urlextraction',
+                             'local_hlai_quizgen',
+                             '',
+                             'Failed to extract content from URL: ' . $e->getMessage()
+            );
         }
     }
 

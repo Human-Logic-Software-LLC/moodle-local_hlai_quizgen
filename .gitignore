@@ -63,3 +63,4 @@ fix_*.py
 
 # Gateway subdirectory (excluded from CI)
 gateway/
+phpcs_output.json

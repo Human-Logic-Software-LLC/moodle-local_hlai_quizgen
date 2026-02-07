@@ -445,14 +445,18 @@ echo $OUTPUT->header();
                     'type' => 'warning',
                     'icon' => '<i class="fa fa-exclamation-triangle" style="color: #F59E0B;"></i>',
                     'title' => 'Low First-Time Acceptance Rate',
-                    'message' => 'Your FTAR is ' . $ftar . '%. Consider providing more detailed content or selecting more specific topics to improve AI accuracy.',
+                    'message' => 'Your FTAR is ' .
+                        $ftar .
+                        '%. Consider providing more detailed content or selecting more specific topics to improve AI accuracy.',
                 ];
             } else if ($ftar >= 75) {
                 $insights[] = [
                     'type' => 'success',
                     'icon' => '<i class="fa fa-check-circle" style="color: #10B981;"></i>',
                     'title' => 'Excellent First-Time Acceptance',
-                    'message' => 'Your FTAR of ' . $ftar . '% is excellent! The AI is generating high-quality questions that match your expectations.',
+                    'message' => 'Your FTAR of ' .
+                        $ftar .
+                        '% is excellent! The AI is generating high-quality questions that match your expectations.',
                 ];
             }
 
@@ -461,7 +465,9 @@ echo $OUTPUT->header();
                     'type' => 'warning',
                     'icon' => '<i class="fa fa-refresh" style="color: #06B6D4;"></i>',
                     'title' => 'High Regeneration Rate',
-                    'message' => 'On average, questions need ' . $avgregenerations . ' regenerations. Try using more structured content or clearer learning objectives.',
+                    'message' => 'On average, questions need ' .
+                        $avgregenerations .
+                        ' regenerations. Try using more structured content or clearer learning objectives.',
                 ];
             }
 
@@ -482,7 +488,10 @@ echo $OUTPUT->header();
                     'type' => 'info',
                     'icon' => '<i class="fa fa-bar-chart"></i>',
                     'title' => 'Best Performing Type',
-                    'message' => ucfirst($besttype) . ' questions have the highest acceptance rate at ' . round($bestrate, 1) . '%. Consider using more of this type.',
+                    'message' => ucfirst($besttype) .
+                        ' questions have the highest acceptance rate at ' .
+                        round($bestrate, 1) .
+                        '%. Consider using more of this type.',
                 ];
             }
 

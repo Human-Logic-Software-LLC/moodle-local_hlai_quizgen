@@ -844,7 +844,17 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
             $dbman->change_field_precision($table, $field);
         }
 
-        $field = new xmldb_field('similarity_score', XMLDB_TYPE_NUMBER, '10, 2', null, XMLDB_NOTNULL, null, '0.0', 'alignment_score');
+        $field = new xmldb_field(
+                          'similarity_score',
+                          XMLDB_TYPE_NUMBER,
+                          '10,
+                          2',
+                          null,
+                          XMLDB_NOTNULL,
+                          null,
+                          '0.0',
+                          'alignment_score'
+        );
         if ($dbman->field_exists($table, $field)) {
             $dbman->change_field_precision($table, $field);
         }
@@ -852,12 +862,32 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // Fix average_score and discrimination_index in local_hlai_quizgen_calibration.
         $table = new xmldb_table('local_hlai_quizgen_calibration');
 
-        $field = new xmldb_field('average_score', XMLDB_TYPE_NUMBER, '10, 2', null, XMLDB_NOTNULL, null, '0.0', 'attempts_analyzed');
+        $field = new xmldb_field(
+                          'average_score',
+                          XMLDB_TYPE_NUMBER,
+                          '10,
+                          2',
+                          null,
+                          XMLDB_NOTNULL,
+                          null,
+                          '0.0',
+                          'attempts_analyzed'
+        );
         if ($dbman->field_exists($table, $field)) {
             $dbman->change_field_precision($table, $field);
         }
 
-        $field = new xmldb_field('discrimination_index', XMLDB_TYPE_NUMBER, '10, 3', null, XMLDB_NOTNULL, null, '0.0', 'average_score');
+        $field = new xmldb_field(
+                          'discrimination_index',
+                          XMLDB_TYPE_NUMBER,
+                          '10,
+                          3',
+                          null,
+                          XMLDB_NOTNULL,
+                          null,
+                          '0.0',
+                          'average_score'
+        );
         if ($dbman->field_exists($table, $field)) {
             $dbman->change_field_precision($table, $field);
         }

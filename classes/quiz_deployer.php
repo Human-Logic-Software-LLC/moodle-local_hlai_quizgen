@@ -52,7 +52,11 @@ class quiz_deployer {
     public static function deploy_to_question_bank(array $questionids, int $courseid, string $categoryname = null): array {
         global $DB, $USER;
 
-        debugging("DEBUG deploy_to_question_bank: Starting with " . count($questionids) . " questions, courseid=$courseid", DEBUG_DEVELOPER);
+        debugging(
+           "DEBUG deploy_to_question_bank: Starting with " . count($questionids) . " questions,
+           courseid=$courseid",
+           DEBUG_DEVELOPER
+        );
 
         $context = \context_course::instance($courseid);
         require_capability('moodle/question:add', $context);
@@ -80,7 +84,11 @@ class quiz_deployer {
 
                 // Get question from our table.
                 $genquestion = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
-                debugging("DEBUG deploy_to_question_bank: Loaded genquestion, type=" . ($genquestion->questiontype ?? 'null'), DEBUG_DEVELOPER);
+                debugging(
+           "DEBUG deploy_to_question_bank: Loaded genquestion,
+           type=" . ($genquestion->questiontype ?? 'null'),
+           DEBUG_DEVELOPER
+                );
 
                 // Convert to Moodle question format.
                 $moodlequestionid = self::convert_to_moodle_question($genquestion, $category->id, $category->name, $questionnumber);
@@ -104,7 +112,10 @@ class quiz_deployer {
                     ]);
                 } catch (\Exception $logex) {
                     // Logging failure shouldn't stop deployment.
-                    debugging("DEBUG deploy_to_question_bank: Warning - log_action failed: " . $logex->getMessage(), DEBUG_DEVELOPER);
+                    debugging(
+           "DEBUG deploy_to_question_bank: Warning - log_action failed: " . $logex->getMessage(),
+           DEBUG_DEVELOPER
+                    );
                 }
             } catch (\Exception $e) {
                 $errormsg = "Question $questionid: " . $e->getMessage();
@@ -113,7 +124,11 @@ class quiz_deployer {
             }
         }
 
-        debugging("DEBUG deploy_to_question_bank: Completed. Deployed: " . count($deployedids) . ", Errors: " . count($errors), DEBUG_DEVELOPER);
+        debugging(
+           "DEBUG deploy_to_question_bank: Completed. Deployed: " . count($deployedids) . ",
+           Errors: " . count($errors),
+           DEBUG_DEVELOPER
+        );
 
         // If no questions were deployed successfully, throw an exception with details.
         if (empty($deployedids)) {
@@ -572,7 +587,11 @@ class quiz_deployer {
         debugging("  - category.parent = " . ($verifycat->parent ?? 'NULL'), DEBUG_DEVELOPER);
 
         // Also log what the user should look for.
-        debugging("DEBUG: To find this question, go to Course Question Bank (not Quiz) and look for category: " . ($verifycat->name ?? 'unknown'), DEBUG_DEVELOPER);
+        debugging(
+           "DEBUG: To find this question,
+           go to Course Question Bank (not Quiz) and look for category: " . ($verifycat->name ?? 'unknown'),
+           DEBUG_DEVELOPER
+        );
 
         return $questionid;
     }
