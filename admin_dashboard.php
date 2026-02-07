@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// Phpcs:disable moodle.Commenting.MissingDocblock.
+// phpcs:disable moodle.Commenting.MissingDocblock
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
@@ -47,7 +47,7 @@ $PAGE->requires->css('/local/hlai_quizgen/styles-bulma.css');
 // Add ApexCharts.
 $PAGE->requires->js(new moodle_url('/local/hlai_quizgen/apexcharts.js'), true);
 
-// ================= SITE-WIDE DATA COLLECTION =================.
+// Site-wide data collection.
 
 // 1. Site-Wide Overview Statistics.
 $totalquestionsgenerated = $DB->count_records('local_hlai_quizgen_questions');
@@ -204,7 +204,7 @@ $recenterrors = $DB->count_records_sql(
 $aiproviderconfigured = !empty(get_config('local_hlai_quizgen', 'azure_endpoint'))
                          && !empty(get_config('local_hlai_quizgen', 'azure_api_key'));
 
-// ================= OUTPUT HTML =================.
+// Output HTML.
 
 echo $OUTPUT->header();
 
@@ -765,8 +765,12 @@ echo $OUTPUT->header();
                        class="config-button">
                         <i class="fa fa-wrench"></i> Plugin Settings
                     </a>
-                    <?php $capurl = new moodle_url('/admin/roles/check.php',
-                        ['capability' => 'local/hlai_quizgen:generatequestions']); ?>
+                    <?php
+                    $capurl = new moodle_url(
+                        '/admin/roles/check.php',
+                        ['capability' => 'local/hlai_quizgen:generatequestions']
+                    );
+                    ?>
                     <a href="<?php echo $capurl; ?>"
                        class="config-button">
                         <i class="fa fa-users"></i> User Capabilities

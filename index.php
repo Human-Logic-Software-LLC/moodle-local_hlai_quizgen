@@ -22,7 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// Phpcs:disable moodle.Commenting.MissingDocblock.
+// phpcs:disable moodle.Commenting.MissingDocblock
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
@@ -121,11 +121,8 @@ $ftar = $totalreviewed > 0 ? round(($firsttimeapproved / $totalreviewed) * 100, 
 
 // DEBUG: Temporarily log FTAR calculation.
 debugging(
-           "FTAR Debug - User: $userid,
-           Total Reviewed: $totalreviewed,
-           First-time Approved: $firsttimeapproved,
-           Approved: $approvedquestions,
-           FTAR: $ftar%"
+    "FTAR Debug - User: $userid, Total Reviewed: $totalreviewed, "
+    . "First-time Approved: $firsttimeapproved, Approved: $approvedquestions, FTAR: $ftar%"
 );
 
 // Recent requests.
@@ -234,11 +231,11 @@ echo $OUTPUT->header();
                 <p class="help <?php echo $qualityclass; ?>">
                     <?php
                     if ($avgquality > 0) {
-                        echo $avgquality >= 70 ? get_string(
-                                     'quality_good',
-                                     'local_hlai_quizgen') : get_string('quality_needs_attention',
-                                     'local_hlai_quizgen'
-                        );
+                        if ($avgquality >= 70) {
+                            echo get_string('quality_good', 'local_hlai_quizgen');
+                        } else {
+                            echo get_string('quality_needs_attention', 'local_hlai_quizgen');
+                        }
                     } else {
                         echo 'No quality scores available';
                     }

@@ -38,7 +38,7 @@ use local_hlai_quizgen\debug_logger;
 
 $courseid = required_param('courseid', PARAM_INT);
 $requestid = optional_param('requestid', 0, PARAM_INT);
-$step = optional_param('step', '1', PARAM_RAW);  // Can be int or string (e.g., "progress")
+$step = optional_param('step', '1', PARAM_RAW); // Can be int or string (e.g., "progress").
 $action = optional_param('action', '', PARAM_ALPHANUMEXT);
 
 // Verify login and context.
@@ -855,7 +855,7 @@ function handle_generate_questions(int $requestid) {
     $request->total_questions = $totalquestions;
     // CRITICAL FIX: Store DISTRIBUTION not expanded array.
     // This allows each topic to generate its proportional share of each type.
-    $request->question_types = json_encode($questiontypedist); // Store as {'multichoice': 3, 'truefalse': 2}.
+    $request->question_types = json_encode($questiontypedist); // Store distribution map for type allocation.
     $request->difficulty_distribution = json_encode($difficultydist);
     $request->blooms_distribution = json_encode($bloomsdist);  // Store Bloom's distribution.
     $request->processing_mode = $processingmode;
@@ -884,21 +884,7 @@ function handle_generate_questions(int $requestid) {
         }
     }
 
-    /* ASYNC CODE - Disabled for better UX - requires cron to be running
-    // Queue adhoc task for background generation with progress tracking.
-    $task = new \local_hlai_quizgen\task\generate_questions_adhoc();
-    $task->set_custom_data([
-        'request_id' => $requestid
-    ]);
-    \core\task\manager::queue_adhoc_task($task);
-
-    // Redirect to progress monitoring page.
-    redirect(new moodle_url('/local/hlai_quizgen/wizard.php', [
-        'courseid' => $request->courseid,
-        'requestid' => $requestid,
-        'step' => 'progress' // Progress monitoring step.
-    ]));
-    */
+    // Async code disabled for better UX - requires cron to be running.
 
     // SYNCHRONOUS GENERATION - Generate questions immediately for better UX.
     // Log the start of question generation.
@@ -2593,11 +2579,7 @@ function render_step3(int $courseid, int $requestid): string {
     $html .= html_writer::end_div(); // Hlai-section.
 
     // Processing mode removed (global setting).
-    // Cost preview section - HIDDEN per user request.
-    // $html .= html_writer::start_div('alert alert-warning mt-4', ['id' => 'cost-preview']);
-    // $html .= html_writer::tag('h5', 'Generation Preview', ['class' => 'mb-3']);
-    // $html .= html_writer::tag('div', '', ['id' => 'cost-details']);
-    // $html .= html_writer::end_div();
+    // Cost preview section hidden per user request.
 
     // Minimal JavaScript for Step 3.
     $html .= html_writer::script("
@@ -2968,7 +2950,7 @@ function render_step4(int $courseid, int $requestid): string {
         $html .= html_writer::start_div('hlai-generating-overlay');
         $html .= html_writer::start_div('hlai-generating-modal');
 
-        // Spinner (Styled by css .hlai-generating-modal .loader)
+        // Spinner styled by CSS class .hlai-generating-modal .loader.
         $html .= html_writer::div('', 'loader');
 
         $html .= html_writer::tag('h3', '<i class="fa fa-lightbulb-o" style="color: #3B82F6;"></i> Generating Questions...', [
@@ -3203,7 +3185,7 @@ function render_step4(int $courseid, int $requestid): string {
         ]);
         $html .= html_writer::end_tag('label');
 
-        // "Question #" text - Clean and Professional.
+        // Question number text, clean and professional.
         $html .= html_writer::tag('span', 'Question ' . $questionnumber, [
             'class' => 'has-text-weight-bold has-text-grey-darker is-size-6',
         ]);

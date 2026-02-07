@@ -81,9 +81,7 @@ if ($courseid > 0) {
 
 try {
     switch ($action) {
-        // =====================================================================.
         // DASHBOARD DATA ENDPOINTS.
-        // =====================================================================.
 
         case 'dashboardstats':
             // Get quick stats for dashboard cards.
@@ -392,9 +390,7 @@ try {
             send_response(true, ['requests' => $items]);
             break;
 
-        // =====================================================================.
         // PROGRESS MONITORING (AJAX Polling for Step 3.5).
-        // =====================================================================.
 
         case 'getprogress':
             // Get current generation progress for a request.
@@ -470,9 +466,7 @@ try {
             ]);
             break;
 
-        // =====================================================================.
         // QUESTION INLINE EDITING (AJAX).
-        // =====================================================================.
 
         case 'updatequestion':
             // Update question text inline.
@@ -683,9 +677,7 @@ try {
             send_response(true, ['rejected' => $rejected, 'reason' => $reason]);
             break;
 
-        // =====================================================================.
         // TOPIC MANAGEMENT (Step 2).
-        // =====================================================================.
 
         case 'updatetopic':
             // Update topic title inline.
@@ -768,9 +760,7 @@ try {
             send_response(true, ['deleted' => $topicid]);
             break;
 
-        // =====================================================================.
         // ANALYTICS DATA.
-        // =====================================================================.
 
         case 'courseanalytics':
             // Get analytics for a specific course.
@@ -862,9 +852,7 @@ try {
             ]);
             break;
 
-        // =====================================================================.
-        // FILE UPLOAD (Drag & Drop).
-        // =====================================================================.
+        // FILE UPLOAD (Drag and Drop).
 
         case 'uploadfile':
             // Handle file upload via AJAX.
@@ -944,9 +932,7 @@ try {
             send_response(true, ['removed' => $itemid]);
             break;
 
-        // =====================================================================.
-        // TEMPLATES & PRESETS.
-        // =====================================================================.
+        // TEMPLATES AND PRESETS.
 
         case 'savetemplate':
             // Save current configuration as template.
@@ -1015,9 +1001,7 @@ try {
             send_response(true, ['deleted' => $templateid]);
             break;
 
-        // =====================================================================.
-        // SESSION/STATE MANAGEMENT.
-        // =====================================================================.
+        // SESSION AND STATE MANAGEMENT.
 
         case 'savewizardstate':
             // Save wizard state for session resumption.
@@ -1099,9 +1083,7 @@ try {
             send_response(true, ['cleared' => true]);
             break;
 
-        // =====================================================================.
         // DIAGNOSTIC ENDPOINT.
-        // =====================================================================.
 
         case 'fixcategory':
             // Force-fix the question.category field by adding it if missing.

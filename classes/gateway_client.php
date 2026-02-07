@@ -52,7 +52,7 @@ class gateway_client {
             return $configured;
         }
 
-        // Return default.
+        // Fall back to the fixed default gateway URL.
         return self::FIXED_GATEWAY_URL;
     }
 

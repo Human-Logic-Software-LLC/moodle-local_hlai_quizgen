@@ -757,7 +757,7 @@ class quiz_deployer {
         foreach ($answers as $answer) {
             $answerrecord = new \stdClass();
             $answerrecord->question = $questionid;
-            $answerrecord->answer = $answer->answer;  // "True" or "False".
+            $answerrecord->answer = $answer->answer; // Contains true or false value.
             $answerrecord->answerformat = FORMAT_MOODLE;
             $answerrecord->fraction = $answer->fraction;
             $answerrecord->feedback = $answer->feedback ?? '';

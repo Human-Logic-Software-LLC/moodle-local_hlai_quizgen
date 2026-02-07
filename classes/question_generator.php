@@ -375,11 +375,13 @@ class question_generator {
         $response = trim($response);
 
         // Extract JSON array.
+        // phpcs:disable moodle.Strings.ForbiddenStrings.Found
         if (preg_match('/```json\\s*(.*?)\\s*```/s', $response, $matches)) {
             $response = $matches[1];
         } else if (preg_match('/```\\s*(.*?)\\s*```/s', $response, $matches)) {
             $response = $matches[1];
         }
+        // phpcs:enable moodle.Strings.ForbiddenStrings.Found
 
         $data = json_decode($response, true);
 
@@ -446,11 +448,13 @@ class question_generator {
         // Extract JSON from response.
         $response = trim($response);
 
+        // phpcs:disable moodle.Strings.ForbiddenStrings.Found
         if (preg_match('/```json\s*(.*?)\s*```/s', $response, $matches)) {
             $response = $matches[1];
         } else if (preg_match('/```\s*(.*?)\s*```/s', $response, $matches)) {
             $response = $matches[1];
         }
+        // phpcs:enable moodle.Strings.ForbiddenStrings.Found
 
         $data = json_decode($response, true);
 

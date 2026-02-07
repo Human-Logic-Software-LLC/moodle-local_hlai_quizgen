@@ -61,15 +61,7 @@ class topic_analyzer {
         $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid], 'courseid');
         $cachekey = cache_manager::generate_topic_cache_key($content, $request->courseid);
 
-        // Topic caching - disabled for now.
-        /*
-        if (cache_manager::is_caching_enabled()) {
-            $cached = cache_manager::get_cached_response('topics', $cachekey);
-            if ($cached !== null) {
-                return self::clone_topics_from_cache($cached, $requestid);
-            }
-        }
-        */
+        // Topic caching disabled for now.
 
         // STRATEGY: First try direct marker extraction (fast, reliable for bulk scans).
         // Only fall back to AI if no markers found (e.g., uploaded files, URLs).
@@ -151,11 +143,13 @@ class topic_analyzer {
         $response = trim($response);
 
         // Remove markdown code blocks if present.
+        // phpcs:disable moodle.Strings.ForbiddenStrings.Found
         if (preg_match('/```json\s*(.*?)\s*```/s', $response, $matches)) {
             $response = $matches[1];
         } else if (preg_match('/```\s*(.*?)\s*```/s', $response, $matches)) {
             $response = $matches[1];
         }
+        // phpcs:enable moodle.Strings.ForbiddenStrings.Found
 
         $data = json_decode($response, true);
 
@@ -893,6 +887,7 @@ class topic_analyzer {
      */
     private static function get_chunking_params(string $content): array {
         // Check if content appears to be code.
+        // phpcs:ignore moodle.Strings.ForbiddenStrings.Found
         $codepatterns = ['<?php', 'function ', 'class ', 'def ', 'import ', '```'];
         $iscode = false;
         foreach ($codepatterns as $pattern) {

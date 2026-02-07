@@ -22,8 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// Phpcs:disable moodle.Commenting.MissingDocblock.
-// phpcs:disable moodle.Commenting.FileExpectedTags.
+// phpcs:disable moodle.Commenting.MissingDocblock
+// phpcs:disable moodle.Commenting.FileExpectedTags
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
@@ -94,7 +94,7 @@ function get_filtered_sql($basesql, $timefilter, $timefield = 'timecreated') {
     return $basesql;
 }
 
-// ===== SUMMARY STATISTICS =====.
+// Summary statistics.
 
 // Total questions generated.
 $sql = get_filtered_sql(
@@ -156,7 +156,7 @@ $sql = get_filtered_sql(
 );
 $totalrequests = $DB->count_records_sql($sql, [$userid, $courseid]);
 
-// ===== QUESTION TYPE BREAKDOWN =====.
+// Question type breakdown.
 $sql = get_filtered_sql(
     "SELECT questiontype, COUNT(*) as count,
             SUM(CASE WHEN status IN ('approved', 'deployed') THEN 1 ELSE 0 END) as approved,
@@ -169,7 +169,7 @@ $sql = get_filtered_sql(
 );
 $typestats = $DB->get_records_sql($sql . " GROUP BY questiontype", [$userid, $courseid]);
 
-// ===== DIFFICULTY BREAKDOWN =====.
+// Difficulty breakdown.
 $sql = get_filtered_sql(
     "SELECT difficulty, COUNT(*) as count,
             SUM(CASE WHEN status IN ('approved', 'deployed') THEN 1 ELSE 0 END) as approved,
@@ -180,7 +180,7 @@ $sql = get_filtered_sql(
 );
 $difficultystats = $DB->get_records_sql($sql . " GROUP BY difficulty", [$userid, $courseid]);
 
-// ===== BLOOM'S TAXONOMY BREAKDOWN =====.
+// Bloom's taxonomy breakdown.
 $sql = get_filtered_sql(
     "SELECT blooms_level, COUNT(*) as count,
             SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
@@ -191,19 +191,7 @@ $sql = get_filtered_sql(
 );
 $bloomsstats = $DB->get_records_sql($sql . " GROUP BY blooms_level", [$userid, $courseid]);
 
-// ===== REJECTION REASONS =====.
-// Note: rejection_reason column doesn't exist in database yet.
-// Commenting out until schema is updated.
-// $sql = get_filtered_sql(.
-// "SELECT COALESCE(rejection_reason, 'Not specified') as reason, COUNT(*) as count.
-// FROM {local_hlai_quizgen_questions}.
-// WHERE userid = ? AND courseid = ? AND status = 'rejected'",.
-// $timefilter.
-// );.
-// $rejection_reasons = $DB->get_records_sql(
-//     $sql . " GROUP BY rejection_reason ORDER BY count DESC LIMIT 10",
-//     [$userid, $courseid]
-// );
+// Rejection reasons - column doesn't exist in database yet, using empty array.
 $rejectionreasons = []; // Empty array for now.
 
 // Output starts here.
