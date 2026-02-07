@@ -112,7 +112,8 @@ $rejected_questions = $DB->count_records_sql($sql, [$userid, $courseid]);
 
 // First-time acceptance
 $sql = get_filtered_sql(
-    "SELECT COUNT(*) FROM {hlai_quizgen_questions} WHERE userid = ? AND courseid = ? AND status IN ('approved', 'deployed') AND (regeneration_count = 0 OR regeneration_count IS NULL)",
+    "SELECT COUNT(*) FROM {hlai_quizgen_questions} WHERE userid = ? AND courseid = ? " .
+    "AND status IN ('approved', 'deployed') AND (regeneration_count = 0 OR regeneration_count IS NULL)",
     $timefilter
 );
 $first_time_approved = $DB->count_records_sql($sql, [$userid, $courseid]);

@@ -1666,7 +1666,8 @@ function render_step1(int $courseid, int $requestid): string {
                 });
                 
                 if (oversizedFiles.length > 0) {
-                    alert('The following files exceed the maximum size of ' + maxFileSizeMB + ' MB:\\n\\n' + oversizedFiles.join('\\n') + '\\n\\nPlease remove these files and try again.');
+                    alert('The following files exceed the maximum size of ' + maxFileSizeMB + ' MB:\\n\\n' +
+                        oversizedFiles.join('\\n') + '\\n\\nPlease remove these files and try again.');
                     return false;
                 }
             }
@@ -1763,7 +1764,8 @@ function render_step1(int $courseid, int $requestid): string {
                 fileNames += '</ul></div>';
                 
                 if (hasOversizedFiles) {
-                    fileNames += '<div class=\"notification is-danger is-light mt-2\"><strong>Error:</strong> The following files exceed the maximum size of ' + maxFileSizeMB + ' MB:<ul>';
+                    fileNames += '<div class=\"notification is-danger is-light mt-2\"><strong>Error:</strong> ' +
+                        'The following files exceed the maximum size of ' + maxFileSizeMB + ' MB:<ul>';
                     oversizedFileNames.forEach(function(fname) {
                         fileNames += '<li>' + fname + '</li>';
                     });
@@ -2283,10 +2285,16 @@ function render_step3(int $courseid, int $requestid): string {
 
     // Minimal topics info bar
     $topicNames = array_map(function($t) { return $t->title; }, $selectedtopics);
+    $topicspreview = implode(', ', array_slice($topicNames, 0, 3));
+    if (count($topicNames) > 3) {
+        $topicspreview .= ' +' . (count($topicNames) - 3) . ' more';
+    }
     $html .= html_writer::div(
-        html_writer::tag('span', '<i class="fa fa-info-circle" style="color: #06B6D4;"></i> ', ['class' => 'hlai-info-icon']) .
-        html_writer::tag('span', count($selectedtopics) . ' topics selected: ', ['class' => 'hlai-info-label']) .
-        html_writer::tag('span', implode(', ', array_slice($topicNames, 0, 3)) . (count($topicNames) > 3 ? ' +' . (count($topicNames) - 3) . ' more' : ''), ['class' => 'hlai-info-topics']),
+        html_writer::tag('span', '<i class="fa fa-info-circle" style="color: #06B6D4;"></i> ',
+            ['class' => 'hlai-info-icon']) .
+        html_writer::tag('span', count($selectedtopics) . ' topics selected: ',
+            ['class' => 'hlai-info-label']) .
+        html_writer::tag('span', $topicspreview, ['class' => 'hlai-info-topics']),
         'hlai-topics-info-bar'
     );
 
@@ -2377,8 +2385,11 @@ function render_step3(int $courseid, int $requestid): string {
     foreach ($questiontypes as $type => $info) {
         $html .= html_writer::start_div('hlai-qtype-row', ['data-type' => $type]);
         $html .= html_writer::start_div('hlai-qtype-left', ['style' => 'display: flex; align-items: center;']);
-        $html .= html_writer::tag('span', $info['icon'], ['class' => 'hlai-qtype-icon', 'style' => 'background: ' . $info['color'] . '15; color: ' . $info['color'] . '; display: flex; align-items: center; justify-content: center;']);
-        $html .= html_writer::tag('span', $info['label'], ['class' => 'hlai-qtype-name', 'style' => 'display: flex; align-items: center;']);
+        $iconstyle = 'background: ' . $info['color'] . '15; color: ' . $info['color'] . '; ' .
+            'display: flex; align-items: center; justify-content: center;';
+        $html .= html_writer::tag('span', $info['icon'], ['class' => 'hlai-qtype-icon', 'style' => $iconstyle]);
+        $html .= html_writer::tag('span', $info['label'],
+            ['class' => 'hlai-qtype-name', 'style' => 'display: flex; align-items: center;']);
         $html .= html_writer::end_div();
         $html .= html_writer::empty_tag('input', [
             'type' => 'number',
@@ -2436,7 +2447,9 @@ function render_step3(int $courseid, int $requestid): string {
             'value' => $info['default'],
             'class' => 'hlai-slider',
             'data-color' => $info['color'],
-            'style' => '--slider-color: ' . $info['color'] . '; background: linear-gradient(to right, ' . $info['color'] . ' 0%, ' . $info['color'] . ' ' . $sliderFill . '%, #e2e8f0 ' . $sliderFill . '%, #e2e8f0 100%);',
+            'style' => '--slider-color: ' . $info['color'] . '; background: linear-gradient(to right, ' .
+                $info['color'] . ' 0%, ' . $info['color'] . ' ' . $sliderFill . '%, ' .
+                '#e2e8f0 ' . $sliderFill . '%, #e2e8f0 100%);',
             'oninput' => 'updateSliderColor(this); updateBloomsTotal();'
         ]);
         $html .= html_writer::tag('span', $info['default'] . '%', ['id' => 'blooms_' . $level . '_value', 'class' => 'hlai-slider-val', 'style' => 'color: ' . $info['color']]);

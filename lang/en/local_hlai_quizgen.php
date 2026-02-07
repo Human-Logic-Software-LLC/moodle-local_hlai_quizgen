@@ -253,7 +253,8 @@ $string['settings_heading'] = 'AI Quiz Generator Settings';
 
 // AI Provider settings.
 $string['aiprovider_heading'] = 'AI Provider';
-$string['aiprovider_heading_desc'] = 'Configure which AI provider to use for question generation. Both hlai_hub (direct AI connection) and hlai_hubproxy (proxy server) are supported.';
+$string['aiprovider_heading_desc'] = 'Configure which AI provider to use for question generation. ' .
+    'Both hlai_hub (direct AI connection) and hlai_hubproxy (proxy server) are supported.';
 $string['aiprovider_select'] = 'Preferred AI Provider';
 $string['aiprovider_select_desc'] = 'Select which AI provider to use. "Auto" will prefer hlai_hub if available, otherwise use hlai_hubproxy.';
 $string['aiprovider_auto'] = 'Auto (use first available)';
@@ -439,7 +440,8 @@ $string['debuglogs_hubavailable'] = 'Hub Available';
 $string['debuglogs_proxyavailable'] = 'Proxy Available';
 $string['debuglogs_yes'] = 'Yes';
 $string['debuglogs_no'] = 'No';
-$string['debuglogs_noprovider_warning'] = 'No AI provider is configured! Questions cannot be generated. Please configure <code>local_hlai_hub</code> or <code>local_hlai_hubproxy</code>.';
+$string['debuglogs_noprovider_warning'] = 'No AI provider is configured! Questions cannot be generated. ' .
+    'Please configure <code>local_hlai_hub</code> or <code>local_hlai_hubproxy</code>.';
 $string['debuglogs_provider_error'] = 'Error checking AI provider: {$a}';
 $string['debuglogs_tab_database'] = 'Database Logs';
 $string['debuglogs_tab_file'] = 'File Logs';

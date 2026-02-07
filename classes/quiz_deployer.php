@@ -374,7 +374,9 @@ class quiz_deployer {
         global $DB, $USER, $CFG;
 
         // DEBUG: Log the start of question conversion.
-        debugging("DEBUG: Starting convert_to_moodle_question for genquestion ID: " . ($genquestion->id ?? 'unknown') . ", type: " . ($genquestion->questiontype ?? 'unknown'), DEBUG_DEVELOPER);
+        debugging("DEBUG: Starting convert_to_moodle_question for genquestion ID: " .
+            ($genquestion->id ?? 'unknown') . ", type: " . ($genquestion->questiontype ?? 'unknown'),
+            DEBUG_DEVELOPER);
 
         // Check Moodle version to determine which fields to use.
         // Moodle 4.0+ removed 'category' from question table, uses question_bank_entries instead.

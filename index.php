@@ -303,7 +303,10 @@ echo $OUTPUT->header();
                 </div>
                 <div class="column is-half">
                     <div class="box">
-                        <p class="title is-5"><i class="fa fa-line-chart" style="color: #06B6D4;"></i> <?php echo get_string('difficulty_distribution', 'local_hlai_quizgen'); ?></p>
+                        <p class="title is-5">
+                            <i class="fa fa-line-chart" style="color: #06B6D4;"></i>
+                            <?php echo get_string('difficulty_distribution', 'local_hlai_quizgen'); ?>
+                        </p>
                         <div id="difficulty-chart" style="height: 280px;"></div>
                     </div>
                 </div>
