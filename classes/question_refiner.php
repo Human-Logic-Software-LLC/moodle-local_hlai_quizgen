@@ -60,8 +60,8 @@ class question_refiner {
     ): array {
         global $DB;
 
-        $question = $DB->get_record('hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
-        $answers = $DB->get_records('hlai_quizgen_answers', ['questionid' => $questionid], 'sortorder ASC');
+        $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
+        $answers = $DB->get_records('local_hlai_quizgen_answers', ['questionid' => $questionid], 'sortorder ASC');
 
         // Get performance data if available.
         $performancedata = [];
@@ -136,7 +136,7 @@ class question_refiner {
     public static function apply_improvements(int $questionid, array $improvements): array {
         global $DB, $USER;
 
-        $question = $DB->get_record('hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
+        $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
 
         $transaction = $DB->start_delegated_transaction();
 
@@ -146,7 +146,7 @@ class question_refiner {
             // Update question text if provided.
             if (!empty($improvements['questiontext'])) {
                 $DB->set_field(
-                    'hlai_quizgen_questions',
+                    'local_hlai_quizgen_questions',
                     'questiontext',
                     $improvements['questiontext'],
                     ['id' => $questionid]
@@ -157,7 +157,7 @@ class question_refiner {
             // Update difficulty if provided.
             if (!empty($improvements['difficulty'])) {
                 $DB->set_field(
-                    'hlai_quizgen_questions',
+                    'local_hlai_quizgen_questions',
                     'difficulty',
                     $improvements['difficulty'],
                     ['id' => $questionid]
@@ -168,7 +168,7 @@ class question_refiner {
             // Update Bloom's level if provided.
             if (!empty($improvements['blooms_level'])) {
                 $DB->set_field(
-                    'hlai_quizgen_questions',
+                    'local_hlai_quizgen_questions',
                     'blooms_level',
                     $improvements['blooms_level'],
                     ['id' => $questionid]
@@ -179,7 +179,7 @@ class question_refiner {
             // Update feedback if provided.
             if (!empty($improvements['generalfeedback'])) {
                 $DB->set_field(
-                    'hlai_quizgen_questions',
+                    'local_hlai_quizgen_questions',
                     'generalfeedback',
                     $improvements['generalfeedback'],
                     ['id' => $questionid]
@@ -199,14 +199,14 @@ class question_refiner {
                         if (isset($answerupdate['feedback'])) {
                             $updatedata->feedback = $answerupdate['feedback'];
                         }
-                        $DB->update_record('hlai_quizgen_answers', $updatedata);
+                        $DB->update_record('local_hlai_quizgen_answers', $updatedata);
                         $changes[] = 'Updated answer ID ' . $answerupdate['id'];
                     }
                 }
             }
 
             // Update modification time.
-            $DB->set_field('hlai_quizgen_questions', 'timemodified', time(), ['id' => $questionid]);
+            $DB->set_field('local_hlai_quizgen_questions', 'timemodified', time(), ['id' => $questionid]);
 
             // Log refinement.
             $log = new \stdClass();
@@ -216,7 +216,7 @@ class question_refiner {
             $log->changes = json_encode($changes);
             $log->improvements_applied = json_encode($improvements);
             $log->timecreated = time();
-            $DB->insert_record('hlai_quizgen_refinements', $log);
+            $DB->insert_record('local_hlai_quizgen_refinements', $log);
 
             $transaction->allow_commit();
 
@@ -242,8 +242,8 @@ class question_refiner {
     public static function generate_alternatives(int $questionid, int $count = 3): array {
         global $DB;
 
-        $question = $DB->get_record('hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
-        $answers = $DB->get_records('hlai_quizgen_answers', ['questionid' => $questionid], 'sortorder ASC');
+        $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
+        $answers = $DB->get_records('local_hlai_quizgen_answers', ['questionid' => $questionid], 'sortorder ASC');
 
         $prompt = "Create {$count} alternative versions of this question that assess the same learning objective " .
                   "but use different wording, examples, or approaches.\n\n" .
@@ -288,7 +288,7 @@ class question_refiner {
                 $altrecord->answers = json_encode($alt['answers']);
                 $altrecord->rationale = $alt['rationale'];
                 $altrecord->timecreated = time();
-                $DB->insert_record('hlai_quizgen_alternatives', $altrecord);
+                $DB->insert_record('local_hlai_quizgen_alternatives', $altrecord);
             }
 
             return [
@@ -313,8 +313,8 @@ class question_refiner {
     public static function improve_distractors(int $questionid): array {
         global $DB;
 
-        $question = $DB->get_record('hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
-        $answers = $DB->get_records('hlai_quizgen_answers', ['questionid' => $questionid], 'sortorder ASC');
+        $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
+        $answers = $DB->get_records('local_hlai_quizgen_answers', ['questionid' => $questionid], 'sortorder ASC');
 
         // Get current performance on each distractor.
         $distractorperformance = [];
@@ -391,8 +391,8 @@ class question_refiner {
     public static function enhance_feedback(int $questionid): array {
         global $DB;
 
-        $question = $DB->get_record('hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
-        $answers = $DB->get_records('hlai_quizgen_answers', ['questionid' => $questionid], 'sortorder ASC');
+        $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
+        $answers = $DB->get_records('local_hlai_quizgen_answers', ['questionid' => $questionid], 'sortorder ASC');
 
         $prompt = "Generate comprehensive, educational feedback for this question and its answers.\n\n" .
                   "Question: {$question->questiontext}\n" .
@@ -455,8 +455,8 @@ class question_refiner {
     public static function auto_fix_issues(int $questionid): array {
         global $DB;
 
-        $question = $DB->get_record('hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
-        $answers = $DB->get_records('hlai_quizgen_answers', ['questionid' => $questionid]);
+        $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
+        $answers = $DB->get_records('local_hlai_quizgen_answers', ['questionid' => $questionid]);
 
         $issues = [];
         $fixes = [];
@@ -622,6 +622,6 @@ class question_refiner {
         $record->userid = $USER->id;
         $record->timecreated = time();
 
-        $DB->insert_record('hlai_quizgen_refine_suggest', $record);
+        $DB->insert_record('local_hlai_quizgen_refine_suggest', $record);
     }
 }

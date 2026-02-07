@@ -141,16 +141,16 @@ class distractor_generator {
         global $DB;
 
         // Get question.
-        $question = $DB->get_record('hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
+        $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
 
         // Get correct answer.
-        $correctanswer = $DB->get_record('hlai_quizgen_answers', [
+        $correctanswer = $DB->get_record('local_hlai_quizgen_answers', [
             'questionid' => $questionid,
             'is_correct' => 1,
         ], '*', MUST_EXIST);
 
         // Get topic for context.
-        $topic = $DB->get_record('hlai_quizgen_topics', ['id' => $question->topicid]);
+        $topic = $DB->get_record('local_hlai_quizgen_topics', ['id' => $question->topicid]);
         $topiccontext = $topic ? $topic->content_excerpt : '';
 
         // Generate new distractors.
@@ -161,7 +161,7 @@ class distractor_generator {
         );
 
         // Delete old distractors.
-        $DB->delete_records('hlai_quizgen_answers', [
+        $DB->delete_records('local_hlai_quizgen_answers', [
             'questionid' => $questionid,
             'is_correct' => 0,
         ]);
@@ -180,7 +180,7 @@ class distractor_generator {
             $record->distractor_reasoning = $distractor['reasoning'] ?? '';
             $record->sortorder = $sortorder++;
 
-            $DB->insert_record('hlai_quizgen_answers', $record);
+            $DB->insert_record('local_hlai_quizgen_answers', $record);
         }
 
         return $distractors;

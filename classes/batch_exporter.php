@@ -52,8 +52,8 @@ class batch_exporter {
             throw new \moodle_exception('Unsupported export format: ' . $format);
         }
 
-        $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
-        $questions = $DB->get_records('hlai_quizgen_questions', ['requestid' => $requestid]);
+        $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
+        $questions = $DB->get_records('local_hlai_quizgen_questions', ['requestid' => $requestid]);
 
         switch ($format) {
             case 'json':
@@ -102,7 +102,7 @@ class batch_exporter {
 
         foreach ($questions as $question) {
             $answers = $DB->get_records(
-                'hlai_quizgen_answers',
+                'local_hlai_quizgen_answers',
                 ['questionid' => $question->id],
                 'sortorder ASC'
             );
@@ -141,7 +141,7 @@ class batch_exporter {
             // Include calibration if requested.
             if (!empty($options['include_calibration']) && $question->moodle_questionid) {
                 $calibration = $DB->get_records(
-                    'hlai_quizgen_calibration',
+                    'local_hlai_quizgen_calibration',
                     ['questionid' => $question->id],
                     'timecreated DESC',
                     '*',
@@ -202,7 +202,7 @@ class batch_exporter {
 
         foreach ($questions as $question) {
             $answers = $DB->get_records(
-                'hlai_quizgen_answers',
+                'local_hlai_quizgen_answers',
                 ['questionid' => $question->id],
                 'sortorder ASC'
             );
@@ -269,7 +269,7 @@ class batch_exporter {
 
         foreach ($questions as $question) {
             $answers = $DB->get_records(
-                'hlai_quizgen_answers',
+                'local_hlai_quizgen_answers',
                 ['questionid' => $question->id],
                 'sortorder ASC'
             );
@@ -332,7 +332,7 @@ class batch_exporter {
 
         foreach ($questions as $question) {
             $answers = $DB->get_records(
-                'hlai_quizgen_answers',
+                'local_hlai_quizgen_answers',
                 ['questionid' => $question->id],
                 'sortorder ASC'
             );
@@ -387,7 +387,7 @@ class batch_exporter {
             }
 
             $answers = $DB->get_records(
-                'hlai_quizgen_answers',
+                'local_hlai_quizgen_answers',
                 ['questionid' => $question->id],
                 'sortorder ASC'
             );
@@ -488,7 +488,7 @@ class batch_exporter {
                 $request->custom_instructions = $config['custom_instructions'] ?? null;
             }
 
-            $requestid = $DB->insert_record('hlai_quizgen_requests', $request);
+            $requestid = $DB->insert_record('local_hlai_quizgen_requests', $request);
 
             $imported = 0;
             foreach ($data['questions'] as $questiondata) {
@@ -507,7 +507,7 @@ class batch_exporter {
                 $question->timecreated = time();
                 $question->timemodified = time();
 
-                $questionid = $DB->insert_record('hlai_quizgen_questions', $question);
+                $questionid = $DB->insert_record('local_hlai_quizgen_questions', $question);
 
                 // Import answers.
                 $answerorder = 0;
@@ -523,7 +523,7 @@ class batch_exporter {
                     $answer->sortorder = $answerorder++;
                     $answer->timecreated = time();
 
-                    $DB->insert_record('hlai_quizgen_answers', $answer);
+                    $DB->insert_record('local_hlai_quizgen_answers', $answer);
                 }
 
                 $imported++;

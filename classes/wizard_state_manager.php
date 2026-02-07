@@ -46,7 +46,7 @@ class wizard_state_manager {
         $now = time();
 
         // Check if state exists for this user/course.
-        $existing = $DB->get_record('hlai_quizgen_wizard_state', [
+        $existing = $DB->get_record('local_hlai_quizgen_wizard_state', [
             'userid' => $userid,
             'courseid' => $courseid,
         ]);
@@ -57,7 +57,7 @@ class wizard_state_manager {
             $existing->state_data = json_encode($data);
             $existing->request_id = $requestid;
             $existing->timemodified = $now;
-            $DB->update_record('hlai_quizgen_wizard_state', $existing);
+            $DB->update_record('local_hlai_quizgen_wizard_state', $existing);
         } else {
             // Create new state.
             $record = new \stdClass();
@@ -68,7 +68,7 @@ class wizard_state_manager {
             $record->request_id = $requestid;
             $record->timecreated = $now;
             $record->timemodified = $now;
-            $DB->insert_record('hlai_quizgen_wizard_state', $record);
+            $DB->insert_record('local_hlai_quizgen_wizard_state', $record);
         }
     }
 
@@ -82,7 +82,7 @@ class wizard_state_manager {
     public static function load_state(int $userid, int $courseid): ?array {
         global $DB;
 
-        $record = $DB->get_record('hlai_quizgen_wizard_state', [
+        $record = $DB->get_record('local_hlai_quizgen_wizard_state', [
             'userid' => $userid,
             'courseid' => $courseid,
         ]);
@@ -113,7 +113,7 @@ class wizard_state_manager {
      */
     public static function clear_state(int $userid, int $courseid): void {
         global $DB;
-        $DB->delete_records('hlai_quizgen_wizard_state', [
+        $DB->delete_records('local_hlai_quizgen_wizard_state', [
             'userid' => $userid,
             'courseid' => $courseid,
         ]);
@@ -128,6 +128,6 @@ class wizard_state_manager {
     public static function cleanup_old_states(int $days = 30): int {
         global $DB;
         $cutoff = time() - ($days * 24 * 3600);
-        return $DB->delete_records_select('hlai_quizgen_wizard_state', 'timemodified < ?', [$cutoff]);
+        return $DB->delete_records_select('local_hlai_quizgen_wizard_state', 'timemodified < ?', [$cutoff]);
     }
 }

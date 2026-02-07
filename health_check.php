@@ -81,12 +81,12 @@ try {
 
     // Check 3: Database tables exist.
     $requiredtables = [
-        'hlai_quizgen_requests',
-        'hlai_quizgen_topics',
-        'hlai_quizgen_questions',
-        'hlai_quizgen_answers',
-        'hlai_quizgen_error_log',
-        'hlai_quizgen_cache',
+        'local_hlai_quizgen_requests',
+        'local_hlai_quizgen_topics',
+        'local_hlai_quizgen_questions',
+        'local_hlai_quizgen_answers',
+        'local_hlai_quizgen_error_log',
+        'local_hlai_quizgen_cache',
     ];
 
     $missingtables = [];
@@ -111,7 +111,7 @@ try {
 
     // Check 4: Recent generation activity.
     $recentrequests = $DB->count_records_select(
-        'hlai_quizgen_requests',
+        'local_hlai_quizgen_requests',
         'timecreated > ?',
         [time() - (24 * 3600)]
     );
@@ -123,13 +123,13 @@ try {
 
     // Check 5: Error rate.
     $totalrecent = $DB->count_records_select(
-        'hlai_quizgen_requests',
+        'local_hlai_quizgen_requests',
         'timecreated > ?',
         [time() - (24 * 3600)]
     );
 
     $failedrecent = $DB->count_records_select(
-        'hlai_quizgen_requests',
+        'local_hlai_quizgen_requests',
         'status = ? AND timecreated > ?',
         ['failed', time() - (24 * 3600)]
     );

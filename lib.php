@@ -40,7 +40,7 @@ function local_hlai_quizgen_extend_navigation_course(navigation_node $navigation
             new moodle_url('/local/hlai_quizgen/wizard.php', ['courseid' => $course->id]),
             navigation_node::TYPE_CUSTOM,
             null,
-            'hlai_quizgen_wizard'
+            'local_hlai_quizgen_wizard'
         );
 
         // AI Quiz Dashboard.
@@ -49,7 +49,7 @@ function local_hlai_quizgen_extend_navigation_course(navigation_node $navigation
             new moodle_url('/local/hlai_quizgen/index.php', ['courseid' => $course->id]),
             navigation_node::TYPE_CUSTOM,
             null,
-            'hlai_quizgen_dashboard'
+            'local_hlai_quizgen_dashboard'
         );
     }
 }

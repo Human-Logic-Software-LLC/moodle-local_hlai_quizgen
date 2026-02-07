@@ -59,7 +59,7 @@ class api_test extends \advanced_testcase {
         $this->assertGreaterThan(0, $requestid);
 
         // Verify request exists in database.
-        $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid]);
+        $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid]);
         $this->assertNotEmpty($request);
         $this->assertEquals($course->id, $request->courseid);
         $this->assertEquals(10, $request->total_questions);
@@ -89,14 +89,14 @@ class api_test extends \advanced_testcase {
         api::update_request_status($requestid, 'processing');
 
         // Verify status was updated.
-        $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid]);
+        $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid]);
         $this->assertEquals('processing', $request->status);
 
         // Update status to completed.
         api::update_request_status($requestid, 'completed', 'Generation complete');
 
         // Verify status and message were updated.
-        $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid]);
+        $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid]);
         $this->assertEquals('completed', $request->status);
         $this->assertEquals('Generation complete', $request->error_message);
     }

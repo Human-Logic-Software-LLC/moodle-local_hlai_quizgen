@@ -53,7 +53,7 @@ echo html_writer::div(
 );
 
 if ($doreset && confirm_sesskey() && $requestid) {
-    $req = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid], '*', IGNORE_MISSING);
+    $req = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid], '*', IGNORE_MISSING);
     if (!$req) {
         echo html_writer::div('Request not found.', 'notification is-danger is-light');
     } else {
@@ -63,7 +63,7 @@ if ($doreset && confirm_sesskey() && $requestid) {
         $update->error_message = null;
         $update->timemodified = time();
         $update->timecompleted = null;
-        $DB->update_record('hlai_quizgen_requests', $update);
+        $DB->update_record('local_hlai_quizgen_requests', $update);
         echo html_writer::div("Request {$requestid} reset to pending.", 'notification is-success is-light');
     }
 }

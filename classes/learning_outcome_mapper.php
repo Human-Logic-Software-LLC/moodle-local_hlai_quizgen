@@ -173,7 +173,7 @@ class learning_outcome_mapper {
     public static function map_question_to_outcomes(int $questionid, int $courseid): array {
         global $DB;
 
-        $question = $DB->get_record('hlai_quizgen_questions', ['id' => $questionid]);
+        $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid]);
         if (!$question) {
             return ['error' => 'Question not found'];
         }
@@ -229,15 +229,15 @@ class learning_outcome_mapper {
 
             // Check if mapping exists.
             $existing = $DB->get_record(
-                'hlai_quizgen_outcome_map',
+                'local_hlai_quizgen_outcome_map',
                 ['questionid' => $questionid]
             );
 
             if ($existing) {
                 $mapping->id = $existing->id;
-                $DB->update_record('hlai_quizgen_outcome_map', $mapping);
+                $DB->update_record('local_hlai_quizgen_outcome_map', $mapping);
             } else {
-                $DB->insert_record('hlai_quizgen_outcome_map', $mapping);
+                $DB->insert_record('local_hlai_quizgen_outcome_map', $mapping);
             }
         }
 
@@ -360,7 +360,7 @@ class learning_outcome_mapper {
         global $DB;
 
         $outcomes = self::get_course_outcomes($courseid);
-        $questions = $DB->get_records('hlai_quizgen_questions', ['requestid' => $requestid]);
+        $questions = $DB->get_records('local_hlai_quizgen_questions', ['requestid' => $requestid]);
 
         $report = [
             'total_outcomes' => count($outcomes),

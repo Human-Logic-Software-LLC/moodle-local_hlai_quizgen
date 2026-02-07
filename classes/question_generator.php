@@ -119,10 +119,10 @@ class question_generator {
         error_handler::validate_request_state($requestid, $allowcompleted);
 
         // Get request details (needed for courseid and userid).
-        $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
+        $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
 
         // Get topic details.
-        $topic = $DB->get_record('hlai_quizgen_topics', ['id' => $topicid], '*', MUST_EXIST);
+        $topic = $DB->get_record('local_hlai_quizgen_topics', ['id' => $topicid], '*', MUST_EXIST);
 
         // OPTIMIZATION: Cache content to avoid repeated expensive extractions.
         // Only fetch content once per request, not once per topic.
@@ -225,7 +225,7 @@ class question_generator {
         // Update request token totals.
         if ($totalprompt > 0 || $totalresponse > 0) {
             $DB->execute(
-                "UPDATE {hlai_quizgen_requests}
+                "UPDATE {local_hlai_quizgen_requests}
                  SET prompt_tokens = prompt_tokens + ?,
                      response_tokens = response_tokens + ?,
                      total_tokens = total_tokens + ?
@@ -282,7 +282,7 @@ class question_generator {
         $existingquestions = [];
         if ($requestid > 0) {
             $existingrecords = $DB->get_records(
-                'hlai_quizgen_questions',
+                'local_hlai_quizgen_questions',
                 ['requestid' => $requestid],
                 'id ASC',
                 'id, questiontext'
@@ -581,7 +581,7 @@ class question_generator {
             );
         }
 
-        $questionid = $DB->insert_record('hlai_quizgen_questions', $record);
+        $questionid = $DB->insert_record('local_hlai_quizgen_questions', $record);
         $record->id = $questionid;
 
         // Save answers if present.
@@ -598,7 +598,7 @@ class question_generator {
                 $answerrecord->distractor_reasoning = $answer['reasoning'] ?? '';
                 $answerrecord->sortorder = $answerorder++;
 
-                $DB->insert_record('hlai_quizgen_answers', $answerrecord);
+                $DB->insert_record('local_hlai_quizgen_answers', $answerrecord);
             }
         }
 
@@ -745,7 +745,7 @@ class question_generator {
                         'source' => $source,
                     ], $request->id);
 
-                    $topics = $DB->get_records('hlai_quizgen_topics', ['requestid' => $request->id], 'id ASC');
+                    $topics = $DB->get_records('local_hlai_quizgen_topics', ['requestid' => $request->id], 'id ASC');
                     \local_hlai_quizgen\debug_logger::debug('Found topics for bulk scan', [
                         'topic_count' => count($topics),
                     ], $request->id);
@@ -769,7 +769,7 @@ class question_generator {
         }
 
         // Get URL content.
-        $urlcontent = $DB->get_records('hlai_quizgen_url_content', ['requestid' => $request->id]);
+        $urlcontent = $DB->get_records('local_hlai_quizgen_url_content', ['requestid' => $request->id]);
         foreach ($urlcontent as $url) {
             $fullcontent .= "\n\n=== Content from {$url->title} ===\n\n";
             $fullcontent .= $url->content;

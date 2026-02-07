@@ -464,7 +464,7 @@ class question_analytics {
     public static function generate_analytics_report(int $requestid): array {
         global $DB;
 
-        $questions = $DB->get_records('hlai_quizgen_questions', ['requestid' => $requestid]);
+        $questions = $DB->get_records('local_hlai_quizgen_questions', ['requestid' => $requestid]);
 
         $report = [
             'summary' => [

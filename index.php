@@ -69,7 +69,7 @@ $userid = $USER->id;
 
 // Quick stats.
 $totalquizzes = $DB->count_records_sql(
-    "SELECT COUNT(DISTINCT id) FROM {hlai_quizgen_requests}
+    "SELECT COUNT(DISTINCT id) FROM {local_hlai_quizgen_requests}
      WHERE userid = ? AND status = 'completed'",
     [$userid]
 );
@@ -83,21 +83,21 @@ $activequizzes = $DB->count_records_sql(
     [$courseid]
 );
 
-$totalquestions = $DB->count_records('hlai_quizgen_questions', ['userid' => $userid]);
+$totalquestions = $DB->count_records('local_hlai_quizgen_questions', ['userid' => $userid]);
 
 $approvedquestions = $DB->count_records_sql(
-    "SELECT COUNT(*) FROM {hlai_quizgen_questions}
+    "SELECT COUNT(*) FROM {local_hlai_quizgen_questions}
      WHERE userid = ? AND status IN ('approved', 'deployed')",
     [$userid]
 );
 
-$pendingquestions = $DB->count_records('hlai_quizgen_questions', [
+$pendingquestions = $DB->count_records('local_hlai_quizgen_questions', [
     'userid' => $userid,
     'status' => 'pending',
 ]);
 
 $avgquality = $DB->get_field_sql(
-    "SELECT AVG(validation_score) FROM {hlai_quizgen_questions}
+    "SELECT AVG(validation_score) FROM {local_hlai_quizgen_questions}
      WHERE userid = ? AND validation_score IS NOT NULL",
     [$userid]
 );
@@ -105,7 +105,7 @@ $avgquality = $avgquality ? round($avgquality, 1) : 0;
 
 // Calculate acceptance rate (approved + deployed vs rejected).
 $totalreviewed = $DB->count_records_sql(
-    "SELECT COUNT(*) FROM {hlai_quizgen_questions}
+    "SELECT COUNT(*) FROM {local_hlai_quizgen_questions}
      WHERE userid = ? AND status IN ('approved', 'deployed', 'rejected')",
     [$userid]
 );
@@ -113,7 +113,7 @@ $acceptancerate = $totalreviewed > 0 ? round(($approvedquestions / $totalreviewe
 
 // First-time acceptance rate (questions approved/deployed without regeneration out of all reviewed questions).
 $firsttimeapproved = $DB->count_records_sql(
-    "SELECT COUNT(*) FROM {hlai_quizgen_questions}
+    "SELECT COUNT(*) FROM {local_hlai_quizgen_questions}
      WHERE userid = ? AND status IN ('approved', 'deployed') AND (regeneration_count = 0 OR regeneration_count IS NULL)",
     [$userid]
 );
@@ -126,7 +126,7 @@ debugging("FTAR Debug - User: $userid, Total Reviewed: $totalreviewed, First-tim
 $recentrequests = $DB->get_records_sql(
     "SELECT r.id, r.courseid, r.status, r.total_questions, r.questions_generated,
             r.timecreated, c.fullname as coursename
-     FROM {hlai_quizgen_requests} r
+     FROM {local_hlai_quizgen_requests} r
      JOIN {course} c ON c.id = r.courseid
      WHERE r.userid = ?
      ORDER BY r.timecreated DESC
@@ -135,13 +135,13 @@ $recentrequests = $DB->get_records_sql(
 );
 
 // Course stats for this course specifically.
-$coursequestions = $DB->count_records('hlai_quizgen_questions', [
+$coursequestions = $DB->count_records('local_hlai_quizgen_questions', [
     'userid' => $userid,
     'courseid' => $courseid,
 ]);
 
 $coursequizzes = $DB->count_records_sql(
-    "SELECT COUNT(DISTINCT id) FROM {hlai_quizgen_requests}
+    "SELECT COUNT(DISTINCT id) FROM {local_hlai_quizgen_requests}
      WHERE userid = ? AND courseid = ? AND status = 'completed'",
     [$userid, $courseid]
 );
@@ -149,7 +149,7 @@ $coursequizzes = $DB->count_records_sql(
 // Question type distribution for this course.
 $typedistribution = $DB->get_records_sql(
     "SELECT questiontype, COUNT(*) as count
-     FROM {hlai_quizgen_questions}
+     FROM {local_hlai_quizgen_questions}
      WHERE userid = ? AND courseid = ?
      GROUP BY questiontype",
     [$userid, $courseid]

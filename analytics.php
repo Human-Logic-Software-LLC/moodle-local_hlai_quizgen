@@ -98,28 +98,28 @@ function get_filtered_sql($basesql, $timefilter, $timefield = 'timecreated') {
 
 // Total questions generated.
 $sql = get_filtered_sql(
-    "SELECT COUNT(*) FROM {hlai_quizgen_questions} WHERE userid = ? AND courseid = ?",
+    "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ?",
     $timefilter
 );
 $totalquestions = $DB->count_records_sql($sql, [$userid, $courseid]);
 
 // Approved questions.
 $sql = get_filtered_sql(
-    "SELECT COUNT(*) FROM {hlai_quizgen_questions} WHERE userid = ? AND courseid = ? AND status IN ('approved', 'deployed')",
+    "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ? AND status IN ('approved', 'deployed')",
     $timefilter
 );
 $approvedquestions = $DB->count_records_sql($sql, [$userid, $courseid]);
 
 // Rejected questions.
 $sql = get_filtered_sql(
-    "SELECT COUNT(*) FROM {hlai_quizgen_questions} WHERE userid = ? AND courseid = ? AND status = 'rejected'",
+    "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ? AND status = 'rejected'",
     $timefilter
 );
 $rejectedquestions = $DB->count_records_sql($sql, [$userid, $courseid]);
 
 // First-time acceptance.
 $sql = get_filtered_sql(
-    "SELECT COUNT(*) FROM {hlai_quizgen_questions} WHERE userid = ? AND courseid = ? " .
+    "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ? " .
     "AND status IN ('approved', 'deployed') AND (regeneration_count = 0 OR regeneration_count IS NULL)",
     $timefilter
 );
@@ -132,7 +132,7 @@ $ftar = $reviewed > 0 ? round(($firsttimeapproved / $reviewed) * 100, 1) : 0;
 
 // Average quality score.
 $sql = get_filtered_sql(
-    "SELECT AVG(validation_score) FROM {hlai_quizgen_questions} WHERE userid = ? AND courseid = ? AND validation_score IS NOT NULL",
+    "SELECT AVG(validation_score) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ? AND validation_score IS NOT NULL",
     $timefilter
 );
 $avgquality = $DB->get_field_sql($sql, [$userid, $courseid]);
@@ -140,7 +140,7 @@ $avgquality = $avgquality ? round($avgquality, 1) : 0;
 
 // Total regenerations.
 $sql = get_filtered_sql(
-    "SELECT SUM(regeneration_count) FROM {hlai_quizgen_questions} WHERE userid = ? AND courseid = ?",
+    "SELECT SUM(regeneration_count) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ?",
     $timefilter
 );
 $totalregenerations = $DB->get_field_sql($sql, [$userid, $courseid]) ?: 0;
@@ -150,7 +150,7 @@ $avgregenerations = $totalquestions > 0 ? round($totalregenerations / $totalques
 
 // Total quizzes/requests.
 $sql = get_filtered_sql(
-    "SELECT COUNT(*) FROM {hlai_quizgen_requests} WHERE userid = ? AND courseid = ?",
+    "SELECT COUNT(*) FROM {local_hlai_quizgen_requests} WHERE userid = ? AND courseid = ?",
     $timefilter
 );
 $totalrequests = $DB->count_records_sql($sql, [$userid, $courseid]);
@@ -162,7 +162,7 @@ $sql = get_filtered_sql(
             SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected,
             AVG(validation_score) as avg_quality,
             AVG(regeneration_count) as avg_regen
-     FROM {hlai_quizgen_questions}
+     FROM {local_hlai_quizgen_questions}
      WHERE userid = ? AND courseid = ?",
     $timefilter
 );
@@ -173,7 +173,7 @@ $sql = get_filtered_sql(
     "SELECT difficulty, COUNT(*) as count,
             SUM(CASE WHEN status IN ('approved', 'deployed') THEN 1 ELSE 0 END) as approved,
             AVG(validation_score) as avg_quality
-     FROM {hlai_quizgen_questions}
+     FROM {local_hlai_quizgen_questions}
      WHERE userid = ? AND courseid = ?",
     $timefilter
 );
@@ -184,7 +184,7 @@ $sql = get_filtered_sql(
     "SELECT blooms_level, COUNT(*) as count,
             SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
             AVG(validation_score) as avg_quality
-     FROM {hlai_quizgen_questions}
+     FROM {local_hlai_quizgen_questions}
      WHERE userid = ? AND courseid = ? AND blooms_level IS NOT NULL",
     $timefilter
 );
@@ -195,7 +195,7 @@ $bloomsstats = $DB->get_records_sql($sql . " GROUP BY blooms_level", [$userid, $
 // Commenting out until schema is updated.
 // $sql = get_filtered_sql(
 // "SELECT COALESCE(rejection_reason, 'Not specified') as reason, COUNT(*) as count.
-// FROM {hlai_quizgen_questions}.
+// FROM {local_hlai_quizgen_questions}.
 // WHERE userid = ? AND courseid = ? AND status = 'rejected'",.
 // $timefilter
 // );.

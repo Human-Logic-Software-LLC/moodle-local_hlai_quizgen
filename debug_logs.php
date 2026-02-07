@@ -197,6 +197,11 @@ echo $OUTPUT->footer();
 
 /**
  * Display database logs.
+ *
+ * @param int|null $requestid Optional request ID filter.
+ * @param string $level Log level filter.
+ * @param int $limit Maximum number of logs to display.
+ * @return void
  */
 function display_database_logs(?int $requestid, string $level, int $limit): void {
     global $DB, $OUTPUT;
@@ -305,6 +310,9 @@ function display_database_logs(?int $requestid, string $level, int $limit): void
 
 /**
  * Display file logs.
+ *
+ * @param int $limit Maximum number of log lines to display.
+ * @return void
  */
 function display_file_logs(int $limit): void {
     $logfile = debug_logger::getlogfilepath();
@@ -382,11 +390,14 @@ function display_file_logs(int $limit): void {
 
 /**
  * Display recent requests.
+ *
+ * @param int $limit Maximum number of requests to display.
+ * @return void
  */
 function display_recent_requests(int $limit): void {
     global $DB;
 
-    $requests = $DB->get_records('hlai_quizgen_requests', [], 'timecreated DESC', '*', 0, $limit);
+    $requests = $DB->get_records('local_hlai_quizgen_requests', [], 'timecreated DESC', '*', 0, $limit);
 
     if (empty($requests)) {
         echo '<div class="notification is-info is-light">No requests found.</div>';
@@ -512,11 +523,11 @@ function display_system_info(): void {
     echo '<div class="content">';
 
     try {
-        $totalrequests = $DB->count_records('hlai_quizgen_requests');
-        $failedrequests = $DB->count_records('hlai_quizgen_requests', ['status' => 'failed']);
-        $completedrequests = $DB->count_records('hlai_quizgen_requests', ['status' => 'completed']);
-        $totalquestions = $DB->count_records('hlai_quizgen_questions');
-        $totallogs = $DB->count_records('hlai_quizgen_logs');
+        $totalrequests = $DB->count_records('local_hlai_quizgen_requests');
+        $failedrequests = $DB->count_records('local_hlai_quizgen_requests', ['status' => 'failed']);
+        $completedrequests = $DB->count_records('local_hlai_quizgen_requests', ['status' => 'completed']);
+        $totalquestions = $DB->count_records('local_hlai_quizgen_questions');
+        $totallogs = $DB->count_records('local_hlai_quizgen_logs');
 
         echo '<table class="table is-fullwidth is-narrow">';
         echo '<tr><td>Total Requests</td><td><code>' . $totalrequests . '</code></td></tr>';
@@ -559,6 +570,9 @@ function display_system_info(): void {
 
 /**
  * Get Bulma tag color class for log level.
+ *
+ * @param string $level The log level.
+ * @return string The CSS class name.
  */
 function get_level_class(string $level): string {
     switch (strtolower($level)) {
@@ -578,6 +592,9 @@ function get_level_class(string $level): string {
 
 /**
  * Get Bulma tag color class for request status.
+ *
+ * @param string $status The request status.
+ * @return string The CSS class name.
  */
 function get_status_class(string $status): string {
     switch (strtolower($status)) {
@@ -596,6 +613,9 @@ function get_status_class(string $status): string {
 
 /**
  * Format bytes to human readable.
+ *
+ * @param int $bytes The number of bytes.
+ * @return string Human readable size string.
  */
 function format_bytes(int $bytes): string {
     $units = ['B', 'KB', 'MB', 'GB'];

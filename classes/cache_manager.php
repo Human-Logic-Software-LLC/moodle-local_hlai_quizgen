@@ -50,7 +50,7 @@ class cache_manager {
         global $DB;
 
         try {
-            $cache = $DB->get_record('hlai_quizgen_cache', [
+            $cache = $DB->get_record('local_hlai_quizgen_cache', [
                 'cachetype' => $cachetype,
                 'cachekey' => $cachekey,
             ]);
@@ -68,7 +68,7 @@ class cache_manager {
 
             // Update hit counter.
             $DB->execute(
-                "UPDATE {hlai_quizgen_cache}
+                "UPDATE {local_hlai_quizgen_cache}
                  SET hits = hits + 1, lastaccessed = ?
                  WHERE id = ?",
                 [time(), $cache->id]
@@ -94,7 +94,7 @@ class cache_manager {
 
         try {
             // Check if already exists.
-            $existing = $DB->get_record('hlai_quizgen_cache', [
+            $existing = $DB->get_record('local_hlai_quizgen_cache', [
                 'cachetype' => $cachetype,
                 'cachekey' => $cachekey,
             ]);
@@ -109,11 +109,11 @@ class cache_manager {
             if ($existing) {
                 $record->id = $existing->id;
                 $record->hits = $existing->hits;
-                $DB->update_record('hlai_quizgen_cache', $record);
+                $DB->update_record('local_hlai_quizgen_cache', $record);
             } else {
                 $record->timecreated = time();
                 $record->hits = 0;
-                $DB->insert_record('hlai_quizgen_cache', $record);
+                $DB->insert_record('local_hlai_quizgen_cache', $record);
             }
 
             return true;
@@ -133,7 +133,7 @@ class cache_manager {
         global $DB;
 
         try {
-            $DB->delete_records('hlai_quizgen_cache', [
+            $DB->delete_records('local_hlai_quizgen_cache', [
                 'cachetype' => $cachetype,
                 'cachekey' => $cachekey,
             ]);
@@ -198,13 +198,13 @@ class cache_manager {
             $expirytime = time() - $ttl;
 
             $count = $DB->count_records_select(
-                'hlai_quizgen_cache',
+                'local_hlai_quizgen_cache',
                 'cachetype = ? AND timecreated < ?',
                 [$type, $expirytime]
             );
 
             $DB->delete_records_select(
-                'hlai_quizgen_cache',
+                'local_hlai_quizgen_cache',
                 'cachetype = ? AND timecreated < ?',
                 [$type, $expirytime]
             );
@@ -232,7 +232,7 @@ class cache_manager {
         $types = ['topics', 'questions', 'distractors'];
 
         foreach ($types as $type) {
-            $records = $DB->get_records('hlai_quizgen_cache', ['cachetype' => $type]);
+            $records = $DB->get_records('local_hlai_quizgen_cache', ['cachetype' => $type]);
             $count = count($records);
             $hits = array_sum(array_column($records, 'hits'));
 
@@ -252,7 +252,7 @@ class cache_manager {
             : 0;
 
         // Calculate storage size.
-        $sql = "SELECT SUM(LENGTH(data)) as total_size FROM {hlai_quizgen_cache}";
+        $sql = "SELECT SUM(LENGTH(data)) as total_size FROM {local_hlai_quizgen_cache}";
         $result = $DB->get_record_sql($sql);
         $stats['storage_bytes'] = $result->total_size ?? 0;
         $stats['storage_mb'] = round($stats['storage_bytes'] / 1048576, 2);
@@ -271,9 +271,9 @@ class cache_manager {
 
         try {
             if ($cachetype) {
-                $DB->delete_records('hlai_quizgen_cache', ['cachetype' => $cachetype]);
+                $DB->delete_records('local_hlai_quizgen_cache', ['cachetype' => $cachetype]);
             } else {
-                $DB->delete_records('hlai_quizgen_cache');
+                $DB->delete_records('local_hlai_quizgen_cache');
             }
             return true;
         } catch (\Exception $e) {
@@ -332,7 +332,7 @@ class cache_manager {
     public static function get_hit_rate($cachetype) {
         global $DB;
 
-        $records = $DB->get_records('hlai_quizgen_cache', ['cachetype' => $cachetype]);
+        $records = $DB->get_records('local_hlai_quizgen_cache', ['cachetype' => $cachetype]);
 
         if (empty($records)) {
             return 0.0;

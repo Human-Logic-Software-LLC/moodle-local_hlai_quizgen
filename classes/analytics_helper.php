@@ -66,7 +66,7 @@ class analytics_helper {
         $stats = new \stdClass();
 
         // Total quizzes created.
-        $sql = "SELECT COUNT(DISTINCT id) FROM {hlai_quizgen_requests} WHERE userid = ?";
+        $sql = "SELECT COUNT(DISTINCT id) FROM {local_hlai_quizgen_requests} WHERE userid = ?";
         $params = [$this->userid];
         if ($this->courseid) {
             $sql .= " AND courseid = ?";
@@ -80,7 +80,7 @@ class analytics_helper {
         $stats->total_quizzes = $DB->count_records_sql($sql, $params);
 
         // Total questions.
-        $sql = "SELECT COUNT(*) FROM {hlai_quizgen_questions} WHERE userid = ?";
+        $sql = "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} WHERE userid = ?";
         $params = [$this->userid];
         if ($this->courseid) {
             $sql .= " AND courseid = ?";
@@ -93,7 +93,7 @@ class analytics_helper {
         $stats->total_questions = $DB->count_records_sql($sql, $params);
 
         // Approved questions.
-        $sql = "SELECT COUNT(*) FROM {hlai_quizgen_questions} WHERE userid = ? AND status = 'approved'";
+        $sql = "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND status = 'approved'";
         $params = [$this->userid];
         if ($this->courseid) {
             $sql .= " AND courseid = ?";
@@ -106,7 +106,7 @@ class analytics_helper {
         $stats->approved_questions = $DB->count_records_sql($sql, $params);
 
         // Pending questions.
-        $sql = "SELECT COUNT(*) FROM {hlai_quizgen_questions} WHERE userid = ? AND status = 'pending'";
+        $sql = "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND status = 'pending'";
         $params = [$this->userid];
         if ($this->courseid) {
             $sql .= " AND courseid = ?";
@@ -119,7 +119,7 @@ class analytics_helper {
         $stats->pending_questions = $DB->count_records_sql($sql, $params);
 
         // Rejected questions.
-        $sql = "SELECT COUNT(*) FROM {hlai_quizgen_questions} WHERE userid = ? AND status = 'rejected'";
+        $sql = "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND status = 'rejected'";
         $params = [$this->userid];
         if ($this->courseid) {
             $sql .= " AND courseid = ?";
@@ -132,7 +132,7 @@ class analytics_helper {
         $stats->rejected_questions = $DB->count_records_sql($sql, $params);
 
         // Average quality score.
-        $sql = "SELECT AVG(validation_score) FROM {hlai_quizgen_questions}
+        $sql = "SELECT AVG(validation_score) FROM {local_hlai_quizgen_questions}
                 WHERE userid = ? AND validation_score IS NOT NULL";
         $params = [$this->userid];
         if ($this->courseid) {
@@ -147,7 +147,7 @@ class analytics_helper {
         $stats->avg_quality = $avg ? round($avg, 1) : 0;
 
         // First-time acceptance rate.
-        $sql = "SELECT COUNT(*) FROM {hlai_quizgen_questions}
+        $sql = "SELECT COUNT(*) FROM {local_hlai_quizgen_questions}
                 WHERE userid = ? AND status = 'approved' AND regeneration_count = 0";
         $params = [$this->userid];
         if ($this->courseid) {
@@ -167,7 +167,7 @@ class analytics_helper {
         $stats->ftar = $stats->total_questions > 0 ? round(($firsttime / $stats->total_questions) * 100, 1) : 0;
 
         // Total regenerations.
-        $sql = "SELECT SUM(regeneration_count) FROM {hlai_quizgen_questions} WHERE userid = ?";
+        $sql = "SELECT SUM(regeneration_count) FROM {local_hlai_quizgen_questions} WHERE userid = ?";
         $params = [$this->userid];
         if ($this->courseid) {
             $sql .= " AND courseid = ?";
@@ -194,7 +194,7 @@ class analytics_helper {
         global $DB;
 
         $sql = "SELECT questiontype, COUNT(*) as count
-                FROM {hlai_quizgen_questions}
+                FROM {local_hlai_quizgen_questions}
                 WHERE userid = ?";
         $params = [$this->userid];
 
@@ -221,7 +221,7 @@ class analytics_helper {
         global $DB;
 
         $sql = "SELECT difficulty, COUNT(*) as count
-                FROM {hlai_quizgen_questions}
+                FROM {local_hlai_quizgen_questions}
                 WHERE userid = ?";
         $params = [$this->userid];
 
@@ -264,7 +264,7 @@ class analytics_helper {
         global $DB;
 
         $sql = "SELECT blooms_level, COUNT(*) as count
-                FROM {hlai_quizgen_questions}
+                FROM {local_hlai_quizgen_questions}
                 WHERE userid = ? AND blooms_level IS NOT NULL";
         $params = [$this->userid];
 
@@ -332,7 +332,7 @@ class analytics_helper {
                         SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
                         SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected,
                         SUM(CASE WHEN status = 'approved' AND regeneration_count = 0 THEN 1 ELSE 0 END) as first_time
-                    FROM {hlai_quizgen_questions}
+                    FROM {local_hlai_quizgen_questions}
                     WHERE userid = ? AND timecreated >= ? AND timecreated < ?";
             $params = [$this->userid, $periodstart, $periodend];
 
@@ -367,7 +367,7 @@ class analytics_helper {
                        COUNT(*) as total,
                        SUM(regeneration_count) as total_regens,
                        AVG(regeneration_count) as avg_regenerations
-                FROM {hlai_quizgen_questions}
+                FROM {local_hlai_quizgen_questions}
                 WHERE userid = ?";
         $params = [$this->userid];
 
@@ -417,7 +417,7 @@ class analytics_helper {
         $distribution = [];
 
         foreach ($ranges as $label => $range) {
-            $sql = "SELECT COUNT(*) FROM {hlai_quizgen_questions}
+            $sql = "SELECT COUNT(*) FROM {local_hlai_quizgen_questions}
                     WHERE userid = ? AND validation_score >= ? AND validation_score <= ?";
             $params = [$this->userid, $range[0], $range[1]];
 
@@ -447,7 +447,7 @@ class analytics_helper {
 
         $sql = "SELECT r.id, r.courseid, r.status, r.total_questions, r.questions_generated,
                        r.timecreated, c.fullname as coursename
-                FROM {hlai_quizgen_requests} r
+                FROM {local_hlai_quizgen_requests} r
                 JOIN {course} c ON c.id = r.courseid
                 WHERE r.userid = ?";
         $params = [$this->userid];
@@ -472,7 +472,7 @@ class analytics_helper {
         global $DB;
 
         $sql = "SELECT COALESCE(rejection_reason, 'Not specified') as reason, COUNT(*) as count
-                FROM {hlai_quizgen_questions}
+                FROM {local_hlai_quizgen_questions}
                 WHERE userid = ? AND status = 'rejected'";
         $params = [$this->userid];
 
@@ -512,8 +512,8 @@ class analytics_helper {
                     AVG(q.regeneration_count) as avg_regenerations,
                     COUNT(DISTINCT r.id) as total_requests
                 FROM {course} c
-                LEFT JOIN {hlai_quizgen_requests} r ON r.courseid = c.id AND r.userid = ?
-                LEFT JOIN {hlai_quizgen_questions} q ON q.courseid = c.id AND q.userid = ?
+                LEFT JOIN {local_hlai_quizgen_requests} r ON r.courseid = c.id AND r.userid = ?
+                LEFT JOIN {local_hlai_quizgen_questions} q ON q.courseid = c.id AND q.userid = ?
                 WHERE c.id = ?
                 GROUP BY c.id, c.fullname";
 

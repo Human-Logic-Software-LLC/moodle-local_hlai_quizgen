@@ -1,4 +1,3 @@
-#!/usr/bin/env php
 <?php
 /**
  * Quick coding standards checker for local development.

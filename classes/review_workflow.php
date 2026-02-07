@@ -61,7 +61,7 @@ class review_workflow {
     public static function submit_for_review(int $questionid, int $reviewerid, array $options = []): array {
         global $DB, $USER;
 
-        $question = $DB->get_record('hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
+        $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
 
         // Check permissions.
         if (!self::can_submit_for_review($question->requestid, $USER->id)) {
@@ -81,10 +81,10 @@ class review_workflow {
         $review->timecreated = time();
         $review->timemodified = time();
 
-        $reviewid = $DB->insert_record('hlai_quizgen_reviews', $review);
+        $reviewid = $DB->insert_record('local_hlai_quizgen_reviews', $review);
 
         // Update question status.
-        $DB->set_field('hlai_quizgen_questions', 'status', self::STATUS_PENDING, ['id' => $questionid]);
+        $DB->set_field('local_hlai_quizgen_questions', 'status', self::STATUS_PENDING, ['id' => $questionid]);
 
         // Send notification.
         self::send_review_notification($reviewid, 'submitted');
@@ -112,7 +112,7 @@ class review_workflow {
     public static function add_review_comment(int $reviewid, string $comment, array $ratings = []): array {
         global $DB, $USER;
 
-        $review = $DB->get_record('hlai_quizgen_reviews', ['id' => $reviewid], '*', MUST_EXIST);
+        $review = $DB->get_record('local_hlai_quizgen_reviews', ['id' => $reviewid], '*', MUST_EXIST);
 
         // Check permissions.
         if (!self::can_review($reviewid, $USER->id)) {
@@ -128,7 +128,7 @@ class review_workflow {
         $reviewcomment->is_resolved = 0;
         $reviewcomment->timecreated = time();
 
-        $commentid = $DB->insert_record('hlai_quizgen_review_comments', $reviewcomment);
+        $commentid = $DB->insert_record('local_hlai_quizgen_review_comments', $reviewcomment);
 
         // Store ratings if provided.
         if (!empty($ratings)) {
@@ -143,13 +143,13 @@ class review_workflow {
             $ratingrecord->overall_rating = $ratings['overall'] ?? null;
             $ratingrecord->timecreated = time();
 
-            $DB->insert_record('hlai_quizgen_review_ratings', $ratingrecord);
+            $DB->insert_record('local_hlai_quizgen_review_ratings', $ratingrecord);
         }
 
         // Update review status to in_review if pending.
         if ($review->status === self::STATUS_PENDING) {
-            $DB->set_field('hlai_quizgen_reviews', 'status', self::STATUS_IN_REVIEW, ['id' => $reviewid]);
-            $DB->set_field('hlai_quizgen_reviews', 'timestarted', time(), ['id' => $reviewid]);
+            $DB->set_field('local_hlai_quizgen_reviews', 'status', self::STATUS_IN_REVIEW, ['id' => $reviewid]);
+            $DB->set_field('local_hlai_quizgen_reviews', 'timestarted', time(), ['id' => $reviewid]);
         }
 
         // Log action.
@@ -173,7 +173,7 @@ class review_workflow {
     public static function make_decision(int $reviewid, string $decision, string $comments = ''): array {
         global $DB, $USER;
 
-        $review = $DB->get_record('hlai_quizgen_reviews', ['id' => $reviewid], '*', MUST_EXIST);
+        $review = $DB->get_record('local_hlai_quizgen_reviews', ['id' => $reviewid], '*', MUST_EXIST);
 
         // Check permissions.
         if (!self::can_approve($reviewid, $USER->id)) {
@@ -185,15 +185,15 @@ class review_workflow {
         try {
             // Update review status.
             $newstatus = $decision === 'approve' ? self::STATUS_APPROVED : self::STATUS_REJECTED;
-            $DB->set_field('hlai_quizgen_reviews', 'status', $newstatus, ['id' => $reviewid]);
-            $DB->set_field('hlai_quizgen_reviews', 'decision', $decision, ['id' => $reviewid]);
-            $DB->set_field('hlai_quizgen_reviews', 'decision_comments', $comments, ['id' => $reviewid]);
-            $DB->set_field('hlai_quizgen_reviews', 'decision_userid', $USER->id, ['id' => $reviewid]);
-            $DB->set_field('hlai_quizgen_reviews', 'timecompleted', time(), ['id' => $reviewid]);
+            $DB->set_field('local_hlai_quizgen_reviews', 'status', $newstatus, ['id' => $reviewid]);
+            $DB->set_field('local_hlai_quizgen_reviews', 'decision', $decision, ['id' => $reviewid]);
+            $DB->set_field('local_hlai_quizgen_reviews', 'decision_comments', $comments, ['id' => $reviewid]);
+            $DB->set_field('local_hlai_quizgen_reviews', 'decision_userid', $USER->id, ['id' => $reviewid]);
+            $DB->set_field('local_hlai_quizgen_reviews', 'timecompleted', time(), ['id' => $reviewid]);
 
             // Update question status.
             $questionstatus = $decision === 'approve' ? 'approved' : 'rejected';
-            $DB->set_field('hlai_quizgen_questions', 'status', $questionstatus, ['id' => $review->questionid]);
+            $DB->set_field('local_hlai_quizgen_questions', 'status', $questionstatus, ['id' => $review->questionid]);
 
             // Add decision comment.
             $commentrecord = new \stdClass();
@@ -203,7 +203,7 @@ class review_workflow {
             $commentrecord->comment_type = 'decision';
             $commentrecord->is_resolved = 1;
             $commentrecord->timecreated = time();
-            $DB->insert_record('hlai_quizgen_review_comments', $commentrecord);
+            $DB->insert_record('local_hlai_quizgen_review_comments', $commentrecord);
 
             // Log action.
             self::log_review_action($reviewid, 'decision_' . $decision, $USER->id);
@@ -236,7 +236,7 @@ class review_workflow {
     public static function request_revision(int $reviewid, array $issues): array {
         global $DB, $USER;
 
-        $review = $DB->get_record('hlai_quizgen_reviews', ['id' => $reviewid], '*', MUST_EXIST);
+        $review = $DB->get_record('local_hlai_quizgen_reviews', ['id' => $reviewid], '*', MUST_EXIST);
 
         // Check permissions.
         if (!self::can_review($reviewid, $USER->id)) {
@@ -244,9 +244,9 @@ class review_workflow {
         }
 
         // Update review status.
-        $DB->set_field('hlai_quizgen_reviews', 'status', self::STATUS_NEEDS_REVISION, ['id' => $reviewid]);
+        $DB->set_field('local_hlai_quizgen_reviews', 'status', self::STATUS_NEEDS_REVISION, ['id' => $reviewid]);
         $DB->set_field(
-            'hlai_quizgen_questions',
+            'local_hlai_quizgen_questions',
             'status',
             self::STATUS_NEEDS_REVISION,
             ['id' => $review->questionid]
@@ -263,7 +263,7 @@ class review_workflow {
             $issuerecord->is_resolved = 0;
             $issuerecord->timecreated = time();
 
-            $DB->insert_record('hlai_quizgen_revision_issues', $issuerecord);
+            $DB->insert_record('local_hlai_quizgen_revision_issues', $issuerecord);
         }
 
         // Add comment.
@@ -275,7 +275,7 @@ class review_workflow {
         $commentrecord->comment_type = 'revision_request';
         $commentrecord->is_resolved = 0;
         $commentrecord->timecreated = time();
-        $DB->insert_record('hlai_quizgen_review_comments', $commentrecord);
+        $DB->insert_record('local_hlai_quizgen_review_comments', $commentrecord);
 
         // Log action.
         self::log_review_action($reviewid, 'revision_requested', $USER->id);
@@ -301,7 +301,7 @@ class review_workflow {
     public static function submit_revision(int $reviewid, array $changes): array {
         global $DB, $USER;
 
-        $review = $DB->get_record('hlai_quizgen_reviews', ['id' => $reviewid], '*', MUST_EXIST);
+        $review = $DB->get_record('local_hlai_quizgen_reviews', ['id' => $reviewid], '*', MUST_EXIST);
 
         // Check permissions.
         if (!self::can_edit($review->questionid, $USER->id)) {
@@ -309,9 +309,9 @@ class review_workflow {
         }
 
         // Update status.
-        $DB->set_field('hlai_quizgen_reviews', 'status', self::STATUS_REVISED, ['id' => $reviewid]);
+        $DB->set_field('local_hlai_quizgen_reviews', 'status', self::STATUS_REVISED, ['id' => $reviewid]);
         $DB->set_field(
-            'hlai_quizgen_questions',
+            'local_hlai_quizgen_questions',
             'status',
             self::STATUS_REVISED,
             ['id' => $review->questionid]
@@ -324,13 +324,13 @@ class review_workflow {
         $changerecord->changes = json_encode($changes);
         $changerecord->revision_notes = $changes['notes'] ?? '';
         $changerecord->timecreated = time();
-        $DB->insert_record('hlai_quizgen_revisions', $changerecord);
+        $DB->insert_record('local_hlai_quizgen_revisions', $changerecord);
 
         // Mark addressed issues as resolved.
         if (!empty($changes['resolved_issues'])) {
             [$insql, $params] = $DB->get_in_or_equal($changes['resolved_issues']);
             $DB->set_field_select(
-                'hlai_quizgen_revision_issues',
+                'local_hlai_quizgen_revision_issues',
                 'is_resolved',
                 1,
                 "id $insql",
@@ -346,7 +346,7 @@ class review_workflow {
         $commentrecord->comment_type = 'revision';
         $commentrecord->is_resolved = 0;
         $commentrecord->timecreated = time();
-        $DB->insert_record('hlai_quizgen_review_comments', $commentrecord);
+        $DB->insert_record('local_hlai_quizgen_review_comments', $commentrecord);
 
         // Log action.
         self::log_review_action($reviewid, 'revision_submitted', $USER->id);
@@ -370,29 +370,29 @@ class review_workflow {
     public static function get_review_details(int $reviewid): array {
         global $DB;
 
-        $review = $DB->get_record('hlai_quizgen_reviews', ['id' => $reviewid], '*', MUST_EXIST);
-        $question = $DB->get_record('hlai_quizgen_questions', ['id' => $review->questionid], '*', MUST_EXIST);
+        $review = $DB->get_record('local_hlai_quizgen_reviews', ['id' => $reviewid], '*', MUST_EXIST);
+        $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $review->questionid], '*', MUST_EXIST);
 
         // Get comments.
         $comments = $DB->get_records(
-            'hlai_quizgen_review_comments',
+            'local_hlai_quizgen_review_comments',
             ['reviewid' => $reviewid],
             'timecreated ASC'
         );
 
         // Get ratings.
-        $ratings = $DB->get_records('hlai_quizgen_review_ratings', ['reviewid' => $reviewid]);
+        $ratings = $DB->get_records('local_hlai_quizgen_review_ratings', ['reviewid' => $reviewid]);
 
         // Get issues if any.
         $issues = $DB->get_records(
-            'hlai_quizgen_revision_issues',
+            'local_hlai_quizgen_revision_issues',
             ['reviewid' => $reviewid],
             'timecreated DESC'
         );
 
         // Get revision history.
         $revisions = $DB->get_records(
-            'hlai_quizgen_revisions',
+            'local_hlai_quizgen_revisions',
             ['reviewid' => $reviewid],
             'timecreated DESC'
         );
@@ -423,8 +423,8 @@ class review_workflow {
 
         $sql = "SELECT r.*, q.questiontext, q.questiontype, q.difficulty,
                        u.firstname, u.lastname
-                FROM {hlai_quizgen_reviews} r
-                JOIN {hlai_quizgen_questions} q ON q.id = r.questionid
+                FROM {local_hlai_quizgen_reviews} r
+                JOIN {local_hlai_quizgen_questions} q ON q.id = r.questionid
                 JOIN {user} u ON u.id = r.submitterid
                 WHERE r.reviewerid = ?
                 AND r.status IN (?, ?)
@@ -453,20 +453,20 @@ class review_workflow {
     private static function calculate_review_metrics(int $reviewid): array {
         global $DB;
 
-        $review = $DB->get_record('hlai_quizgen_reviews', ['id' => $reviewid]);
+        $review = $DB->get_record('local_hlai_quizgen_reviews', ['id' => $reviewid]);
 
         $metrics = [
-            'total_comments' => $DB->count_records('hlai_quizgen_review_comments', ['reviewid' => $reviewid]),
+            'total_comments' => $DB->count_records('local_hlai_quizgen_review_comments', ['reviewid' => $reviewid]),
             'unresolved_comments' => $DB->count_records(
-                'hlai_quizgen_review_comments',
+                'local_hlai_quizgen_review_comments',
                 ['reviewid' => $reviewid, 'is_resolved' => 0]
             ),
-            'total_issues' => $DB->count_records('hlai_quizgen_revision_issues', ['reviewid' => $reviewid]),
+            'total_issues' => $DB->count_records('local_hlai_quizgen_revision_issues', ['reviewid' => $reviewid]),
             'resolved_issues' => $DB->count_records(
-                'hlai_quizgen_revision_issues',
+                'local_hlai_quizgen_revision_issues',
                 ['reviewid' => $reviewid, 'is_resolved' => 1]
             ),
-            'revision_count' => $DB->count_records('hlai_quizgen_revisions', ['reviewid' => $reviewid]),
+            'revision_count' => $DB->count_records('local_hlai_quizgen_revisions', ['reviewid' => $reviewid]),
         ];
 
         // Average ratings.
@@ -476,7 +476,7 @@ class review_workflow {
                        AVG(pedagogical_value) as avg_pedagogical,
                        AVG(distractor_quality) as avg_distractor,
                        AVG(overall_rating) as avg_overall
-                FROM {hlai_quizgen_review_ratings}
+                FROM {local_hlai_quizgen_review_ratings}
                 WHERE reviewid = ?";
 
         $avgratings = $DB->get_record_sql($sql, [$reviewid]);
@@ -512,11 +512,11 @@ class review_workflow {
         global $DB;
 
         $sql = "SELECT 'comment' as type, timecreated, userid, comment as details
-                FROM {hlai_quizgen_review_comments}
+                FROM {local_hlai_quizgen_review_comments}
                 WHERE reviewid = ?
                 UNION ALL
                 SELECT 'revision' as type, timecreated, userid, revision_notes as details
-                FROM {hlai_quizgen_revisions}
+                FROM {local_hlai_quizgen_revisions}
                 WHERE reviewid = ?
                 ORDER BY timecreated ASC";
 
@@ -535,7 +535,7 @@ class review_workflow {
     private static function can_submit_for_review(int $requestid, int $userid): bool {
         global $DB;
 
-        $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid]);
+        $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid]);
         return $request && ($request->userid == $userid || has_capability(
             'local/hlai_quizgen:managequestions',
             \context_course::instance($request->courseid),
@@ -553,7 +553,7 @@ class review_workflow {
     private static function can_review(int $reviewid, int $userid): bool {
         global $DB;
 
-        $review = $DB->get_record('hlai_quizgen_reviews', ['id' => $reviewid]);
+        $review = $DB->get_record('local_hlai_quizgen_reviews', ['id' => $reviewid]);
         return $review && ($review->reviewerid == $userid ||
             has_capability(
                 'local/hlai_quizgen:reviewquestions',
@@ -587,12 +587,12 @@ class review_workflow {
     private static function can_edit(int $questionid, int $userid): bool {
         global $DB;
 
-        $question = $DB->get_record('hlai_quizgen_questions', ['id' => $questionid]);
+        $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid]);
         if (!$question) {
             return false;
         }
 
-        $request = $DB->get_record('hlai_quizgen_requests', ['id' => $question->requestid]);
+        $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $question->requestid]);
         return $request && ($request->userid == $userid ||
             has_capability(
                 'local/hlai_quizgen:editquestions',
@@ -628,6 +628,6 @@ class review_workflow {
         $log->action = $action;
         $log->timecreated = time();
 
-        $DB->insert_record('hlai_quizgen_review_log', $log);
+        $DB->insert_record('local_hlai_quizgen_review_log', $log);
     }
 }

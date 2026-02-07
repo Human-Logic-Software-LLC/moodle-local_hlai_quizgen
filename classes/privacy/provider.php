@@ -49,33 +49,33 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
     public static function get_metadata(collection $collection): collection {
         // Request data.
         $collection->add_database_table(
-            'hlai_quizgen_requests',
+            'local_hlai_quizgen_requests',
             [
-                'userid' => 'privacy:metadata:hlai_quizgen_requests:userid',
-                'timecreated' => 'privacy:metadata:hlai_quizgen_requests:timecreated',
+                'userid' => 'privacy:metadata:local_hlai_quizgen_requests:userid',
+                'timecreated' => 'privacy:metadata:local_hlai_quizgen_requests:timecreated',
             ],
-            'privacy:metadata:hlai_quizgen_requests'
+            'privacy:metadata:local_hlai_quizgen_requests'
         );
 
         // User settings.
         $collection->add_database_table(
-            'hlai_quizgen_settings',
+            'local_hlai_quizgen_settings',
             [
-                'userid' => 'privacy:metadata:hlai_quizgen_settings:userid',
-                'setting_value' => 'privacy:metadata:hlai_quizgen_settings:setting_value',
+                'userid' => 'privacy:metadata:local_hlai_quizgen_settings:userid',
+                'setting_value' => 'privacy:metadata:local_hlai_quizgen_settings:setting_value',
             ],
-            'privacy:metadata:hlai_quizgen_settings'
+            'privacy:metadata:local_hlai_quizgen_settings'
         );
 
         // Logs.
         $collection->add_database_table(
-            'hlai_quizgen_logs',
+            'local_hlai_quizgen_logs',
             [
-                'userid' => 'privacy:metadata:hlai_quizgen_logs:userid',
-                'action' => 'privacy:metadata:hlai_quizgen_logs:action',
-                'timecreated' => 'privacy:metadata:hlai_quizgen_logs:timecreated',
+                'userid' => 'privacy:metadata:local_hlai_quizgen_logs:userid',
+                'action' => 'privacy:metadata:local_hlai_quizgen_logs:action',
+                'timecreated' => 'privacy:metadata:local_hlai_quizgen_logs:timecreated',
             ],
-            'privacy:metadata:hlai_quizgen_logs'
+            'privacy:metadata:local_hlai_quizgen_logs'
         );
 
         // External data sent to AI Hub.
@@ -103,7 +103,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         $sql = "SELECT DISTINCT ctx.id
                   FROM {context} ctx
                   JOIN {course} c ON c.id = ctx.instanceid AND ctx.contextlevel = :courselevel
-                  JOIN {hlai_quizgen_requests} r ON r.courseid = c.id
+                  JOIN {local_hlai_quizgen_requests} r ON r.courseid = c.id
                  WHERE r.userid = :userid";
 
         $contextlist->add_from_sql($sql, [
@@ -128,7 +128,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
 
         // Get users with requests in this course.
         $sql = "SELECT r.userid
-                  FROM {hlai_quizgen_requests} r
+                  FROM {local_hlai_quizgen_requests} r
                  WHERE r.courseid = :courseid";
 
         $userlist->add_from_sql('userid', $sql, ['courseid' => $context->instanceid]);
@@ -152,7 +152,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             $courseid = $context->instanceid;
 
             // Export requests.
-            $requests = $DB->get_records('hlai_quizgen_requests', [
+            $requests = $DB->get_records('local_hlai_quizgen_requests', [
                 'courseid' => $courseid,
                 'userid' => $userid,
             ]);
@@ -177,7 +177,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             }
 
             // Export settings.
-            $settings = $DB->get_records('hlai_quizgen_settings', [
+            $settings = $DB->get_records('local_hlai_quizgen_settings', [
                 'userid' => $userid,
                 'courseid' => $courseid,
             ]);
@@ -211,7 +211,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         $courseid = $context->instanceid;
 
         // Get all requests for this course.
-        $requests = $DB->get_records('hlai_quizgen_requests', ['courseid' => $courseid]);
+        $requests = $DB->get_records('local_hlai_quizgen_requests', ['courseid' => $courseid]);
 
         foreach ($requests as $request) {
             self::delete_request_data($request->id);
@@ -236,7 +236,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             $courseid = $context->instanceid;
 
             // Delete user's requests.
-            $requests = $DB->get_records('hlai_quizgen_requests', [
+            $requests = $DB->get_records('local_hlai_quizgen_requests', [
                 'courseid' => $courseid,
                 'userid' => $userid,
             ]);
@@ -246,13 +246,13 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             }
 
             // Delete user settings.
-            $DB->delete_records('hlai_quizgen_settings', [
+            $DB->delete_records('local_hlai_quizgen_settings', [
                 'userid' => $userid,
                 'courseid' => $courseid,
             ]);
 
             // Delete user logs.
-            $DB->delete_records('hlai_quizgen_logs', [
+            $DB->delete_records('local_hlai_quizgen_logs', [
                 'userid' => $userid,
             ]);
         }
@@ -277,7 +277,7 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
 
         foreach ($userids as $userid) {
             // Delete user's requests.
-            $requests = $DB->get_records('hlai_quizgen_requests', [
+            $requests = $DB->get_records('local_hlai_quizgen_requests', [
                 'courseid' => $courseid,
                 'userid' => $userid,
             ]);
@@ -287,13 +287,13 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
             }
 
             // Delete user settings.
-            $DB->delete_records('hlai_quizgen_settings', [
+            $DB->delete_records('local_hlai_quizgen_settings', [
                 'userid' => $userid,
                 'courseid' => $courseid,
             ]);
 
             // Delete user logs.
-            $DB->delete_records('hlai_quizgen_logs', ['userid' => $userid]);
+            $DB->delete_records('local_hlai_quizgen_logs', ['userid' => $userid]);
         }
     }
 
@@ -306,15 +306,15 @@ class provider implements \core_privacy\local\metadata\provider, \core_privacy\l
         global $DB;
 
         // Get questions.
-        $questions = $DB->get_records('hlai_quizgen_questions', ['requestid' => $requestid]);
+        $questions = $DB->get_records('local_hlai_quizgen_questions', ['requestid' => $requestid]);
 
         foreach ($questions as $question) {
-            $DB->delete_records('hlai_quizgen_answers', ['questionid' => $question->id]);
+            $DB->delete_records('local_hlai_quizgen_answers', ['questionid' => $question->id]);
         }
 
-        $DB->delete_records('hlai_quizgen_questions', ['requestid' => $requestid]);
-        $DB->delete_records('hlai_quizgen_topics', ['requestid' => $requestid]);
-        $DB->delete_records('hlai_quizgen_logs', ['requestid' => $requestid]);
-        $DB->delete_records('hlai_quizgen_requests', ['id' => $requestid]);
+        $DB->delete_records('local_hlai_quizgen_questions', ['requestid' => $requestid]);
+        $DB->delete_records('local_hlai_quizgen_topics', ['requestid' => $requestid]);
+        $DB->delete_records('local_hlai_quizgen_logs', ['requestid' => $requestid]);
+        $DB->delete_records('local_hlai_quizgen_requests', ['id' => $requestid]);
     }
 }

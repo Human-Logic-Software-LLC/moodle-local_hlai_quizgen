@@ -70,7 +70,7 @@ class difficulty_calibrator {
         $actualdifficulty = self::calculate_difficulty_from_rate($successrate);
 
         // Get originally assigned difficulty.
-        $question = $DB->get_record('hlai_quizgen_questions', ['moodle_questionid' => $questionid]);
+        $question = $DB->get_record('local_hlai_quizgen_questions', ['moodle_questionid' => $questionid]);
         $originaldifficulty = $question ? $question->difficulty : 'medium';
 
         // Calculate discrimination index (how well it separates strong/weak students).
@@ -90,7 +90,7 @@ class difficulty_calibrator {
             $update->attempt_count = $stats['attempt_count'];
             $update->last_calibrated = time();
 
-            $DB->update_record('hlai_quizgen_questions', $update);
+            $DB->update_record('local_hlai_quizgen_questions', $update);
         }
 
         return [
@@ -115,7 +115,7 @@ class difficulty_calibrator {
     public static function calibrate_request_questions(int $requestid): array {
         global $DB;
 
-        $questions = $DB->get_records('hlai_quizgen_questions', ['requestid' => $requestid]);
+        $questions = $DB->get_records('local_hlai_quizgen_questions', ['requestid' => $requestid]);
 
         $results = [
             'total' => count($questions),

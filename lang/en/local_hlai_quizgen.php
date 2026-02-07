@@ -351,16 +351,16 @@ $string['pending'] = 'Pending';
 $string['rejected'] = 'Rejected';
 
 // Privacy.
-$string['privacy:metadata:hlai_quizgen_requests'] = 'Stores question generation requests';
-$string['privacy:metadata:hlai_quizgen_requests:userid'] = 'The ID of the user who created the request';
-$string['privacy:metadata:hlai_quizgen_requests:timecreated'] = 'The time when the request was created';
-$string['privacy:metadata:hlai_quizgen_settings'] = 'Stores user preferences';
-$string['privacy:metadata:hlai_quizgen_settings:userid'] = 'The ID of the user';
-$string['privacy:metadata:hlai_quizgen_settings:setting_value'] = 'The user\'s preference value';
-$string['privacy:metadata:hlai_quizgen_logs'] = 'Audit log of user actions';
-$string['privacy:metadata:hlai_quizgen_logs:userid'] = 'The ID of the user who performed the action';
-$string['privacy:metadata:hlai_quizgen_logs:action'] = 'The action performed';
-$string['privacy:metadata:hlai_quizgen_logs:timecreated'] = 'The time when the action was performed';
+$string['privacy:metadata:local_hlai_quizgen_requests'] = 'Stores question generation requests';
+$string['privacy:metadata:local_hlai_quizgen_requests:userid'] = 'The ID of the user who created the request';
+$string['privacy:metadata:local_hlai_quizgen_requests:timecreated'] = 'The time when the request was created';
+$string['privacy:metadata:local_hlai_quizgen_settings'] = 'Stores user preferences';
+$string['privacy:metadata:local_hlai_quizgen_settings:userid'] = 'The ID of the user';
+$string['privacy:metadata:local_hlai_quizgen_settings:setting_value'] = 'The user\'s preference value';
+$string['privacy:metadata:local_hlai_quizgen_logs'] = 'Audit log of user actions';
+$string['privacy:metadata:local_hlai_quizgen_logs:userid'] = 'The ID of the user who performed the action';
+$string['privacy:metadata:local_hlai_quizgen_logs:action'] = 'The action performed';
+$string['privacy:metadata:local_hlai_quizgen_logs:timecreated'] = 'The time when the action was performed';
 $string['privacy:metadata:external:aihub'] = 'Course content is sent to AI Hub for analysis and question generation';
 $string['privacy:metadata:external:aihub:content'] = 'Course materials (no student data)';
 $string['privacy:metadata:external:aihub:purpose'] = 'To generate quiz questions from course content';

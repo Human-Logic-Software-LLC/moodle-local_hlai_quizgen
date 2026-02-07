@@ -60,7 +60,7 @@ class topic_analyzer {
         }
 
         // Check cache first if enabled.
-        $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid], 'courseid');
+        $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid], 'courseid');
         $cachekey = cache_manager::generate_topic_cache_key($content, $request->courseid);
 
         // Topic caching - disabled for now.
@@ -589,7 +589,7 @@ class topic_analyzer {
             $topicrecord->learning_objectives = json_encode($maintopic['learning_objectives'] ?? []);
             $topicrecord->timecreated = $now;
 
-            $topicid = $DB->insert_record('hlai_quizgen_topics', $topicrecord);
+            $topicid = $DB->insert_record('local_hlai_quizgen_topics', $topicrecord);
             $topicrecord->id = $topicid;
             $savedtopics[] = $topicrecord;
 
@@ -608,7 +608,7 @@ class topic_analyzer {
                     $subtopicrecord->learning_objectives = json_encode([]);
                     $subtopicrecord->timecreated = $now;
 
-                    $subtopicid = $DB->insert_record('hlai_quizgen_topics', $subtopicrecord);
+                    $subtopicid = $DB->insert_record('local_hlai_quizgen_topics', $subtopicrecord);
                     $subtopicrecord->id = $subtopicid;
                     $savedtopics[] = $subtopicrecord;
                 }
@@ -627,7 +627,7 @@ class topic_analyzer {
     public static function get_topics(int $requestid): array {
         global $DB;
 
-        $topics = $DB->get_records('hlai_quizgen_topics', ['requestid' => $requestid], 'level ASC, id ASC');
+        $topics = $DB->get_records('local_hlai_quizgen_topics', ['requestid' => $requestid], 'level ASC, id ASC');
 
         // Organize topics hierarchically.
         $organized = [];
@@ -664,7 +664,7 @@ class topic_analyzer {
         $record->selected = $selected ? 1 : 0;
         $record->num_questions = $numquestions;
 
-        return $DB->update_record('hlai_quizgen_topics', $record);
+        return $DB->update_record('local_hlai_quizgen_topics', $record);
     }
 
     /**
@@ -676,7 +676,7 @@ class topic_analyzer {
     public static function get_selected_topics(int $requestid): array {
         global $DB;
 
-        return $DB->get_records('hlai_quizgen_topics', [
+        return $DB->get_records('local_hlai_quizgen_topics', [
             'requestid' => $requestid,
             'selected' => 1,
         ], 'level ASC, id ASC');
@@ -730,7 +730,7 @@ class topic_analyzer {
             $newtopic->selected = 1; // Auto-select cached topics.
             $newtopic->timecreated = time();
 
-            $newid = $DB->insert_record('hlai_quizgen_topics', $newtopic);
+            $newid = $DB->insert_record('local_hlai_quizgen_topics', $newtopic);
 
             // Store mapping if this was a parent.
             if (isset($topic['id'])) {
@@ -757,7 +757,7 @@ class topic_analyzer {
 
             if ($originalparent > 0 && isset($parentmap[$originalparent])) {
                 $DB->set_field(
-                    'hlai_quizgen_topics',
+                    'local_hlai_quizgen_topics',
                     'parent_topic_id',
                     $parentmap[$originalparent],
                     ['id' => $topic->id]

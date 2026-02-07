@@ -118,7 +118,7 @@ class error_handler {
             $log->error_message = substr($errordetails['message'], 0, 1000); // Truncate if too long.
             $log->timecreated = time();
 
-            $DB->insert_record('hlai_quizgen_logs', $log);
+            $DB->insert_record('local_hlai_quizgen_logs', $log);
         } catch (\Exception $e) {
             // Prevent cascading failures.
             debugging($e->getMessage(), DEBUG_DEVELOPER);
@@ -169,13 +169,14 @@ class error_handler {
      * Validate request can proceed (not failed or completed).
      *
      * @param int $requestid Request ID
+     * @param bool $allowcompleted Whether to allow completed requests.
      * @return bool True if can proceed
      * @throws \moodle_exception If request is in invalid state
      */
     public static function validate_request_state(int $requestid, bool $allowcompleted = false): bool {
         global $DB;
 
-        $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid], 'status', MUST_EXIST);
+        $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid], 'status', MUST_EXIST);
 
         // FIX: Allow completed requests when regenerating questions.
         if ($request->status === 'completed' && !$allowcompleted) {

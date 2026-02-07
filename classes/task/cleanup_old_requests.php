@@ -61,7 +61,7 @@ class cleanup_old_requests extends \core\task\scheduled_task {
         $cutofftime = time() - ($cleanupdays * 86400);
 
         // Find old requests that are completed or failed.
-        $sql = "SELECT id FROM {hlai_quizgen_requests}
+        $sql = "SELECT id FROM {local_hlai_quizgen_requests}
                  WHERE (status = 'completed' OR status = 'failed')
                    AND timecompleted < :cutoff";
 
@@ -101,24 +101,24 @@ class cleanup_old_requests extends \core\task\scheduled_task {
 
         try {
             // Get questions for this request.
-            $questions = $DB->get_records('hlai_quizgen_questions', ['requestid' => $requestid]);
+            $questions = $DB->get_records('local_hlai_quizgen_questions', ['requestid' => $requestid]);
 
             // Delete answers for each question.
             foreach ($questions as $question) {
-                $DB->delete_records('hlai_quizgen_answers', ['questionid' => $question->id]);
+                $DB->delete_records('local_hlai_quizgen_answers', ['questionid' => $question->id]);
             }
 
             // Delete questions.
-            $DB->delete_records('hlai_quizgen_questions', ['requestid' => $requestid]);
+            $DB->delete_records('local_hlai_quizgen_questions', ['requestid' => $requestid]);
 
             // Delete topics.
-            $DB->delete_records('hlai_quizgen_topics', ['requestid' => $requestid]);
+            $DB->delete_records('local_hlai_quizgen_topics', ['requestid' => $requestid]);
 
             // Delete logs.
-            $DB->delete_records('hlai_quizgen_logs', ['requestid' => $requestid]);
+            $DB->delete_records('local_hlai_quizgen_logs', ['requestid' => $requestid]);
 
             // Delete request.
-            $DB->delete_records('hlai_quizgen_requests', ['id' => $requestid]);
+            $DB->delete_records('local_hlai_quizgen_requests', ['id' => $requestid]);
 
             // Commit transaction.
             $transaction->allow_commit();

@@ -52,7 +52,7 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
             self::update_progress($requestid, 'processing', 0, 'Starting generation...');
 
             // Get request details.
-            $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
+            $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
 
             // Get selected topics.
             $topics = \local_hlai_quizgen\topic_analyzer::get_selected_topics($requestid);
@@ -89,7 +89,7 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                 foreach ($topics as $topic) {
                     $topicquestions = $questionspertopic + ($index < $remainder ? 1 : 0);
                     $topic->num_questions = $topicquestions;
-                    $DB->set_field('hlai_quizgen_topics', 'num_questions', $topicquestions, ['id' => $topic->id]);
+                    $DB->set_field('local_hlai_quizgen_topics', 'num_questions', $topicquestions, ['id' => $topic->id]);
                     $index++;
                 }
             }
@@ -191,7 +191,7 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                 if ($questionsgenerated > $topic->num_questions) {
                     // Get all questions for this topic in this request.
                     $topicquestions = $DB->get_records(
-                        'hlai_quizgen_questions',
+                        'local_hlai_quizgen_questions',
                         ['requestid' => $requestid, 'topicid' => $topic->id],
                         'id ASC'
                     );
@@ -201,8 +201,8 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                     $topicquestions = array_values($topicquestions);
                     for ($i = count($topicquestions) - 1; $i >= 0 && $deleted < $excess; $i--) {
                         $qid = $topicquestions[$i]->id;
-                        $DB->delete_records('hlai_quizgen_answers', ['questionid' => $qid]);
-                        $DB->delete_records('hlai_quizgen_questions', ['id' => $qid]);
+                        $DB->delete_records('local_hlai_quizgen_answers', ['questionid' => $qid]);
+                        $DB->delete_records('local_hlai_quizgen_questions', ['id' => $qid]);
                         $deleted++;
                     }
                     $questionsgenerated -= $deleted;
@@ -219,11 +219,11 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
             }
 
             // Update request with actual generated count.
-            $DB->set_field('hlai_quizgen_requests', 'total_questions', $totalquestionsgenerated, ['id' => $requestid]);
+            $DB->set_field('local_hlai_quizgen_requests', 'total_questions', $totalquestionsgenerated, ['id' => $requestid]);
 
             // POST-GENERATION: Check for duplicates and flag them.
             self::update_progress($requestid, 'processing', 95, "Checking for duplicate questions...");
-            $allquestions = $DB->get_records('hlai_quizgen_questions', ['requestid' => $requestid], 'id ASC');
+            $allquestions = $DB->get_records('local_hlai_quizgen_questions', ['requestid' => $requestid], 'id ASC');
             $questiontexts = [];
             foreach ($allquestions as $q) {
                 $questiontexts[] = $q->questiontext;
@@ -278,6 +278,6 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
         $record->progress_message = $message;
         $record->timemodified = time();
 
-        $DB->update_record('hlai_quizgen_requests', $record);
+        $DB->update_record('local_hlai_quizgen_requests', $record);
     }
 }

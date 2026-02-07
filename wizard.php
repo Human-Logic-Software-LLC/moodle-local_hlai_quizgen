@@ -121,7 +121,7 @@ if ($action === 'deploy_questions' && confirm_sesskey()) {
 // Handle individual question actions (Step 4).
 if ($action === 'approve_question' && confirm_sesskey()) {
     $questionid = required_param('questionid', PARAM_INT);
-    $DB->set_field('hlai_quizgen_questions', 'status', 'approved', ['id' => $questionid]);
+    $DB->set_field('local_hlai_quizgen_questions', 'status', 'approved', ['id' => $questionid]);
     redirect(new moodle_url('/local/hlai_quizgen/wizard.php', [
         'courseid' => $courseid,
         'requestid' => $requestid,
@@ -131,7 +131,7 @@ if ($action === 'approve_question' && confirm_sesskey()) {
 
 if ($action === 'reject_question' && confirm_sesskey()) {
     $questionid = required_param('questionid', PARAM_INT);
-    $DB->set_field('hlai_quizgen_questions', 'status', 'rejected', ['id' => $questionid]);
+    $DB->set_field('local_hlai_quizgen_questions', 'status', 'rejected', ['id' => $questionid]);
     redirect(new moodle_url('/local/hlai_quizgen/wizard.php', [
         'courseid' => $courseid,
         'requestid' => $requestid,
@@ -164,7 +164,7 @@ if ($action === 'regenerate_question' && confirm_sesskey()) {
     } catch (\Exception $e) {
         // FIX: Get requestid from question if not available.
         if (empty($requestid) || $requestid == 0) {
-            $question = $DB->get_record('hlai_quizgen_questions', ['id' => $questionid], 'requestid');
+            $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], 'requestid');
             if ($question) {
                 $requestid = $question->requestid;
             }
@@ -414,7 +414,7 @@ function handle_content_upload(int $courseid, context $context) {
     if ($deduplicationenabled) {
         // Check for duplicate content in this course from the last 30 days.
         $existingrequest = $DB->get_record_sql(
-            "SELECT * FROM {hlai_quizgen_requests}
+            "SELECT * FROM {local_hlai_quizgen_requests}
              WHERE courseid = ? AND content_hash = ? AND timecreated > ?
              ORDER BY timecreated DESC
              LIMIT 1",
@@ -424,7 +424,7 @@ function handle_content_upload(int $courseid, context $context) {
 
     if ($existingrequest && $existingrequest->status === 'completed') {
         // Found duplicate! Check if topics exist.
-        $existingtopics = $DB->get_records('hlai_quizgen_topics', ['requestid' => $existingrequest->id]);
+        $existingtopics = $DB->get_records('local_hlai_quizgen_topics', ['requestid' => $existingrequest->id]);
 
         if (!empty($existingtopics)) {
             // Create new request and clone topics from existing.
@@ -465,7 +465,7 @@ function handle_content_upload(int $courseid, context $context) {
                 $record->custom_instructions = $manualtext;
             }
 
-            $requestid = $DB->insert_record('hlai_quizgen_requests', $record);
+            $requestid = $DB->insert_record('local_hlai_quizgen_requests', $record);
 
             // Clone topics from existing request, with deduplication.
             // First, deduplicate the topics by normalized title.
@@ -492,7 +492,7 @@ function handle_content_upload(int $courseid, context $context) {
                 unset($newtopic->id);
                 $newtopic->requestid = $requestid;
                 $newtopic->timecreated = time();
-                $DB->insert_record('hlai_quizgen_topics', $newtopic);
+                $DB->insert_record('local_hlai_quizgen_topics', $newtopic);
             }
 
             // Skip to step 2 (topic selection) since we already have topics.
@@ -544,7 +544,7 @@ function handle_content_upload(int $courseid, context $context) {
         $record->custom_instructions = $manualtext;
     }
 
-    $requestid = $DB->insert_record('hlai_quizgen_requests', $record);
+    $requestid = $DB->insert_record('local_hlai_quizgen_requests', $record);
 
     // Update to analyzing status.
     \local_hlai_quizgen\api::update_request_status($requestid, 'analyzing');
@@ -655,7 +655,7 @@ function handle_content_upload(int $courseid, context $context) {
                 $urlrecord->word_count = $urlcontent['word_count'];
                 $urlrecord->timecreated = time();
 
-                $DB->insert_record('hlai_quizgen_url_content', $urlrecord);
+                $DB->insert_record('local_hlai_quizgen_url_content', $urlrecord);
             } catch (Exception $e) {
                 // Continue with other URLs even if one fails.
                 debugging($e->getMessage(), DEBUG_DEVELOPER);
@@ -701,7 +701,7 @@ function handle_create_request(int $courseid) {
     $record->status = 'pending';
     $record->timecreated = time();
     $record->timemodified = time();
-    $requestid = $DB->insert_record('hlai_quizgen_requests', $record);
+    $requestid = $DB->insert_record('local_hlai_quizgen_requests', $record);
 
     redirect(new moodle_url('/local/hlai_quizgen/wizard.php', [
         'courseid' => $courseid,
@@ -732,12 +732,12 @@ function handle_save_question_distribution(int $requestid) {
             $numqs = 50;
         }
 
-        $DB->set_field('hlai_quizgen_topics', 'num_questions', $numqs, ['id' => $topicid]);
+        $DB->set_field('local_hlai_quizgen_topics', 'num_questions', $numqs, ['id' => $topicid]);
     }
 
     // Update total question count on request.
     $totalquestions = array_sum($topicquestions);
-    $DB->set_field('hlai_quizgen_requests', 'total_questions', $totalquestions, ['id' => $requestid]);
+    $DB->set_field('local_hlai_quizgen_requests', 'total_questions', $totalquestions, ['id' => $requestid]);
 
     // Redirect to step 3 to show configuration (don't auto-generate).
     redirect(new moodle_url('/local/hlai_quizgen/wizard.php', [
@@ -760,12 +760,12 @@ function handle_save_topic_selection(int $requestid) {
     $selectedtopics = optional_param_array('topics', [], PARAM_INT);
 
     // Update all topics to deselected first.
-    $DB->set_field('hlai_quizgen_topics', 'selected', 0, ['requestid' => $requestid]);
+    $DB->set_field('local_hlai_quizgen_topics', 'selected', 0, ['requestid' => $requestid]);
 
     // Set default num_questions for selected topics.
     foreach ($selectedtopics as $topicid) {
-        $DB->set_field('hlai_quizgen_topics', 'selected', 1, ['id' => $topicid]);
-        $DB->set_field('hlai_quizgen_topics', 'num_questions', 5, ['id' => $topicid]); // Default 5 questions.
+        $DB->set_field('local_hlai_quizgen_topics', 'selected', 1, ['id' => $topicid]);
+        $DB->set_field('local_hlai_quizgen_topics', 'num_questions', 5, ['id' => $topicid]); // Default 5 questions.
     }
 
     // Redirect to step 3.
@@ -786,7 +786,7 @@ function handle_save_topic_selection(int $requestid) {
 function handle_generate_questions(int $requestid) {
     global $DB;
 
-    $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
+    $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
 
     // Get total questions from form input (new approach).
     $totalquestions = required_param('total_questions', PARAM_INT);
@@ -855,10 +855,10 @@ function handle_generate_questions(int $requestid) {
     $request->processing_mode = $processingmode;
     $request->timemodified = time();
 
-    $DB->update_record('hlai_quizgen_requests', $request);
+    $DB->update_record('local_hlai_quizgen_requests', $request);
 
     // CRITICAL FIX: Distribute total questions across ALL selected topics.
-    $selectedtopics = $DB->get_records('hlai_quizgen_topics', ['requestid' => $requestid, 'selected' => 1]);
+    $selectedtopics = $DB->get_records('local_hlai_quizgen_topics', ['requestid' => $requestid, 'selected' => 1]);
     $topiccount = count($selectedtopics);
 
     if ($topiccount > 0) {
@@ -869,7 +869,7 @@ function handle_generate_questions(int $requestid) {
         $index = 0;
         foreach ($selectedtopics as $topic) {
             $topicquestions = $questionspertopic + ($index < $remainder ? 1 : 0);
-            $DB->set_field('hlai_quizgen_topics', 'num_questions', $topicquestions, ['id' => $topic->id]);
+            $DB->set_field('local_hlai_quizgen_topics', 'num_questions', $topicquestions, ['id' => $topic->id]);
 
             // FIXED: Don't store distribution per topic - let it inherit from request level.
             // This prevents double-counting where each topic gets the full distribution.
@@ -931,10 +931,10 @@ function handle_generate_questions(int $requestid) {
         }
 
         // Refresh request status after generation.
-        $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
+        $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
 
         // Log successful completion.
-        $questionsgenerated = $DB->count_records('hlai_quizgen_questions', ['requestid' => $requestid]);
+        $questionsgenerated = $DB->count_records('local_hlai_quizgen_questions', ['requestid' => $requestid]);
         debug_logger::wizard_step(3, 'generate_questions_complete', $requestid, [
             'status' => $request->status,
             'questions_generated' => $questionsgenerated,
@@ -952,7 +952,7 @@ function handle_generate_questions(int $requestid) {
             \local_hlai_quizgen\error_handler::SEVERITY_ERROR
         );
         \local_hlai_quizgen\api::update_request_status($requestid, 'failed', $e->getMessage());
-        $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
+        $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
 
         // Log the failure.
         debug_logger::wizard_step(3, 'generate_questions_failed', $requestid, [
@@ -984,7 +984,7 @@ function handle_bulk_action(string $action, int $requestid) {
     if (empty($questionids)) {
         redirect(
             new moodle_url('/local/hlai_quizgen/wizard.php', [
-                'courseid' => $DB->get_field('hlai_quizgen_requests', 'courseid', ['id' => $requestid]),
+                'courseid' => $DB->get_field('local_hlai_quizgen_requests', 'courseid', ['id' => $requestid]),
                 'requestid' => $requestid,
                 'step' => 4,
             ]),
@@ -995,11 +995,11 @@ function handle_bulk_action(string $action, int $requestid) {
         return;
     }
 
-    $courseid = $DB->get_field('hlai_quizgen_requests', 'courseid', ['id' => $requestid]);
+    $courseid = $DB->get_field('local_hlai_quizgen_requests', 'courseid', ['id' => $requestid]);
 
     $count = 0;
     foreach ($questionids as $qid) {
-        $question = $DB->get_record('hlai_quizgen_questions', [
+        $question = $DB->get_record('local_hlai_quizgen_questions', [
             'id' => $qid,
             'requestid' => $requestid,
         ]);
@@ -1011,21 +1011,21 @@ function handle_bulk_action(string $action, int $requestid) {
         switch ($action) {
             case 'approve':
                 $question->status = 'approved';
-                $DB->update_record('hlai_quizgen_questions', $question);
+                $DB->update_record('local_hlai_quizgen_questions', $question);
                 $count++;
                 break;
 
             case 'reject':
                 $question->status = 'rejected';
-                $DB->update_record('hlai_quizgen_questions', $question);
+                $DB->update_record('local_hlai_quizgen_questions', $question);
                 $count++;
                 break;
 
             case 'delete':
                 // Delete answers first.
-                $DB->delete_records('hlai_quizgen_answers', ['questionid' => $qid]);
+                $DB->delete_records('local_hlai_quizgen_answers', ['questionid' => $qid]);
                 // Delete question.
-                $DB->delete_records('hlai_quizgen_questions', ['id' => $qid]);
+                $DB->delete_records('local_hlai_quizgen_questions', ['id' => $qid]);
                 $count++;
                 break;
         }
@@ -1069,7 +1069,7 @@ function handle_deploy_questions(int $requestid, int $courseid) {
     debugging("DEBUG handle_deploy_questions: deploy_type=$deploytype, quiz_name=$quizname", DEBUG_DEVELOPER);
 
     // Get only approved questions for this request.
-    $questions = $DB->get_records('hlai_quizgen_questions', [
+    $questions = $DB->get_records('local_hlai_quizgen_questions', [
         'requestid' => $requestid,
         'status' => 'approved',
     ], '', 'id, questiontype');
@@ -1097,7 +1097,7 @@ function handle_deploy_questions(int $requestid, int $courseid) {
 
             // Mark questions as deployed on success.
             foreach ($questionids as $qid) {
-                $DB->set_field('hlai_quizgen_questions', 'status', 'deployed', ['id' => $qid]);
+                $DB->set_field('local_hlai_quizgen_questions', 'status', 'deployed', ['id' => $qid]);
             }
 
             redirect(
@@ -1112,7 +1112,7 @@ function handle_deploy_questions(int $requestid, int $courseid) {
 
             // Mark questions as deployed on success (already done in deploy_to_question_bank, but keeping for safety).
             foreach ($questionids as $qid) {
-                $DB->set_field('hlai_quizgen_questions', 'status', 'deployed', ['id' => $qid]);
+                $DB->set_field('local_hlai_quizgen_questions', 'status', 'deployed', ['id' => $qid]);
             }
 
             redirect(
@@ -1910,7 +1910,7 @@ function render_step2(int $courseid, int $requestid): string {
     $html .= html_writer::tag('p', get_string('step2_description', 'local_hlai_quizgen'), ['class' => 'subtitle is-6 has-text-grey mt-1 mb-4']);
     $html .= html_writer::tag('hr', '', ['class' => 'mt-0 mb-5']);
 
-    $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
+    $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
 
     // If the request is still "pending" (e.g., after a reset), bump it into "analyzing".
     // So the synchronous analysis path below can run on this page load.
@@ -2058,7 +2058,7 @@ function render_step2(int $courseid, int $requestid): string {
     }
 
     // Display topics if available.
-    $topics = $DB->get_records('hlai_quizgen_topics', ['requestid' => $requestid], 'level ASC, id ASC');
+    $topics = $DB->get_records('local_hlai_quizgen_topics', ['requestid' => $requestid], 'level ASC, id ASC');
 
     // DEDUPLICATION: Remove duplicate topics for display (and fix titles).
     if (!empty($topics)) {
@@ -2080,7 +2080,7 @@ function render_step2(int $courseid, int $requestid): string {
             // Update the title to cleaned version.
             if ($topic->title !== $cleanedtitle) {
                 $topic->title = $cleanedtitle;
-                $DB->set_field('hlai_quizgen_topics', 'title', $cleanedtitle, ['id' => $topic->id]);
+                $DB->set_field('local_hlai_quizgen_topics', 'title', $cleanedtitle, ['id' => $topic->id]);
             }
 
             $seentitles[$normalizedtitle] = $cleanedtitle;
@@ -2090,7 +2090,7 @@ function render_step2(int $courseid, int $requestid): string {
         // Delete duplicate topics from database (cleanup).
         if (!empty($duplicateids)) {
             foreach ($duplicateids as $dupid) {
-                $DB->delete_records('hlai_quizgen_topics', ['id' => $dupid]);
+                $DB->delete_records('local_hlai_quizgen_topics', ['id' => $dupid]);
             }
         }
 
@@ -2305,7 +2305,7 @@ function render_step3(int $courseid, int $requestid): string {
     $html .= html_writer::tag('hr', '', ['class' => 'mt-0 mb-5 hlai-step3-divider']);
 
     // Count selected topics.
-    $selectedtopics = $DB->get_records('hlai_quizgen_topics', ['requestid' => $requestid, 'selected' => 1]);
+    $selectedtopics = $DB->get_records('local_hlai_quizgen_topics', ['requestid' => $requestid, 'selected' => 1]);
 
     if (empty($selectedtopics)) {
         $html .= html_writer::div(
@@ -2763,7 +2763,7 @@ function render_step3(int $courseid, int $requestid): string {
 function render_step3_5(int $courseid, int $requestid): string {
     global $DB, $PAGE;
 
-    $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
+    $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
 
     // Check if already completed - redirect to step 4.
     if ($request->status === 'completed') {
@@ -2864,7 +2864,7 @@ function render_step4(int $courseid, int $requestid): string {
     $html .= html_writer::tag('p', get_string('step4_description', 'local_hlai_quizgen'), ['class' => 'subtitle is-6 has-text-grey mb-4']);
     $html .= html_writer::tag('hr', '', ['class' => 'mt-0 mb-6']);
 
-    $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
+    $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
 
     // Check request status.
     if ($request->status === 'pending') {
@@ -2910,7 +2910,7 @@ function render_step4(int $courseid, int $requestid): string {
     }
 
     // Get generated questions.
-    $questions = $DB->get_records('hlai_quizgen_questions', ['requestid' => $requestid], 'id ASC');
+    $questions = $DB->get_records('local_hlai_quizgen_questions', ['requestid' => $requestid], 'id ASC');
 
     if (empty($questions)) {
         $html .= html_writer::div(
@@ -3155,7 +3155,7 @@ function render_step4(int $courseid, int $requestid): string {
             }
         } else {
             // For MCQ, TF, Short Answer, Matching - show answer options.
-            $answers = $DB->get_records('hlai_quizgen_answers', ['questionid' => $question->id], 'sortorder ASC');
+            $answers = $DB->get_records('local_hlai_quizgen_answers', ['questionid' => $question->id], 'sortorder ASC');
             if (!empty($answers)) {
                 $html .= html_writer::start_div('mt-3');
                 $letterlabel = 'A';
@@ -3401,12 +3401,12 @@ function render_step5(int $courseid, int $requestid): string {
     $html .= html_writer::tag('hr', '', ['class' => 'mt-0 mb-5']);
 
     // Count approved questions only.
-    $approvedcount = $DB->count_records('hlai_quizgen_questions', [
+    $approvedcount = $DB->count_records('local_hlai_quizgen_questions', [
         'requestid' => $requestid,
         'status' => 'approved',
     ]);
 
-    $totalcount = $DB->count_records('hlai_quizgen_questions', ['requestid' => $requestid]);
+    $totalcount = $DB->count_records('local_hlai_quizgen_questions', ['requestid' => $requestid]);
 
     if ($totalcount == 0) {
         $html .= html_writer::div(

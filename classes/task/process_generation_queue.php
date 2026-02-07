@@ -52,7 +52,7 @@ class process_generation_queue extends \core\task\scheduled_task {
         mtrace('AI Quiz Generator: Processing generation queue...');
 
         // Find pending requests.
-        $requests = $DB->get_records('hlai_quizgen_requests', ['status' => 'pending'], 'timecreated ASC', '*', 0, 5);
+        $requests = $DB->get_records('local_hlai_quizgen_requests', ['status' => 'pending'], 'timecreated ASC', '*', 0, 5);
 
         if (empty($requests)) {
             mtrace('No pending requests found.');
@@ -89,7 +89,7 @@ class process_generation_queue extends \core\task\scheduled_task {
         \local_hlai_quizgen\api::update_request_status($request->id, 'processing');
 
         // Get selected topics.
-        $topics = $DB->get_records('hlai_quizgen_topics', [
+        $topics = $DB->get_records('local_hlai_quizgen_topics', [
             'requestid' => $request->id,
             'selected' => 1,
         ]);
@@ -177,7 +177,7 @@ class process_generation_queue extends \core\task\scheduled_task {
                 mtrace('    Generated ' . count($questions) . ' ' . $difficulty . ' questions');
 
                 // Update progress.
-                $DB->set_field('hlai_quizgen_requests', 'questions_generated', $totalgenerated, ['id' => $request->id]);
+                $DB->set_field('local_hlai_quizgen_requests', 'questions_generated', $totalgenerated, ['id' => $request->id]);
             }
         }
 
@@ -238,7 +238,7 @@ class process_generation_queue extends \core\task\scheduled_task {
         \local_hlai_quizgen\api::update_request_status($requestid, 'failed', $error);
 
         // Send failure notification.
-        $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid]);
+        $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid]);
         if ($request) {
             $this->send_failure_notification($request, $error);
         }

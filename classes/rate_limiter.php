@@ -97,7 +97,7 @@ class rate_limiter {
         $hourstarttime = strtotime('-1 hour');
 
         $count = $DB->count_records_select(
-            'hlai_quizgen_requests',
+            'local_hlai_quizgen_requests',
             'userid = ? AND timecreated > ?',
             [$userid, $hourstarttime]
         );
@@ -129,7 +129,7 @@ class rate_limiter {
         $daystarttime = strtotime('-24 hours');
 
         $count = $DB->count_records_select(
-            'hlai_quizgen_requests',
+            'local_hlai_quizgen_requests',
             'userid = ? AND timecreated > ?',
             [$userid, $daystarttime]
         );
@@ -160,7 +160,7 @@ class rate_limiter {
         $hourstarttime = strtotime('-1 hour');
 
         $count = $DB->count_records_select(
-            'hlai_quizgen_requests',
+            'local_hlai_quizgen_requests',
             'timecreated > ?',
             [$hourstarttime]
         );
@@ -201,13 +201,13 @@ class rate_limiter {
         $daystarttime = strtotime('-24 hours');
 
         $hourlyrequests = $DB->count_records_select(
-            'hlai_quizgen_requests',
+            'local_hlai_quizgen_requests',
             'userid = ? AND timecreated > ?',
             [$userid, $hourstarttime]
         );
 
         $dailyrequests = $DB->count_records_select(
-            'hlai_quizgen_requests',
+            'local_hlai_quizgen_requests',
             'userid = ? AND timecreated > ?',
             [$userid, $daystarttime]
         );
@@ -244,7 +244,7 @@ class rate_limiter {
         $hourstarttime = strtotime('-1 hour');
 
         $hourlyrequests = $DB->count_records_select(
-            'hlai_quizgen_requests',
+            'local_hlai_quizgen_requests',
             'timecreated > ?',
             [$hourstarttime]
         );
@@ -278,7 +278,7 @@ class rate_limiter {
         $record->timecreated = time();
 
         try {
-            $DB->insert_record('hlai_quizgen_ratelimit_log', $record);
+            $DB->insert_record('local_hlai_quizgen_ratelimit_log', $record);
         } catch (\Exception $e) {
             // Silently fail - violations are informational.
             debugging($e->getMessage(), DEBUG_DEVELOPER);
@@ -300,7 +300,7 @@ class rate_limiter {
         }
 
         $sql = "SELECT userid, COUNT(*) as violations
-                FROM {hlai_quizgen_ratelimit_log}
+                FROM {local_hlai_quizgen_ratelimit_log}
                 WHERE timecreated > ?
                 GROUP BY userid
                 ORDER BY violations DESC

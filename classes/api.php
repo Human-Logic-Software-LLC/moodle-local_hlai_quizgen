@@ -54,7 +54,7 @@ class api {
     public static function update_request_status(int $requestid, string $newstatus, ?string $errormessage = null): bool {
         global $DB, $USER;
 
-        $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
+        $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
         $oldstatus = $request->status;
 
         // Validate status transition.
@@ -87,7 +87,7 @@ class api {
             $update->timecompleted = time();
         }
 
-        $result = $DB->update_record('hlai_quizgen_requests', $update);
+        $result = $DB->update_record('local_hlai_quizgen_requests', $update);
 
         // Log status change.
         self::log_action('status_changed', $requestid, $USER->id ?? 0, [
@@ -148,7 +148,7 @@ class api {
         $request->timecreated = time();
         $request->timemodified = time();
 
-        $requestid = $DB->insert_record('hlai_quizgen_requests', $request);
+        $requestid = $DB->insert_record('local_hlai_quizgen_requests', $request);
 
         // Log creation.
         self::log_action('request_created', $requestid, $USER->id, [
@@ -169,7 +169,7 @@ class api {
     public static function get_request(int $requestid): \stdClass {
         global $DB;
 
-        $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
+        $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
 
         // Decode JSON fields.
         $request->content_sources = json_decode($request->content_sources, true);
@@ -194,12 +194,12 @@ class api {
             $params['status'] = $status;
         }
 
-        $questions = $DB->get_records('hlai_quizgen_questions', $params, 'timecreated ASC');
+        $questions = $DB->get_records('local_hlai_quizgen_questions', $params, 'timecreated ASC');
 
         // Load answers for each question.
         foreach ($questions as $question) {
             $question->answers = $DB->get_records(
-                'hlai_quizgen_answers',
+                'local_hlai_quizgen_answers',
                 ['questionid' => $question->id],
                 'sortorder ASC'
             );
@@ -223,7 +223,7 @@ class api {
     public static function update_question(int $questionid, array $data): bool {
         global $DB, $USER;
 
-        $question = $DB->get_record('hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
+        $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
 
         $record = new \stdClass();
         $record->id = $questionid;
@@ -243,7 +243,7 @@ class api {
 
         $record->timemodified = time();
 
-        $result = $DB->update_record('hlai_quizgen_questions', $record);
+        $result = $DB->update_record('local_hlai_quizgen_questions', $record);
 
         // Log update.
         self::log_action('question_updated', $question->requestid, $USER->id, [
@@ -263,13 +263,13 @@ class api {
     public static function delete_question(int $questionid): bool {
         global $DB, $USER;
 
-        $question = $DB->get_record('hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
+        $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
 
         // Delete answers.
-        $DB->delete_records('hlai_quizgen_answers', ['questionid' => $questionid]);
+        $DB->delete_records('local_hlai_quizgen_answers', ['questionid' => $questionid]);
 
         // Delete question.
-        $result = $DB->delete_records('hlai_quizgen_questions', ['id' => $questionid]);
+        $result = $DB->delete_records('local_hlai_quizgen_questions', ['id' => $questionid]);
 
         // Log deletion.
         self::log_action('question_deleted', $question->requestid, $USER->id, [
@@ -329,7 +329,7 @@ class api {
         $log->error_message = $error;
         $log->timecreated = time();
 
-        $DB->insert_record('hlai_quizgen_logs', $log);
+        $DB->insert_record('local_hlai_quizgen_logs', $log);
     }
 
     /**
@@ -349,7 +349,7 @@ class api {
             $params['userid'] = $USER->id;
         }
 
-        return $DB->get_records('hlai_quizgen_requests', $params, 'timecreated DESC');
+        return $DB->get_records('local_hlai_quizgen_requests', $params, 'timecreated DESC');
     }
 
     /**
@@ -386,19 +386,19 @@ class api {
         }
 
         // Total requests.
-        $sql = "SELECT COUNT(*) FROM {hlai_quizgen_requests} r $where";
+        $sql = "SELECT COUNT(*) FROM {local_hlai_quizgen_requests} r $where";
         $stats['total_requests'] = $DB->count_records_sql($sql, $params);
 
         // Total questions.
-        $sql = "SELECT COUNT(*) FROM {hlai_quizgen_questions} q
-                JOIN {hlai_quizgen_requests} r ON q.requestid = r.id
+        $sql = "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} q
+                JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
                 $where";
         $stats['total_questions'] = $DB->count_records_sql($sql, $params);
 
         // Questions by type.
         $sql = "SELECT q.questiontype, COUNT(*) as count
-                FROM {hlai_quizgen_questions} q
-                JOIN {hlai_quizgen_requests} r ON q.requestid = r.id
+                FROM {local_hlai_quizgen_questions} q
+                JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
                 $where
                 GROUP BY q.questiontype";
         $types = $DB->get_records_sql($sql, $params);
@@ -408,8 +408,8 @@ class api {
 
         // Questions by difficulty.
         $sql = "SELECT q.difficulty, COUNT(*) as count
-                FROM {hlai_quizgen_questions} q
-                JOIN {hlai_quizgen_requests} r ON q.requestid = r.id
+                FROM {local_hlai_quizgen_questions} q
+                JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
                 $where
                 GROUP BY q.difficulty";
         $difficulties = $DB->get_records_sql($sql, $params);
@@ -424,8 +424,8 @@ class api {
 
         // Quality distribution (if validation enabled).
         $sql = "SELECT q.quality_rating, COUNT(*) as count
-                FROM {hlai_quizgen_questions} q
-                JOIN {hlai_quizgen_requests} r ON q.requestid = r.id
+                FROM {local_hlai_quizgen_questions} q
+                JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
                 $where AND q.quality_rating IS NOT NULL
                 GROUP BY q.quality_rating";
         $qualities = $DB->get_records_sql($sql, $params);
@@ -436,8 +436,8 @@ class api {
 
         // Average validation score.
         $sql = "SELECT AVG(q.validation_score) as avg_score
-                FROM {hlai_quizgen_questions} q
-                JOIN {hlai_quizgen_requests} r ON q.requestid = r.id
+                FROM {local_hlai_quizgen_questions} q
+                JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
                 $where AND q.validation_score IS NOT NULL";
         $result = $DB->get_record_sql($sql, $params);
         $stats['average_validation_score'] = $result && $result->avg_score ? round($result->avg_score, 1) : null;
@@ -467,7 +467,7 @@ class api {
         ];
 
         // Get request info.
-        $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid]);
+        $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid]);
         if (!$request) {
             $result['issues'][] = "Request ID $requestid not found";
             return $result;
@@ -476,7 +476,7 @@ class api {
         $result['course_id'] = $request->courseid;
 
         // Get questions from plugin table.
-        $pluginquestions = $DB->get_records('hlai_quizgen_questions', ['requestid' => $requestid]);
+        $pluginquestions = $DB->get_records('local_hlai_quizgen_questions', ['requestid' => $requestid]);
         $result['plugin_question_count'] = count($pluginquestions);
 
         foreach ($pluginquestions as $pq) {
@@ -583,7 +583,7 @@ class api {
         global $DB, $USER;
 
         // Get current question.
-        $question = $DB->get_record('hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
+        $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
 
         // Check permissions - user must own the question or have managequestions capability.
         $context = \context_course::instance($question->courseid);
@@ -605,10 +605,10 @@ class api {
         }
 
         // Get topic info for context.
-        $topic = $DB->get_record('hlai_quizgen_topics', ['id' => $question->topicid], '*', MUST_EXIST);
+        $topic = $DB->get_record('local_hlai_quizgen_topics', ['id' => $question->topicid], '*', MUST_EXIST);
 
         // Get request for config.
-        $request = $DB->get_record('hlai_quizgen_requests', ['id' => $question->requestid], '*', MUST_EXIST);
+        $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $question->requestid], '*', MUST_EXIST);
 
         try {
             // Build config array for generate_for_topic().
@@ -643,19 +643,19 @@ class api {
             $originaltimecreated = $question->timecreated;
 
             // Delete old question and answers.
-            $DB->delete_records('hlai_quizgen_answers', ['questionid' => $questionid]);
-            $DB->delete_records('hlai_quizgen_questions', ['id' => $questionid]);
+            $DB->delete_records('local_hlai_quizgen_answers', ['questionid' => $questionid]);
+            $DB->delete_records('local_hlai_quizgen_questions', ['id' => $questionid]);
 
             // Update new question's timecreated to match original position.
-            $DB->set_field('hlai_quizgen_questions', 'timecreated', $originaltimecreated, ['id' => $newquestion->id]);
+            $DB->set_field('local_hlai_quizgen_questions', 'timecreated', $originaltimecreated, ['id' => $newquestion->id]);
             $newquestion->timecreated = $originaltimecreated;
 
             // Increment regeneration count on new question.
             // Only attempt to write if the column exists in DB (older installs may miss it).
-            $columns = $DB->get_columns('hlai_quizgen_questions');
+            $columns = $DB->get_columns('local_hlai_quizgen_questions');
             if (isset($columns['regeneration_count'])) {
                 $DB->set_field(
-                    'hlai_quizgen_questions',
+                    'local_hlai_quizgen_questions',
                     'regeneration_count',
                     $currentregen + 1,
                     ['id' => $newquestion->id]

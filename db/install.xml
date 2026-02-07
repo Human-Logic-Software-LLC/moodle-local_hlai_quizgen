@@ -4,7 +4,7 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="hlai_quizgen_requests" COMMENT="Stores question generation requests">
+    <TABLE NAME="local_hlai_quizgen_requests" COMMENT="Stores question generation requests">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Course ID"/>
@@ -41,7 +41,7 @@
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="hlai_quizgen_topics" COMMENT="Stores extracted topics from content analysis">
+    <TABLE NAME="local_hlai_quizgen_topics" COMMENT="Stores extracted topics from content analysis">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="requestid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Parent request ID"/>
@@ -60,15 +60,15 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="requestid" TYPE="foreign" FIELDS="requestid" REFTABLE="hlai_quizgen_requests" REFFIELDS="id"/>
-        <KEY NAME="parent_topic_id" TYPE="foreign" FIELDS="parent_topic_id" REFTABLE="hlai_quizgen_topics" REFFIELDS="id"/>
+        <KEY NAME="requestid" TYPE="foreign" FIELDS="requestid" REFTABLE="local_hlai_quizgen_requests" REFFIELDS="id"/>
+        <KEY NAME="parent_topic_id" TYPE="foreign" FIELDS="parent_topic_id" REFTABLE="local_hlai_quizgen_topics" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="requestid_selected" UNIQUE="false" FIELDS="requestid, selected"/>
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="hlai_quizgen_questions" COMMENT="Stores generated questions">
+    <TABLE NAME="local_hlai_quizgen_questions" COMMENT="Stores generated questions">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="requestid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Parent request ID"/>
@@ -93,8 +93,8 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="requestid" TYPE="foreign" FIELDS="requestid" REFTABLE="hlai_quizgen_requests" REFFIELDS="id"/>
-        <KEY NAME="topicid" TYPE="foreign" FIELDS="topicid" REFTABLE="hlai_quizgen_topics" REFFIELDS="id"/>
+        <KEY NAME="requestid" TYPE="foreign" FIELDS="requestid" REFTABLE="local_hlai_quizgen_requests" REFFIELDS="id"/>
+        <KEY NAME="topicid" TYPE="foreign" FIELDS="topicid" REFTABLE="local_hlai_quizgen_topics" REFFIELDS="id"/>
         <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
@@ -104,7 +104,7 @@
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="hlai_quizgen_answers" COMMENT="Stores question answers and distractors">
+    <TABLE NAME="local_hlai_quizgen_answers" COMMENT="Stores question answers and distractors">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Parent question ID"/>
@@ -119,14 +119,14 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="hlai_quizgen_questions" REFFIELDS="id"/>
+        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="local_hlai_quizgen_questions" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="questionid_sortorder" UNIQUE="false" FIELDS="questionid, sortorder"/>
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="hlai_quizgen_settings" COMMENT="Stores user-specific settings and preferences">
+    <TABLE NAME="local_hlai_quizgen_settings" COMMENT="Stores user-specific settings and preferences">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -145,7 +145,7 @@
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="hlai_quizgen_logs" COMMENT="Audit log for AI operations and user actions">
+    <TABLE NAME="local_hlai_quizgen_logs" COMMENT="Audit log for AI operations and user actions">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="requestid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Related request ID"/>
@@ -161,7 +161,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="requestid" TYPE="foreign" FIELDS="requestid" REFTABLE="hlai_quizgen_requests" REFFIELDS="id"/>
+        <KEY NAME="requestid" TYPE="foreign" FIELDS="requestid" REFTABLE="local_hlai_quizgen_requests" REFFIELDS="id"/>
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
@@ -170,7 +170,7 @@
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="hlai_quizgen_url_content" COMMENT="Stores extracted content from URLs">
+    <TABLE NAME="local_hlai_quizgen_url_content" COMMENT="Stores extracted content from URLs">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="requestid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Parent request ID"/>
@@ -182,14 +182,14 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="requestid" TYPE="foreign" FIELDS="requestid" REFTABLE="hlai_quizgen_requests" REFFIELDS="id"/>
+        <KEY NAME="requestid" TYPE="foreign" FIELDS="requestid" REFTABLE="local_hlai_quizgen_requests" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="requestid" UNIQUE="false" FIELDS="requestid"/>
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="hlai_quizgen_cache" COMMENT="Cache for AI responses to reduce API calls">
+    <TABLE NAME="local_hlai_quizgen_cache" COMMENT="Cache for AI responses to reduce API calls">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="cachetype" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="Type: topics, questions, distractors"/>
@@ -210,7 +210,7 @@
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="hlai_quizgen_outcome_map" COMMENT="Maps questions to learning outcomes">
+    <TABLE NAME="local_hlai_quizgen_outcome_map" COMMENT="Maps questions to learning outcomes">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Question ID"/>
@@ -223,7 +223,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="hlai_quizgen_questions" REFFIELDS="id"/>
+        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="local_hlai_quizgen_questions" REFFIELDS="id"/>
         <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
@@ -232,7 +232,7 @@
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="hlai_quizgen_calibration" COMMENT="Historical difficulty calibration data">
+    <TABLE NAME="local_hlai_quizgen_calibration" COMMENT="Historical difficulty calibration data">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Question ID"/>
@@ -248,7 +248,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="hlai_quizgen_questions" REFFIELDS="id"/>
+        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="local_hlai_quizgen_questions" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="questionid_time" UNIQUE="false" FIELDS="questionid, timecreated"/>
@@ -256,7 +256,7 @@
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="hlai_quizgen_analytics_cache" COMMENT="Cached analytics calculations">
+    <TABLE NAME="local_hlai_quizgen_analytics_cache" COMMENT="Cached analytics calculations">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="entity_type" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="question, request, course"/>
@@ -274,7 +274,7 @@
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="hlai_quizgen_reviews" COMMENT="Peer review and approval workflow">
+    <TABLE NAME="local_hlai_quizgen_reviews" COMMENT="Peer review and approval workflow">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -295,7 +295,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="hlai_quizgen_questions" REFFIELDS="id"/>
+        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="local_hlai_quizgen_questions" REFFIELDS="id"/>
         <KEY NAME="reviewerid" TYPE="foreign" FIELDS="reviewerid" REFTABLE="user" REFFIELDS="id"/>
         <KEY NAME="submitterid" TYPE="foreign" FIELDS="submitterid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
@@ -306,7 +306,7 @@
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="hlai_quizgen_review_comments" COMMENT="Review comments and discussions">
+    <TABLE NAME="local_hlai_quizgen_review_comments" COMMENT="Review comments and discussions">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="reviewid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -318,7 +318,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="reviewid" TYPE="foreign" FIELDS="reviewid" REFTABLE="hlai_quizgen_reviews" REFFIELDS="id"/>
+        <KEY NAME="reviewid" TYPE="foreign" FIELDS="reviewid" REFTABLE="local_hlai_quizgen_reviews" REFFIELDS="id"/>
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
@@ -326,7 +326,7 @@
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="hlai_quizgen_review_ratings" COMMENT="Quality ratings for questions">
+    <TABLE NAME="local_hlai_quizgen_review_ratings" COMMENT="Quality ratings for questions">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="reviewid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -341,12 +341,12 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="fk_rating_review" TYPE="foreign" FIELDS="reviewid" REFTABLE="hlai_quizgen_reviews" REFFIELDS="id"/>
+        <KEY NAME="fk_rating_review" TYPE="foreign" FIELDS="reviewid" REFTABLE="local_hlai_quizgen_reviews" REFFIELDS="id"/>
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
     
-    <TABLE NAME="hlai_quizgen_revision_issues" COMMENT="Issues requiring revision">
+    <TABLE NAME="local_hlai_quizgen_revision_issues" COMMENT="Issues requiring revision">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="reviewid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -359,14 +359,14 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="reviewid" TYPE="foreign" FIELDS="reviewid" REFTABLE="hlai_quizgen_reviews" REFFIELDS="id"/>
+        <KEY NAME="reviewid" TYPE="foreign" FIELDS="reviewid" REFTABLE="local_hlai_quizgen_reviews" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="reviewid_resolved" UNIQUE="false" FIELDS="reviewid, is_resolved"/>
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="hlai_quizgen_revisions" COMMENT="Revision history">
+    <TABLE NAME="local_hlai_quizgen_revisions" COMMENT="Revision history">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="reviewid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -377,7 +377,7 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="reviewid" TYPE="foreign" FIELDS="reviewid" REFTABLE="hlai_quizgen_reviews" REFFIELDS="id"/>
+        <KEY NAME="reviewid" TYPE="foreign" FIELDS="reviewid" REFTABLE="local_hlai_quizgen_reviews" REFFIELDS="id"/>
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
@@ -385,7 +385,7 @@
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="hlai_quizgen_review_log" COMMENT="Audit log for review actions">
+    <TABLE NAME="local_hlai_quizgen_review_log" COMMENT="Audit log for review actions">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="reviewid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -395,14 +395,14 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="reviewid" TYPE="foreign" FIELDS="reviewid" REFTABLE="hlai_quizgen_reviews" REFFIELDS="id"/>
+        <KEY NAME="reviewid" TYPE="foreign" FIELDS="reviewid" REFTABLE="local_hlai_quizgen_reviews" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="reviewid_time" UNIQUE="false" FIELDS="reviewid, timecreated"/>
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="hlai_quizgen_refinements" COMMENT="AI refinement history">
+    <TABLE NAME="local_hlai_quizgen_refinements" COMMENT="AI refinement history">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -414,14 +414,14 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="hlai_quizgen_questions" REFFIELDS="id"/>
+        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="local_hlai_quizgen_questions" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="questionid_time" UNIQUE="false" FIELDS="questionid, timecreated"/>
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="hlai_quizgen_refine_suggest" COMMENT="AI-generated improvement suggestions">
+    <TABLE NAME="local_hlai_quizgen_refine_suggest" COMMENT="AI-generated improvement suggestions">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -432,14 +432,14 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="hlai_quizgen_questions" REFFIELDS="id"/>
+        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="local_hlai_quizgen_questions" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="questionid_type" UNIQUE="false" FIELDS="questionid, refinement_type"/>
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="hlai_quizgen_alternatives" COMMENT="Alternative question versions">
+    <TABLE NAME="local_hlai_quizgen_alternatives" COMMENT="Alternative question versions">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="original_questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -450,11 +450,11 @@
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="original_questionid" TYPE="foreign" FIELDS="original_questionid" REFTABLE="hlai_quizgen_questions" REFFIELDS="id"/>
+        <KEY NAME="original_questionid" TYPE="foreign" FIELDS="original_questionid" REFTABLE="local_hlai_quizgen_questions" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
 
-    <TABLE NAME="hlai_quizgen_wizard_state" COMMENT="Stores wizard session state for resumption">
+    <TABLE NAME="local_hlai_quizgen_wizard_state" COMMENT="Stores wizard session state for resumption">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -469,7 +469,7 @@
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
         <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
-        <KEY NAME="request_id" TYPE="foreign" FIELDS="request_id" REFTABLE="hlai_quizgen_requests" REFFIELDS="id"/>
+        <KEY NAME="request_id" TYPE="foreign" FIELDS="request_id" REFTABLE="local_hlai_quizgen_requests" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="userid_courseid" UNIQUE="true" FIELDS="userid, courseid"/>
@@ -477,7 +477,7 @@
       </INDEXES>
     </TABLE>
 
-    <TABLE NAME="hlai_quizgen_ratelimit_log" COMMENT="Rate limiting log for API calls">
+    <TABLE NAME="local_hlai_quizgen_ratelimit_log" COMMENT="Rate limiting log for API calls">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User making the request"/>

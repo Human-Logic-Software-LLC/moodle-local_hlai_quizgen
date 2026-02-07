@@ -79,7 +79,7 @@ class quiz_deployer {
                 debugging("DEBUG deploy_to_question_bank: Processing question ID: $questionid", DEBUG_DEVELOPER);
 
                 // Get question from our table.
-                $genquestion = $DB->get_record('hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
+                $genquestion = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
                 debugging("DEBUG deploy_to_question_bank: Loaded genquestion, type=" . ($genquestion->questiontype ?? 'null'), DEBUG_DEVELOPER);
 
                 // Convert to Moodle question format.
@@ -89,9 +89,9 @@ class quiz_deployer {
                 debugging("DEBUG deploy_to_question_bank: Created Moodle question ID: $moodlequestionid", DEBUG_DEVELOPER);
 
                 // Update our record with Moodle question ID.
-                $DB->set_field('hlai_quizgen_questions', 'moodle_questionid', $moodlequestionid, ['id' => $questionid]);
-                $DB->set_field('hlai_quizgen_questions', 'status', 'deployed', ['id' => $questionid]);
-                $DB->set_field('hlai_quizgen_questions', 'timedeployed', time(), ['id' => $questionid]);
+                $DB->set_field('local_hlai_quizgen_questions', 'moodle_questionid', $moodlequestionid, ['id' => $questionid]);
+                $DB->set_field('local_hlai_quizgen_questions', 'status', 'deployed', ['id' => $questionid]);
+                $DB->set_field('local_hlai_quizgen_questions', 'timedeployed', time(), ['id' => $questionid]);
 
                 $deployedids[] = $moodlequestionid;
 
@@ -612,7 +612,7 @@ class quiz_deployer {
 
         // 2. Topic tag (if available).
         if (!empty($genquestion->topicid)) {
-            $topic = $DB->get_record('hlai_quizgen_topics', ['id' => $genquestion->topicid], 'title');
+            $topic = $DB->get_record('local_hlai_quizgen_topics', ['id' => $genquestion->topicid], 'title');
             if ($topic) {
                 // Clean and format topic name for tag.
                 $topictag = strtolower(trim($topic->title));
@@ -697,7 +697,7 @@ class quiz_deployer {
         $DB->insert_record('qtype_multichoice_options', $options);
 
         // Add answers.
-        $answers = $DB->get_records('hlai_quizgen_answers', ['questionid' => $genquestion->id], 'sortorder ASC');
+        $answers = $DB->get_records('local_hlai_quizgen_answers', ['questionid' => $genquestion->id], 'sortorder ASC');
         foreach ($answers as $answer) {
             $answerrecord = new \stdClass();
             $answerrecord->question = $questionid;
@@ -721,7 +721,7 @@ class quiz_deployer {
         global $DB;
 
         // Get answers and create answer records.
-        $answers = $DB->get_records('hlai_quizgen_answers', ['questionid' => $genquestion->id], 'sortorder ASC');
+        $answers = $DB->get_records('local_hlai_quizgen_answers', ['questionid' => $genquestion->id], 'sortorder ASC');
 
         $trueid = 0;
         $falseid = 0;
@@ -772,7 +772,7 @@ class quiz_deployer {
         $DB->insert_record('qtype_shortanswer_options', $options);
 
         // Add answers.
-        $answers = $DB->get_records('hlai_quizgen_answers', ['questionid' => $genquestion->id], 'sortorder ASC');
+        $answers = $DB->get_records('local_hlai_quizgen_answers', ['questionid' => $genquestion->id], 'sortorder ASC');
         foreach ($answers as $answer) {
             $answerrecord = new \stdClass();
             $answerrecord->question = $questionid;
@@ -810,7 +810,7 @@ class quiz_deployer {
         }
 
         // Get sample answers/criteria from answers table.
-        $answers = $DB->get_records('hlai_quizgen_answers', ['questionid' => $genquestion->id], 'sortorder ASC');
+        $answers = $DB->get_records('local_hlai_quizgen_answers', ['questionid' => $genquestion->id], 'sortorder ASC');
         if (!empty($answers)) {
             $graderinfo .= '<h4>Expected Content / Grading Criteria:</h4>';
             $graderinfo .= '<ul>';
@@ -871,7 +871,7 @@ class quiz_deployer {
             $subquestions = $genquestion->subquestions;
         } else {
             // Try to get from answers table (if stored there).
-            $answers = $DB->get_records('hlai_quizgen_answers', ['questionid' => $genquestion->id], 'sortorder ASC');
+            $answers = $DB->get_records('local_hlai_quizgen_answers', ['questionid' => $genquestion->id], 'sortorder ASC');
             $subquestions = [];
             foreach ($answers as $answer) {
                 $subquestions[] = [

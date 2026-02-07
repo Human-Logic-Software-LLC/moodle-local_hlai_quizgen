@@ -50,21 +50,21 @@ $PAGE->requires->js(new moodle_url('/local/hlai_quizgen/apexcharts.js'), true);
 // ================= SITE-WIDE DATA COLLECTION =================.
 
 // 1. Site-Wide Overview Statistics.
-$totalquestionsgenerated = $DB->count_records('hlai_quizgen_questions');
-$totalquizzescreated = $DB->count_records('hlai_quizgen_requests', ['status' => 'completed']);
+$totalquestionsgenerated = $DB->count_records('local_hlai_quizgen_questions');
+$totalquizzescreated = $DB->count_records('local_hlai_quizgen_requests', ['status' => 'completed']);
 
 $activeteachers = $DB->count_records_sql(
-    "SELECT COUNT(DISTINCT userid) FROM {hlai_quizgen_requests}",
+    "SELECT COUNT(DISTINCT userid) FROM {local_hlai_quizgen_requests}",
     []
 );
 
 $activecourses = $DB->count_records_sql(
-    "SELECT COUNT(DISTINCT courseid) FROM {hlai_quizgen_requests}",
+    "SELECT COUNT(DISTINCT courseid) FROM {local_hlai_quizgen_requests}",
     []
 );
 
 $avgqualityscore = $DB->get_field_sql(
-    "SELECT AVG(validation_score) FROM {hlai_quizgen_questions}
+    "SELECT AVG(validation_score) FROM {local_hlai_quizgen_questions}
      WHERE validation_score IS NOT NULL AND validation_score > 0",
     []
 );
@@ -72,13 +72,13 @@ $avgqualityscore = $avgqualityscore ? round($avgqualityscore, 1) : 'N/A';
 
 // Site-wide FTAR calculation.
 $totalapproved = $DB->count_records_sql(
-    "SELECT COUNT(*) FROM {hlai_quizgen_questions}
+    "SELECT COUNT(*) FROM {local_hlai_quizgen_questions}
      WHERE status IN ('approved', 'deployed')",
     []
 );
 
 $totalreviewed = $DB->count_records_sql(
-    "SELECT COUNT(*) FROM {hlai_quizgen_questions}
+    "SELECT COUNT(*) FROM {local_hlai_quizgen_questions}
      WHERE status IN ('approved', 'rejected', 'deployed')",
     []
 );
@@ -108,7 +108,7 @@ $coursecoverage = $totalcourses > 0
 // 3. Usage Trends (Last 30 days) - Use PHP for date grouping for database compatibility.
 $thirtydaysago = time() - (30 * 24 * 60 * 60);
 $rawusagedata = $DB->get_records_sql(
-    "SELECT timecreated FROM {hlai_quizgen_questions} WHERE timecreated >= ?",
+    "SELECT timecreated FROM {local_hlai_quizgen_questions} WHERE timecreated >= ?",
     [$thirtydaysago]
 );
 
@@ -135,7 +135,7 @@ foreach ($usagebydate as $date => $count) {
 // 4. Question Type Distribution (Site-Wide).
 $questiontypestats = $DB->get_records_sql(
     "SELECT questiontype, COUNT(*) as count
-     FROM {hlai_quizgen_questions}
+     FROM {local_hlai_quizgen_questions}
      WHERE status IN ('approved', 'deployed')
      GROUP BY questiontype
      ORDER BY count DESC",
@@ -145,7 +145,7 @@ $questiontypestats = $DB->get_records_sql(
 // 5. Difficulty Distribution (Site-Wide).
 $difficultystats = $DB->get_records_sql(
     "SELECT difficulty, COUNT(*) as count
-     FROM {hlai_quizgen_questions}
+     FROM {local_hlai_quizgen_questions}
      WHERE status IN ('approved', 'deployed')
      GROUP BY difficulty",
     []
@@ -154,7 +154,7 @@ $difficultystats = $DB->get_records_sql(
 // 6. Bloom's Taxonomy Distribution (Site-Wide).
 $bloomsstats = $DB->get_records_sql(
     "SELECT blooms_level, COUNT(*) as count
-     FROM {hlai_quizgen_questions}
+     FROM {local_hlai_quizgen_questions}
      WHERE status IN ('approved', 'deployed') AND blooms_level IS NOT NULL
      GROUP BY blooms_level",
     []
@@ -163,7 +163,7 @@ $bloomsstats = $DB->get_records_sql(
 // 7. Top Performers - Courses.
 $topcourses = $DB->get_records_sql(
     "SELECT c.id, c.fullname, COUNT(q.id) as question_count
-     FROM {hlai_quizgen_questions} q
+     FROM {local_hlai_quizgen_questions} q
      JOIN {course} c ON q.courseid = c.id
      WHERE q.status IN ('approved', 'deployed')
      GROUP BY c.id, c.fullname
@@ -178,7 +178,7 @@ $topteachers = $DB->get_records_sql(
             COUNT(*) as total_questions,
             SUM(CASE WHEN q.status IN ('approved', 'deployed') THEN 1 ELSE 0 END) as approved_questions,
             ROUND((SUM(CASE WHEN q.status IN ('approved', 'deployed') THEN 1 ELSE 0 END) / COUNT(*)) * 100, 1) as acceptance_rate
-     FROM {hlai_quizgen_questions} q
+     FROM {local_hlai_quizgen_questions} q
      JOIN {user} u ON q.userid = u.id
      WHERE q.status IN ('approved', 'rejected', 'deployed')
      GROUP BY u.id, u.firstname, u.lastname
@@ -189,13 +189,13 @@ $topteachers = $DB->get_records_sql(
 );
 
 // 9. System Health Checks.
-$pendinggenerations = $DB->count_records('hlai_quizgen_requests', ['status' => 'pending']);
-$failedgenerations = $DB->count_records('hlai_quizgen_requests', ['status' => 'failed']);
+$pendinggenerations = $DB->count_records('local_hlai_quizgen_requests', ['status' => 'pending']);
+$failedgenerations = $DB->count_records('local_hlai_quizgen_requests', ['status' => 'failed']);
 
 // Recent errors (last 7 days).
 $sevendaysago = time() - (7 * 24 * 60 * 60);
 $recenterrors = $DB->count_records_sql(
-    "SELECT COUNT(*) FROM {hlai_quizgen_requests}
+    "SELECT COUNT(*) FROM {local_hlai_quizgen_requests}
      WHERE status = ? AND timecreated >= ?",
     ['failed', $sevendaysago]
 );

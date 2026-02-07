@@ -45,7 +45,7 @@ class debug_logger {
     const LEVEL_CRITICAL = 'CRITICAL';
 
     /** @var string Log file name */
-    const LOG_FILE = 'hlai_quizgen_debug.log';
+    const LOG_FILE = 'local_hlai_quizgen_debug.log';
 
     /** @var bool Whether logging is enabled */
     private static $enabled = null;
@@ -64,7 +64,7 @@ class debug_logger {
             self::$enabled = true;
 
             // Set up log file path in moodledata.
-            $logdir = $CFG->dataroot . '/hlai_quizgen_logs';
+            $logdir = $CFG->dataroot . '/local_hlai_quizgen_logs';
             if (!is_dir($logdir)) {
                 @mkdir($logdir, 0777, true);
             }
@@ -368,7 +368,7 @@ class debug_logger {
             $record->error_message = substr($message, 0, 1000);
             $record->timecreated = time();
 
-            $DB->insert_record('hlai_quizgen_logs', $record);
+            $DB->insert_record('local_hlai_quizgen_logs', $record);
         } catch (\Exception $e) {
             // Silently fail to prevent cascading errors.
             debugging("HLAI QuizGen: Failed to write to log database: " . $e->getMessage());
@@ -428,7 +428,7 @@ class debug_logger {
 
         $where = empty($conditions) ? '' : 'WHERE ' . implode(' AND ', $conditions);
 
-        $sql = "SELECT * FROM {hlai_quizgen_logs} {$where} ORDER BY timecreated DESC, id DESC";
+        $sql = "SELECT * FROM {local_hlai_quizgen_logs} {$where} ORDER BY timecreated DESC, id DESC";
 
         try {
             return $DB->get_records_sql($sql, $params, 0, $limit);
