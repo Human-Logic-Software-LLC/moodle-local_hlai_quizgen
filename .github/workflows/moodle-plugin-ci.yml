@@ -11,7 +11,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:13
+        image: postgres:15
         env:
           POSTGRES_USER: 'postgres'
           POSTGRES_HOST_AUTH_METHOD: 'trust'
@@ -20,14 +20,15 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 3
 
       mariadb:
-        image: mariadb:10.6
+        image: mariadb:10
         env:
+          MYSQL_USER: 'root'
           MYSQL_ALLOW_EMPTY_PASSWORD: "true"
           MYSQL_CHARACTER_SET_SERVER: "utf8mb4"
           MYSQL_COLLATION_SERVER: "utf8mb4_unicode_ci"
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping --silent" --health-interval 10s --health-timeout 5s --health-retries 5
+        options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
 
     strategy:
       fail-fast: false
@@ -63,63 +64,58 @@ jobs:
           echo "NVM_DIR=$HOME/.nvm" >> $GITHUB_ENV
 
       - name: Install moodle-plugin-ci
-        run: |
-          if [ "$DB" = "pgsql" ]; then
-            moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1 --no-init
-          else
-            moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1 --db-user=root --db-pass= --no-init
-          fi
+        run: moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1 --no-init
         env:
           DB: ${{ matrix.database }}
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
           IGNORE_PATHS: 'gateway'
 
       - name: PHP Lint
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci phplint
 
       - name: PHP Copy/Paste Detector
-        continue-on-error: true # This step will show report but won't fail the build
-        if: ${{ always() }}
+        continue-on-error: true
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci phpcpd
 
       - name: PHP Mess Detector
-        continue-on-error: true # This step will show report but won't fail the build
-        if: ${{ always() }}
+        continue-on-error: true
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci phpmd
 
       - name: Moodle Code Checker
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci phpcs
 
       - name: Moodle PHPDoc Checker
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci phpdoc
 
       - name: Validating
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci validate
 
       - name: Check upgrade savepoints
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci savepoints
 
       - name: Mustache Lint
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         run: moodle-plugin-ci mustache
 
       - name: Grunt
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         continue-on-error: true
         run: moodle-plugin-ci grunt
 
       - name: PHPUnit tests
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         continue-on-error: true
         run: moodle-plugin-ci phpunit --fail-on-warning || echo "PHPUnit tests skipped or failed"
 
       - name: Behat features
-        if: ${{ always() }}
+        if: ${{ !cancelled() }}
         continue-on-error: true
         run: moodle-plugin-ci behat --profile chrome || echo "Behat tests skipped or failed"
 

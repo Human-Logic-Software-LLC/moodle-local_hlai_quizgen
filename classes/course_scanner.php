@@ -1,26 +1,19 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify.
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,.
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License.
+// You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-/**
- * Course scanner page.
- *
- * @package    local_hlai_quizgen
- * @copyright  2025 STARTER
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 /**
  * Course scanner for bulk content extraction.
  *
@@ -43,19 +36,15 @@ defined('MOODLE_INTERNAL') || die();
  */
 class course_scanner {
     /** @var int Maximum content size in bytes (10MB) */
-    /** MAX_CONTENT_SIZE constant. */
     const MAX_CONTENT_SIZE = 10485760;
 
     /** @var array Resource module types that contain static learning content */
-    /** RESOURCE_MODULES constant. */
     const RESOURCE_MODULES = ['page', 'book', 'resource', 'url', 'folder', 'label'];
 
     /** @var array Activity module types that contain structured learning content */
-    /** ACTIVITY_MODULES constant. */
     const ACTIVITY_MODULES = ['lesson', 'scorm', 'forum'];
 
     /** @var array Section names to exclude (non-learning administrative sections) */
-    /** EXCLUDED_SECTION_NAMES constant. */
     const EXCLUDED_SECTION_NAMES = ['assignment', 'assignments', 'assessment', 'assessments', 'certificate', 'certificates', 'completion certificate', 'course completion'];
 
     /**

@@ -1,26 +1,19 @@
 <?php
-// This file is part of Moodle - http://moodle.org/.
+// This file is part of Moodle - http://moodle.org/
 //
-// Moodle is free software: you can redistribute it and/or modify.
+// Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,.
+// Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License.
+// You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
-/**
- * Review workflow page.
- *
- * @package    local_hlai_quizgen
- * @copyright  2025 STARTER
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 /**
  * Collaborative review workflow for question quality assurance.
  *
@@ -38,7 +31,6 @@ defined('MOODLE_INTERNAL') || die();
  */
 class review_workflow {
     /** @var array Review statuses */
-    /** STATUS_PENDING constant. */
     const STATUS_PENDING = 'pending_review';
     /** STATUS_IN_REVIEW constant. */
     const STATUS_IN_REVIEW = 'in_review';
@@ -52,7 +44,6 @@ class review_workflow {
     const STATUS_REVISED = 'revised';
 
     /** @var array Review roles */
-    /** ROLE_REVIEWER constant. */
     const ROLE_REVIEWER = 'reviewer';
     /** ROLE_APPROVER constant. */
     const ROLE_APPROVER = 'approver';
