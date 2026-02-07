@@ -1,0 +1,72 @@
+<?php
+// Browser helper to reset a quizgen request back to pending.
+
+require_once(__DIR__ . '/../../config.php');
+
+$requestid = optional_param('requestid', 0, PARAM_INT);
+$doreset   = optional_param('doreset', 0, PARAM_BOOL);
+
+require_login();
+$context = context_system::instance();
+// Allow quizgen report viewers or site admins.
+if (!has_capability('local_hlai_quizgen:viewreports', $context) && !has_capability('moodle/site:config', $context)) {
+    require_capability('local_hlai_quizgen:viewreports', $context);
+}
+
+$PAGE->set_url('/local/hlai_quizgen/reset_request.php', ['requestid' => $requestid]);
+$PAGE->set_context($context);
+$PAGE->set_title('Reset QuizGen Request');
+$PAGE->set_heading('Reset QuizGen Request');
+$PAGE->requires->css('/local/hlai_quizgen/bulma.css');
+$PAGE->requires->css('/local/hlai_quizgen/styles-bulma.css');
+
+global $DB, $OUTPUT;
+
+echo $OUTPUT->header();
+echo $OUTPUT->heading('Reset QuizGen Request', 2);
+echo html_writer::start_div('hlai-quizgen-wrapper local-hlai-iksha');
+
+echo html_writer::div(
+    'Use this to reset a stuck AI Quiz Generator request back to pending. Only available to users with appropriate permissions.',
+    'notification is-info is-light'
+);
+
+if ($doreset && confirm_sesskey() && $requestid) {
+    $req = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid], '*', IGNORE_MISSING);
+    if (!$req) {
+        echo html_writer::div('Request not found.', 'notification is-danger is-light');
+    } else {
+        $update = new stdClass();
+        $update->id = $requestid;
+        $update->status = 'pending';
+        $update->error_message = null;
+        $update->timemodified = time();
+        $update->timecompleted = null;
+        $DB->update_record('hlai_quizgen_requests', $update);
+        echo html_writer::div("Request {$requestid} reset to pending.", 'notification is-success is-light');
+    }
+}
+
+// Show form.
+$formurl = new moodle_url('/local/hlai_quizgen/reset_request.php');
+echo html_writer::start_tag('form', ['method' => 'post', 'action' => $formurl->out(false)]);
+echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]);
+echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'doreset', 'value' => 1]);
+echo html_writer::start_div('field');
+echo html_writer::tag('label', 'Request ID', ['for' => 'requestid', 'class' => 'label']);
+echo html_writer::start_div('control');
+echo html_writer::empty_tag('input', [
+    'type' => 'number',
+    'name' => 'requestid',
+    'id' => 'requestid',
+    'value' => $requestid ?: '',
+    'required' => 'required',
+    'class' => 'input',
+]);
+echo html_writer::end_div();
+echo html_writer::end_div();
+echo html_writer::tag('button', 'Reset to pending', ['type' => 'submit', 'class' => 'button is-primary']);
+echo html_writer::end_tag('form');
+
+echo html_writer::end_div();
+echo $OUTPUT->footer();

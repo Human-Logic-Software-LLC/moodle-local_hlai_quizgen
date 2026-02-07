@@ -1,0 +1,34 @@
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+*.old
+
+# Node modules (if any)
+node_modules/
+
+# Log files
+*.log
+
+# Build files
+amd/build/*.min.js
+amd/build/*.min.js.map
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Test files (keep in dev, but document them)
+test_*.php
+*_test.php
+
+# Documentation files that are development-only
+docs/development/
