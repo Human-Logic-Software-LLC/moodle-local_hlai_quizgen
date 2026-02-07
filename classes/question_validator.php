@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Question validator page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Question validator for the AI Quiz Generator plugin.
  *
@@ -32,29 +39,38 @@ defined('MOODLE_INTERNAL') || die();
  * Question validator class.
  */
 class question_validator {
-
     /** @var int Minimum question text length */
+    /** MIN_QUESTION_LENGTH constant. */
     const MIN_QUESTION_LENGTH = 10;
 
     /** @var int Maximum question text length */
+    /** MAX_QUESTION_LENGTH constant. */
     const MAX_QUESTION_LENGTH = 1000;
 
     /** @var int Minimum answer length */
+    /** MIN_ANSWER_LENGTH constant. */
     const MIN_ANSWER_LENGTH = 1;
 
     /** @var int Maximum answer length */
+    /** MAX_ANSWER_LENGTH constant. */
     const MAX_ANSWER_LENGTH = 500;
 
     /** @var int Minimum number of answers for multichoice */
+    /** MIN_MULTICHOICE_ANSWERS constant. */
     const MIN_MULTICHOICE_ANSWERS = 2;
 
     /** @var int Maximum number of answers for multichoice */
+    /** MAX_MULTICHOICE_ANSWERS constant. */
     const MAX_MULTICHOICE_ANSWERS = 10;
 
     /** @var array Quality score thresholds */
+    /** QUALITY_EXCELLENT constant. */
     const QUALITY_EXCELLENT = 90;
+    /** QUALITY_GOOD constant. */
     const QUALITY_GOOD = 70;
+    /** QUALITY_ACCEPTABLE constant. */
     const QUALITY_ACCEPTABLE = 50;
+    /** QUALITY_POOR constant. */
     const QUALITY_POOR = 30;
 
     /**
@@ -358,7 +374,7 @@ class question_validator {
             }
         }
 
-        // CHECK FOR DUMB QUESTIONS ABOUT DELIVERY FORMAT (SCORM, Lesson, Module, etc.)
+        // CHECK FOR DUMB QUESTIONS ABOUT DELIVERY FORMAT (SCORM, Lesson, Module, etc.).
         // These questions are about the platform/format, not the educational content.
         $deliveryformatpatterns = [
             'what is scorm' => 'Asking about SCORM format instead of content',

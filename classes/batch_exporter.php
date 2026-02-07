@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Batch exporter page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Batch export and import functionality for questions.
  *
@@ -33,8 +40,8 @@ require_once($CFG->dirroot . '/question/format/xml/format.php');
  * Handles batch export/import of AI-generated questions.
  */
 class batch_exporter {
-
     /** @var array Supported export formats */
+    /** SUPPORTED_FORMATS constant. */
     const SUPPORTED_FORMATS = ['moodle_xml', 'gift', 'aiken', 'json', 'csv'];
 
     /**
@@ -89,19 +96,20 @@ class batch_exporter {
                 'export_date' => date('Y-m-d H:i:s'),
                 'request_id' => $request->id,
                 'course_id' => $request->courseid,
-                'total_questions' => count($questions)
+                'total_questions' => count($questions),
             ],
             'request_config' => [
                 'difficulty_distribution' => json_decode($request->difficulty_distribution ?? '{}'),
                 'blooms_distribution' => json_decode($request->blooms_distribution ?? '{}'),
                 'question_types' => json_decode($request->question_types ?? '[]'),
-                'custom_instructions' => $request->custom_instructions
+                'custom_instructions' => $request->custom_instructions,
             ],
-            'questions' => []
+            'questions' => [],
         ];
 
         foreach ($questions as $question) {
-            $answers = $DB->get_records('hlai_quizgen_answers',
+            $answers = $DB->get_records(
+                'hlai_quizgen_answers',
                 ['questionid' => $question->id],
                 'sortorder ASC'
             );
@@ -116,7 +124,7 @@ class batch_exporter {
                 'ai_reasoning' => $question->ai_reasoning,
                 'validation_score' => $question->validation_score,
                 'quality_rating' => $question->quality_rating,
-                'answers' => []
+                'answers' => [],
             ];
 
             foreach ($answers as $answer) {
@@ -125,7 +133,7 @@ class batch_exporter {
                     'is_correct' => (bool)$answer->is_correct,
                     'fraction' => $answer->fraction,
                     'feedback' => $answer->feedback,
-                    'distractor_reasoning' => $answer->distractor_reasoning
+                    'distractor_reasoning' => $answer->distractor_reasoning,
                 ];
             }
 
@@ -139,7 +147,8 @@ class batch_exporter {
 
             // Include calibration if requested.
             if (!empty($options['include_calibration']) && $question->moodle_questionid) {
-                $calibration = $DB->get_records('hlai_quizgen_calibration',
+                $calibration = $DB->get_records(
+                    'hlai_quizgen_calibration',
                     ['questionid' => $question->id],
                     'timecreated DESC',
                     '*',
@@ -160,7 +169,7 @@ class batch_exporter {
             'content' => json_encode($exportdata, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
             'filename' => 'hlai_questions_' . $request->id . '_' . date('Ymd_His') . '.json',
             'mimetype' => 'application/json',
-            'count' => count($questions)
+            'count' => count($questions),
         ];
     }
 
@@ -194,12 +203,13 @@ class batch_exporter {
             'Answer 4 Correct',
             'General Feedback',
             'Validation Score',
-            'Quality Rating'
+            'Quality Rating',
         ];
         $csv[] = $headers;
 
         foreach ($questions as $question) {
-            $answers = $DB->get_records('hlai_quizgen_answers',
+            $answers = $DB->get_records(
+                'hlai_quizgen_answers',
                 ['questionid' => $question->id],
                 'sortorder ASC'
             );
@@ -209,7 +219,7 @@ class batch_exporter {
                 $question->questiontype,
                 $question->difficulty,
                 $question->blooms_level,
-                self::clean_html($question->questiontext)
+                self::clean_html($question->questiontext),
             ];
 
             // Add up to 4 answers.
@@ -246,7 +256,7 @@ class batch_exporter {
             'content' => $content,
             'filename' => 'hlai_questions_' . $request->id . '_' . date('Ymd_His') . '.csv',
             'mimetype' => 'text/csv',
-            'count' => count($questions)
+            'count' => count($questions),
         ];
     }
 
@@ -265,7 +275,8 @@ class batch_exporter {
         $xml->addAttribute('timestamp', time());
 
         foreach ($questions as $question) {
-            $answers = $DB->get_records('hlai_quizgen_answers',
+            $answers = $DB->get_records(
+                'hlai_quizgen_answers',
                 ['questionid' => $question->id],
                 'sortorder ASC'
             );
@@ -307,7 +318,7 @@ class batch_exporter {
             'content' => $xml->asXML(),
             'filename' => 'hlai_questions_' . $request->id . '_' . date('Ymd_His') . '.xml',
             'mimetype' => 'application/xml',
-            'count' => count($questions)
+            'count' => count($questions),
         ];
     }
 
@@ -327,7 +338,8 @@ class batch_exporter {
         $gift .= "// Exported: " . date('Y-m-d H:i:s') . "\n\n";
 
         foreach ($questions as $question) {
-            $answers = $DB->get_records('hlai_quizgen_answers',
+            $answers = $DB->get_records(
+                'hlai_quizgen_answers',
                 ['questionid' => $question->id],
                 'sortorder ASC'
             );
@@ -358,7 +370,7 @@ class batch_exporter {
             'content' => $gift,
             'filename' => 'hlai_questions_' . $request->id . '_' . date('Ymd_His') . '.gift',
             'mimetype' => 'text/plain',
-            'count' => count($questions)
+            'count' => count($questions),
         ];
     }
 
@@ -381,7 +393,8 @@ class batch_exporter {
                 continue;
             }
 
-            $answers = $DB->get_records('hlai_quizgen_answers',
+            $answers = $DB->get_records(
+                'hlai_quizgen_answers',
                 ['questionid' => $question->id],
                 'sortorder ASC'
             );
@@ -413,7 +426,7 @@ class batch_exporter {
             'content' => $aiken,
             'filename' => 'hlai_questions_' . $request->id . '_' . date('Ymd_His') . '.txt',
             'mimetype' => 'text/plain',
-            'count' => count($questions)
+            'count' => count($questions),
         ];
     }
 
@@ -529,9 +542,8 @@ class batch_exporter {
                 'success' => true,
                 'request_id' => $requestid,
                 'questions_imported' => $imported,
-                'message' => "Successfully imported {$imported} questions"
+                'message' => "Successfully imported {$imported} questions",
             ];
-
         } catch (\Exception $e) {
             $transaction->rollback($e);
             throw $e;
@@ -550,7 +562,7 @@ class batch_exporter {
             'truefalse' => 'truefalse',
             'shortanswer' => 'shortanswer',
             'essay' => 'essay',
-            'matching' => 'matching'
+            'matching' => 'matching',
         ];
         return $map[$type] ?? 'multichoice';
     }
@@ -577,9 +589,11 @@ class batch_exporter {
     private static function escape_gift_text(string $text): string {
         $text = self::clean_html($text);
         // Escape special GIFT characters.
-        $text = str_replace(['~', '=', '#', '{', '}', ':'],
-                           ['\~', '\=', '\#', '\{', '\}', '\:'],
-                           $text);
+        $text = str_replace(
+            ['~', '=', '#', '{', '}', ':'],
+            ['\~', '\=', '\#', '\{', '\}', '\:'],
+            $text
+        );
         return $text;
     }
 }

@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Content extractor page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Content extraction engine for the AI Quiz Generator plugin.
  *
@@ -46,7 +53,6 @@ if (isset($CFG)) {
  * Content extractor class.
  */
 class content_extractor {
-
     /**
      * Extract content from multiple sources.
      *
@@ -88,6 +94,7 @@ class content_extractor {
                 }
             } catch (\Exception $e) {
                 // Silently continue with other sources.
+                debugging($e->getMessage(), DEBUG_DEVELOPER);
             }
         }
 
@@ -159,26 +166,30 @@ class content_extractor {
      * @return string Extracted text
      */
     private static function extract_from_pdf(string $filepath): string {
-        // Method 1: Try pdftotext (best quality)
+        // Method 1: Try pdftotext (best quality).
         $text = self::extract_pdf_pdftotext($filepath);
         if (!empty($text)) {
             return $text;
         }
 
-        // Method 2: Try Ghostscript (gs) - available on most servers
+        // Method 2: Try Ghostscript (gs) - available on most servers.
         $text = self::extract_pdf_ghostscript($filepath);
         if (!empty($text)) {
             return $text;
         }
 
-        // Method 3: Try pure PHP extraction (basic, no dependencies)
+        // Method 3: Try pure PHP extraction (basic, no dependencies).
         $text = self::extract_pdf_native($filepath);
         if (!empty($text)) {
             return $text;
         }
 
-        throw new \moodle_exception('error:contentextraction', 'local_hlai_quizgen', '',
-            'PDF extraction failed - no suitable extraction method available or the PDF contains only images');
+        throw new \moodle_exception(
+            'error:contentextraction',
+            'local_hlai_quizgen',
+            '',
+            'PDF extraction failed - no suitable extraction method available or the PDF contains only images'
+        );
     }
 
     /**
@@ -193,9 +204,9 @@ class content_extractor {
         try {
             $outputfile = tempnam(sys_get_temp_dir(), 'pdf_');
             $cmd = escapeshellcmd($pdftotext) . ' -layout ' . escapeshellarg($filepath) . ' ' . escapeshellarg($outputfile) . ' 2>/dev/null';
-            exec($cmd, $output, $returnCode);
+            exec($cmd, $output, $returncode);
 
-            if ($returnCode === 0 && file_exists($outputfile)) {
+            if ($returncode === 0 && file_exists($outputfile)) {
                 $text = file_get_contents($outputfile);
                 @unlink($outputfile);
                 $text = preg_replace('/\s+/', ' ', $text);
@@ -203,7 +214,8 @@ class content_extractor {
             }
             @unlink($outputfile);
         } catch (\Exception $e) {
-            // Silently fail, try next method
+            // Silently fail, try next method.
+            debugging($e->getMessage(), DEBUG_DEVELOPER);
         }
         return '';
     }
@@ -220,11 +232,11 @@ class content_extractor {
         try {
             $outputfile = tempnam(sys_get_temp_dir(), 'pdf_') . '.txt';
 
-            // Use Ghostscript to extract text
+            // Use Ghostscript to extract text.
             $cmd = escapeshellcmd($gs) . ' -sDEVICE=txtwrite -o ' . escapeshellarg($outputfile) . ' ' . escapeshellarg($filepath) . ' 2>/dev/null';
-            exec($cmd, $output, $returnCode);
+            exec($cmd, $output, $returncode);
 
-            if ($returnCode === 0 && file_exists($outputfile)) {
+            if ($returncode === 0 && file_exists($outputfile)) {
                 $text = file_get_contents($outputfile);
                 @unlink($outputfile);
                 $text = preg_replace('/\s+/', ' ', $text);
@@ -232,7 +244,8 @@ class content_extractor {
             }
             @unlink($outputfile);
         } catch (\Exception $e) {
-            // Silently fail, try next method
+            // Silently fail, try next method.
+            debugging($e->getMessage(), DEBUG_DEVELOPER);
         }
         return '';
     }
@@ -250,15 +263,15 @@ class content_extractor {
 
             $text = '';
 
-            // Method 1: Extract text between BT and ET markers (text blocks)
+            // Method 1: Extract text between BT and ET markers (text blocks).
             if (preg_match_all('/BT\s*(.*?)\s*ET/s', $content, $matches)) {
                 foreach ($matches[1] as $block) {
-                    // Extract text from Tj and TJ operators
-                    if (preg_match_all('/\((.*?)\)\s*Tj/s', $block, $tjMatches)) {
-                        $text .= implode(' ', $tjMatches[1]) . ' ';
+                    // Extract text from Tj and TJ operators.
+                    if (preg_match_all('/\((.*?)\)\s*Tj/s', $block, $tjmatches)) {
+                        $text .= implode(' ', $tjmatches[1]) . ' ';
                     }
-                    if (preg_match_all('/\[(.*?)\]\s*TJ/s', $block, $tjArrayMatches)) {
-                        foreach ($tjArrayMatches[1] as $arr) {
+                    if (preg_match_all('/\[(.*?)\]\s*TJ/s', $block, $tjarraymatches)) {
+                        foreach ($tjarraymatches[1] as $arr) {
                             if (preg_match_all('/\((.*?)\)/', $arr, $items)) {
                                 $text .= implode('', $items[1]) . ' ';
                             }
@@ -267,24 +280,23 @@ class content_extractor {
                 }
             }
 
-            // Method 2: Look for stream content with text
+            // Method 2: Look for stream content with text.
             if (empty($text) && preg_match_all('/stream\s*(.*?)\s*endstream/s', $content, $streams)) {
                 foreach ($streams[1] as $stream) {
-                    // Try to find readable text in streams
+                    // Try to find readable text in streams.
                     $decoded = @gzuncompress($stream);
                     if ($decoded !== false) {
-                        if (preg_match_all('/\((.*?)\)/', $decoded, $textMatches)) {
-                            $text .= implode(' ', $textMatches[1]) . ' ';
+                        if (preg_match_all('/\((.*?)\)/', $decoded, $textmatches)) {
+                            $text .= implode(' ', $textmatches[1]) . ' ';
                         }
                     }
                 }
             }
 
-            // Clean up extracted text
+            // Clean up extracted text.
             $text = preg_replace('/[^\x20-\x7E\s]/', '', $text); // Remove non-printable
             $text = preg_replace('/\s+/', ' ', $text);
             return trim($text);
-
         } catch (\Exception $e) {
             return '';
         }
@@ -306,17 +318,17 @@ class content_extractor {
 
             $text = '';
 
-            // Extract from main document
+            // Extract from main document.
             $xml = $zip->getFromName('word/document.xml');
             if ($xml) {
-                // Extract text from <w:t> tags
+                // Extract text from <w:t> tags.
                 preg_match_all('/<w:t[^>]*>([^<]*)<\/w:t>/i', $xml, $matches);
                 if (!empty($matches[1])) {
                     $text .= implode(' ', $matches[1]) . "\n";
                 }
             }
 
-            // Also extract from headers/footers if present
+            // Also extract from headers/footers if present.
             for ($i = 1; $i <= 3; $i++) {
                 $header = $zip->getFromName("word/header{$i}.xml");
                 if ($header) {
@@ -329,7 +341,7 @@ class content_extractor {
 
             $zip->close();
 
-            // Clean up text
+            // Clean up text.
             $text = html_entity_decode($text, ENT_QUOTES | ENT_XML1, 'UTF-8');
             $text = preg_replace('/\s+/', ' ', $text);
             $text = trim($text);
@@ -339,10 +351,13 @@ class content_extractor {
             }
 
             return $text;
-
         } catch (\Exception $e) {
-            throw new \moodle_exception('error:contentextraction', 'local_hlai_quizgen', '',
-                'DOCX extraction failed: ' . $e->getMessage());
+            throw new \moodle_exception(
+                'error:contentextraction',
+                'local_hlai_quizgen',
+                '',
+                'DOCX extraction failed: ' . $e->getMessage()
+            );
         }
     }
 
@@ -362,7 +377,7 @@ class content_extractor {
 
             $text = '';
 
-            // Extract text from each slide
+            // Extract text from each slide.
             for ($i = 1; $i <= 200; $i++) {
                 $slidename = "ppt/slides/slide{$i}.xml";
                 $xml = $zip->getFromName($slidename);
@@ -373,7 +388,7 @@ class content_extractor {
 
                 $text .= "--- Slide {$i} ---\n";
 
-                // Extract text from <a:t> tags (PowerPoint text elements)
+                // Extract text from <a:t> tags (PowerPoint text elements).
                 preg_match_all('/<a:t>([^<]*)<\/a:t>/i', $xml, $matches);
                 if (!empty($matches[1])) {
                     $text .= implode(' ', $matches[1]) . "\n";
@@ -384,7 +399,7 @@ class content_extractor {
 
             $zip->close();
 
-            // Clean up text
+            // Clean up text.
             $text = html_entity_decode($text, ENT_QUOTES | ENT_XML1, 'UTF-8');
             $text = preg_replace('/\s+/', ' ', $text);
             $text = trim($text);
@@ -394,10 +409,13 @@ class content_extractor {
             }
 
             return $text;
-
         } catch (\Exception $e) {
-            throw new \moodle_exception('error:contentextraction', 'local_hlai_quizgen', '',
-                'PPTX extraction failed: ' . $e->getMessage());
+            throw new \moodle_exception(
+                'error:contentextraction',
+                'local_hlai_quizgen',
+                '',
+                'PPTX extraction failed: ' . $e->getMessage()
+            );
         }
     }
 
@@ -412,7 +430,7 @@ class content_extractor {
         try {
             $extension = strtolower(pathinfo($filepath, PATHINFO_EXTENSION));
 
-            // Handle CSV (native PHP)
+            // Handle CSV (native PHP).
             if ($extension === 'csv') {
                 $text = '';
                 if (($handle = fopen($filepath, 'r')) !== false) {
@@ -430,25 +448,36 @@ class content_extractor {
                 return trim($text);
             }
 
-            // Handle XLSX (native PHP using ZipArchive)
+            // Handle XLSX (native PHP using ZipArchive).
             if ($extension === 'xlsx') {
                 return self::extract_xlsx_native($filepath);
             }
 
             // XLS (old Excel format) not supported without libraries
             if ($extension === 'xls') {
-                throw new \moodle_exception('error:contentextraction', 'local_hlai_quizgen', '',
-                    'XLS format not supported. Please convert to XLSX or CSV format.');
+                throw new \moodle_exception(
+                    'error:contentextraction',
+                    'local_hlai_quizgen',
+                    '',
+                    'XLS format not supported. Please convert to XLSX or CSV format.'
+                );
             }
 
-            throw new \moodle_exception('error:contentextraction', 'local_hlai_quizgen', '',
-                'Unsupported spreadsheet format: ' . $extension);
-
+            throw new \moodle_exception(
+                'error:contentextraction',
+                'local_hlai_quizgen',
+                '',
+                'Unsupported spreadsheet format: ' . $extension
+            );
         } catch (\moodle_exception $e) {
             throw $e;
         } catch (\Exception $e) {
-            throw new \moodle_exception('error:contentextraction', 'local_hlai_quizgen', '',
-                'Excel extraction failed: ' . $e->getMessage());
+            throw new \moodle_exception(
+                'error:contentextraction',
+                'local_hlai_quizgen',
+                '',
+                'Excel extraction failed: ' . $e->getMessage()
+            );
         }
     }
 
@@ -466,32 +495,32 @@ class content_extractor {
 
         $text = '';
 
-        // Get shared strings (where actual text is stored)
-        $sharedStrings = [];
-        $stringsXml = $zip->getFromName('xl/sharedStrings.xml');
-        if ($stringsXml) {
-            preg_match_all('/<t[^>]*>([^<]*)<\/t>/i', $stringsXml, $matches);
+        // Get shared strings (where actual text is stored).
+        $sharedstrings = [];
+        $stringsxml = $zip->getFromName('xl/sharedStrings.xml');
+        if ($stringsxml) {
+            preg_match_all('/<t[^>]*>([^<]*)<\/t>/i', $stringsxml, $matches);
             if (!empty($matches[1])) {
-                $sharedStrings = $matches[1];
+                $sharedstrings = $matches[1];
             }
         }
 
-        // Get content from each sheet
-        for ($sheetNum = 1; $sheetNum <= 10; $sheetNum++) {
-            $sheetXml = $zip->getFromName("xl/worksheets/sheet{$sheetNum}.xml");
-            if ($sheetXml === false) {
+        // Get content from each sheet.
+        for ($sheetnum = 1; $sheetnum <= 10; $sheetnum++) {
+            $sheetxml = $zip->getFromName("xl/worksheets/sheet{$sheetnum}.xml");
+            if ($sheetxml === false) {
                 break;
             }
 
-            $text .= "--- Sheet {$sheetNum} ---\n";
+            $text .= "--- Sheet {$sheetnum} ---\n";
 
-            // Extract cell values
-            preg_match_all('/<v>([^<]*)<\/v>/i', $sheetXml, $matches);
+            // Extract cell values.
+            preg_match_all('/<v>([^<]*)<\/v>/i', $sheetxml, $matches);
             if (!empty($matches[1])) {
                 foreach ($matches[1] as $value) {
-                    // Check if it's a shared string reference
-                    if (is_numeric($value) && isset($sharedStrings[(int)$value])) {
-                        $text .= $sharedStrings[(int)$value] . ' ';
+                    // Check if it's a shared string reference.
+                    if (is_numeric($value) && isset($sharedstrings[(int)$value])) {
+                        $text .= $sharedstrings[(int)$value] . ' ';
                     } else {
                         $text .= $value . ' ';
                     }
@@ -503,7 +532,7 @@ class content_extractor {
 
         $zip->close();
 
-        // Clean up text
+        // Clean up text.
         $text = html_entity_decode($text, ENT_QUOTES | ENT_XML1, 'UTF-8');
         $text = preg_replace('/\s+/', ' ', $text);
         $text = trim($text);
@@ -576,7 +605,6 @@ class content_extractor {
                 'word_count' => $wordcount,
                 'title' => $title ?: parse_url($url, PHP_URL_HOST),
             ];
-
         } catch (\Exception $e) {
             throw new \moodle_exception('error:urlextraction', 'local_hlai_quizgen', '', 'Failed to extract content from URL: ' . $e->getMessage());
         }
@@ -784,6 +812,7 @@ class content_extractor {
                 }
             } catch (\Exception $e) {
                 // If URL fetch fails, continue with what we have.
+                debugging($e->getMessage(), DEBUG_DEVELOPER);
             }
         }
 
@@ -955,7 +984,7 @@ class content_extractor {
                 $modulelabel = ucfirst($moduletype);
 
                 // CRITICAL: Mark with actual activity name prominently so AI uses it as topic title.
-                // Format: === TOPIC: [Activity Name] ([Type]) ===
+                // Format: === TOPIC: [Activity Name] ([Type]) ===.
                 $allcontent .= "\n\n=== TOPIC: {$activityname} ({$modulelabel}) ===\n";
                 $allcontent .= "Activity Name: {$activityname}\n";
                 $allcontent .= "Activity Type: {$modulelabel}\n";
@@ -1090,14 +1119,13 @@ class content_extractor {
 
                 // Clean up temp directory.
                 self::delete_directory($tempdir);
-
             } else {
                 self::delete_directory($tempdir);
                 return '';
             }
-
         } catch (\Exception $e) {
             // SCORM extraction failed - return whatever text we have.
+            debugging($e->getMessage(), DEBUG_DEVELOPER);
         }
 
         return $text;
@@ -1147,13 +1175,13 @@ class content_extractor {
             $text .= self::html_to_structured_text($forum->intro) . "\n\n";
         }
 
-        // Get forum discussions and posts (limit to avoid too much content)
+        // Get forum discussions and posts (limit to avoid too much content).
         $discussions = $DB->get_records('forum_discussions', ['forum' => $forum->id], 'timemodified DESC', '*', 0, 10);
 
         foreach ($discussions as $discussion) {
             $text .= "\n\n## Discussion: " . $discussion->name . "\n\n";
 
-            // Get first post of each discussion
+            // Get first post of each discussion.
             $posts = $DB->get_records('forum_posts', ['discussion' => $discussion->id], 'created ASC', '*', 0, 5);
             foreach ($posts as $post) {
                 if (!empty($post->message)) {

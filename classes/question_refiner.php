@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Question refiner page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * AI-assisted question refinement and improvement.
  *
@@ -32,13 +39,18 @@ defined('MOODLE_INTERNAL') || die();
  * Uses the ai_provider abstraction to work with either hlai_hub or hlai_hubproxy.
  */
 class question_refiner {
-
     /** @var array Refinement types */
+    /** REFINE_CLARITY constant. */
     const REFINE_CLARITY = 'clarity';
+    /** REFINE_DIFFICULTY constant. */
     const REFINE_DIFFICULTY = 'difficulty';
+    /** REFINE_DISTRACTORS constant. */
     const REFINE_DISTRACTORS = 'distractors';
+    /** REFINE_FEEDBACK constant. */
     const REFINE_FEEDBACK = 'feedback';
+    /** REFINE_BLOOMS constant. */
     const REFINE_BLOOMS = 'blooms_level';
+    /** REFINE_COMPREHENSIVE constant. */
     const REFINE_COMPREHENSIVE = 'comprehensive';
 
     /**
@@ -66,7 +78,7 @@ class question_refiner {
             $performancedata = [
                 'average_score' => $analytics['performance']['average_score'],
                 'attempts' => $analytics['usage']['total_attempts'],
-                'discrimination' => $analytics['performance']['score_std_dev']
+                'discrimination' => $analytics['performance']['score_std_dev'],
             ];
         }
 
@@ -74,7 +86,7 @@ class question_refiner {
         if (!gateway_client::is_ready()) {
             return [
                 'success' => false,
-                'error' => 'Gateway not configured. Please configure the AI Service URL and API Key in plugin settings.'
+                'error' => 'Gateway not configured. Please configure the AI Service URL and API Key in plugin settings.',
             ];
         }
 
@@ -86,16 +98,16 @@ class question_refiner {
                 'difficulty' => $question->difficulty,
                 'blooms_level' => $question->blooms_level,
             ],
-            'answers' => array_values(array_map(function($answer) {
+            'answers' => array_values(array_map(function ($answer) {
                 return [
                     'text' => $answer->answer,
                     'is_correct' => $answer->is_correct,
-                    'feedback' => $answer->feedback ?? ''
+                    'feedback' => $answer->feedback ?? '',
                 ];
             }, $answers)),
             'refinement_type' => $refinementtype,
             'performance' => $performancedata,
-            'context' => $context
+            'context' => $context,
         ];
 
         // Call gateway for question refinement.
@@ -112,13 +124,12 @@ class question_refiner {
                 'success' => true,
                 'refinement_type' => $refinementtype,
                 'suggestions' => $suggestions,
-                'tokens_used' => $response['tokens']['total'] ?? 0
+                'tokens_used' => $response['tokens']['total'] ?? 0,
             ];
-
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ];
         }
     }
@@ -142,29 +153,45 @@ class question_refiner {
 
             // Update question text if provided.
             if (!empty($improvements['questiontext'])) {
-                $DB->set_field('hlai_quizgen_questions', 'questiontext',
-                    $improvements['questiontext'], ['id' => $questionid]);
+                $DB->set_field(
+                    'hlai_quizgen_questions',
+                    'questiontext',
+                    $improvements['questiontext'],
+                    ['id' => $questionid]
+                );
                 $changes[] = 'Updated question text';
             }
 
             // Update difficulty if provided.
             if (!empty($improvements['difficulty'])) {
-                $DB->set_field('hlai_quizgen_questions', 'difficulty',
-                    $improvements['difficulty'], ['id' => $questionid]);
+                $DB->set_field(
+                    'hlai_quizgen_questions',
+                    'difficulty',
+                    $improvements['difficulty'],
+                    ['id' => $questionid]
+                );
                 $changes[] = 'Updated difficulty level';
             }
 
             // Update Bloom's level if provided.
             if (!empty($improvements['blooms_level'])) {
-                $DB->set_field('hlai_quizgen_questions', 'blooms_level',
-                    $improvements['blooms_level'], ['id' => $questionid]);
+                $DB->set_field(
+                    'hlai_quizgen_questions',
+                    'blooms_level',
+                    $improvements['blooms_level'],
+                    ['id' => $questionid]
+                );
                 $changes[] = 'Updated Bloom\'s taxonomy level';
             }
 
             // Update feedback if provided.
             if (!empty($improvements['generalfeedback'])) {
-                $DB->set_field('hlai_quizgen_questions', 'generalfeedback',
-                    $improvements['generalfeedback'], ['id' => $questionid]);
+                $DB->set_field(
+                    'hlai_quizgen_questions',
+                    'generalfeedback',
+                    $improvements['generalfeedback'],
+                    ['id' => $questionid]
+                );
                 $changes[] = 'Updated general feedback';
             }
 
@@ -205,9 +232,8 @@ class question_refiner {
                 'success' => true,
                 'changes_count' => count($changes),
                 'changes' => $changes,
-                'message' => 'Improvements applied successfully'
+                'message' => 'Improvements applied successfully',
             ];
-
         } catch (\Exception $e) {
             $transaction->rollback($e);
             throw $e;
@@ -256,7 +282,7 @@ class question_refiner {
                 $prompt,
                 [
                     'temperature' => 0.7,
-                    'max_tokens' => 2000
+                    'max_tokens' => 2000,
                 ]
             );
 
@@ -276,13 +302,12 @@ class question_refiner {
             return [
                 'success' => true,
                 'alternatives' => $alternatives,
-                'count' => count($alternatives)
+                'count' => count($alternatives),
             ];
-
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ];
         }
     }
@@ -345,7 +370,7 @@ class question_refiner {
                 $prompt,
                 [
                     'temperature' => 0.4,
-                    'max_tokens' => 1500
+                    'max_tokens' => 1500,
                 ]
             );
 
@@ -355,13 +380,12 @@ class question_refiner {
                 'success' => true,
                 'improvements' => $improvements,
                 'original_count' => count($answers),
-                'improved_count' => count($improvements['improved_distractors'] ?? [])
+                'improved_count' => count($improvements['improved_distractors'] ?? []),
             ];
-
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ];
         }
     }
@@ -412,7 +436,7 @@ class question_refiner {
                 $prompt,
                 [
                     'temperature' => 0.5,
-                    'max_tokens' => 1500
+                    'max_tokens' => 1500,
                 ]
             );
 
@@ -420,13 +444,12 @@ class question_refiner {
 
             return [
                 'success' => true,
-                'feedback' => $feedback
+                'feedback' => $feedback,
             ];
-
         } catch (\Exception $e) {
             return [
                 'success' => false,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ];
         }
     }
@@ -454,7 +477,7 @@ class question_refiner {
         }
 
         // Issue 2: Answer length disparity.
-        $answerlengths = array_map(function($a) {
+        $answerlengths = array_map(function ($a) {
             return strlen(strip_tags($a->answer));
         }, $answers);
         $avglen = array_sum($answerlengths) / count($answerlengths);
@@ -506,14 +529,14 @@ class question_refiner {
                     $prompt,
                     [
                         'temperature' => 0.3,
-                        'max_tokens' => 1000
+                        'max_tokens' => 1000,
                     ]
                 );
 
                 $fixes = self::parse_auto_fixes($response->content);
-
             } catch (\Exception $e) {
                 // Continue with detected issues even if AI fails.
+                debugging($e->getMessage(), DEBUG_DEVELOPER);
             }
         }
 
@@ -521,7 +544,7 @@ class question_refiner {
             'has_issues' => !empty($issues),
             'issues' => $issues,
             'fixes' => $fixes,
-            'issue_count' => count($issues)
+            'issue_count' => count($issues),
         ];
     }
 

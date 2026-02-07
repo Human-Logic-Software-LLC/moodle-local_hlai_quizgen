@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Difficulty calibrator page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Automatic difficulty calibration based on student performance.
  *
@@ -30,11 +37,12 @@ defined('MOODLE_INTERNAL') || die();
  * Analyzes student performance to automatically calibrate question difficulty.
  */
 class difficulty_calibrator {
-
     /** Minimum attempts required for calibration. */
+    /** MIN_ATTEMPTS_FOR_CALIBRATION constant. */
     const MIN_ATTEMPTS_FOR_CALIBRATION = 10;
 
     /** Difficulty thresholds based on success rate. */
+    /** DIFFICULTY_THRESHOLDS constant. */
     const DIFFICULTY_THRESHOLDS = [
         'very_easy' => ['min' => 90, 'max' => 100],
         'easy' => ['min' => 70, 'max' => 89],
@@ -60,7 +68,7 @@ class difficulty_calibrator {
                 'calibrated' => false,
                 'reason' => 'insufficient_data',
                 'attempts' => $stats['attempt_count'],
-                'required' => self::MIN_ATTEMPTS_FOR_CALIBRATION
+                'required' => self::MIN_ATTEMPTS_FOR_CALIBRATION,
             ];
         }
 
@@ -103,7 +111,7 @@ class difficulty_calibrator {
             'average_time' => round($avgtime),
             'attempt_count' => $stats['attempt_count'],
             'mismatch' => $originaldifficulty !== $actualdifficulty,
-            'quality_indicator' => self::assess_question_quality($successrate, $discrimination)
+            'quality_indicator' => self::assess_question_quality($successrate, $discrimination),
         ];
     }
 
@@ -123,7 +131,7 @@ class difficulty_calibrator {
             'calibrated' => 0,
             'insufficient_data' => 0,
             'mismatches' => 0,
-            'questions' => []
+            'questions' => [],
         ];
 
         foreach ($questions as $question) {
@@ -169,7 +177,7 @@ class difficulty_calibrator {
         return [
             'attempt_count' => (int)($stats->attempt_count ?? 0),
             'correct_count' => (int)($stats->correct_count ?? 0),
-            'partial_correct_count' => (int)($stats->partial_correct_count ?? 0)
+            'partial_correct_count' => (int)($stats->partial_correct_count ?? 0),
         ];
     }
 
@@ -309,7 +317,7 @@ class difficulty_calibrator {
             return [
                 'type' => 'insufficient_data',
                 'message' => 'Need more attempts for calibration',
-                'actions' => []
+                'actions' => [],
             ];
         }
 
@@ -326,8 +334,8 @@ class difficulty_calibrator {
                     'Add more complex distractors',
                     'Increase cognitive level (Bloom\'s)',
                     'Add time pressure',
-                    'Consider removing obvious incorrect answers'
-                ]
+                    'Consider removing obvious incorrect answers',
+                ],
             ];
         } else if ($rate < 10) {
             $recommendations[] = [
@@ -338,8 +346,8 @@ class difficulty_calibrator {
                     'Simplify question wording',
                     'Remove trick elements',
                     'Check if content was covered adequately',
-                    'Consider providing hints'
-                ]
+                    'Consider providing hints',
+                ],
             ];
         }
 
@@ -354,8 +362,8 @@ class difficulty_calibrator {
                     'Review answer key - may be incorrect',
                     'Check for ambiguous wording',
                     'Look for trick questions',
-                    'Consider removing this question'
-                ]
+                    'Consider removing this question',
+                ],
             ];
         } else if ($disc < 0.2) {
             $recommendations[] = [
@@ -366,8 +374,8 @@ class difficulty_calibrator {
                     'Improve distractor quality',
                     'Ensure single clear correct answer',
                     'Check for partial credit issues',
-                    'Review alignment with learning objectives'
-                ]
+                    'Review alignment with learning objectives',
+                ],
             ];
         }
 
@@ -376,14 +384,16 @@ class difficulty_calibrator {
             $recommendations[] = [
                 'issue' => 'difficulty_mismatch',
                 'severity' => 'low',
-                'message' => sprintf('Actual difficulty (%s) differs from intended (%s)',
+                'message' => sprintf(
+                    'Actual difficulty (%s) differs from intended (%s)',
                     $calibration['actual_difficulty'],
-                    $calibration['original_difficulty']),
+                    $calibration['original_difficulty']
+                ),
                 'suggestions' => [
                     'Update difficulty classification',
                     'Adjust question or adjust expectations',
-                    'Review learning materials coverage'
-                ]
+                    'Review learning materials coverage',
+                ],
             ];
         }
 
@@ -396,7 +406,7 @@ class difficulty_calibrator {
             'calibration' => $calibration,
             'recommendations' => $recommendations,
             'overall_status' => empty($recommendations) ? 'excellent' :
-                (count($recommendations) > 2 ? 'needs_improvement' : 'good')
+                (count($recommendations) > 2 ? 'needs_improvement' : 'good'),
         ];
     }
 
@@ -417,10 +427,10 @@ class difficulty_calibrator {
                 'difficulty_mismatches' => $calibration['mismatches'],
                 'calibration_rate' => $calibration['total'] > 0
                     ? round($calibration['calibrated'] / $calibration['total'] * 100, 1)
-                    : 0
+                    : 0,
             ],
             'questions' => [],
-            'recommendations' => []
+            'recommendations' => [],
         ];
 
         // Analyze each question.
@@ -428,7 +438,7 @@ class difficulty_calibrator {
             if ($data['calibrated']) {
                 $report['questions'][$qid] = [
                     'calibration' => $data,
-                    'recommendations' => self::get_recommendations($data['questionid'] ?? 0)
+                    'recommendations' => self::get_recommendations($data['questionid'] ?? 0),
                 ];
             }
         }
@@ -450,7 +460,7 @@ class difficulty_calibrator {
             'quality_rating' => self::calculate_overall_quality_rating($calibration),
             'poor_quality_count' => $poorquality,
             'needs_review_count' => $needsreview,
-            'action_required' => $poorquality > 0 || $needsreview > 2
+            'action_required' => $poorquality > 0 || $needsreview > 2,
         ];
 
         return $report;

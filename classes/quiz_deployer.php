@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Quiz deployer page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Quiz deployment engine for the AI Quiz Generator plugin.
  *
@@ -40,7 +47,6 @@ require_once($CFG->dirroot . '/mod/quiz/locallib.php');
  * Quiz deployer class.
  */
 class quiz_deployer {
-
     /**
      * Deploy questions to question bank.
      *
@@ -63,8 +69,12 @@ class quiz_deployer {
             $category = self::get_or_create_category($courseid, $categoryname);
             debugging("DEBUG deploy_to_question_bank: Got/created category ID: " . $category->id, DEBUG_DEVELOPER);
         } catch (\Exception $e) {
-            throw new \moodle_exception('error:deployment', 'local_hlai_quizgen', '',
-                "Failed to create/get question category: " . $e->getMessage());
+            throw new \moodle_exception(
+                'error:deployment',
+                'local_hlai_quizgen',
+                '',
+                "Failed to create/get question category: " . $e->getMessage()
+            );
         }
 
         $deployedids = [];
@@ -103,7 +113,6 @@ class quiz_deployer {
                     // Logging failure shouldn't stop deployment.
                     debugging("DEBUG deploy_to_question_bank: Warning - log_action failed: " . $logex->getMessage(), DEBUG_DEVELOPER);
                 }
-
             } catch (\Exception $e) {
                 $errormsg = "Question $questionid: " . $e->getMessage();
                 debugging("DEBUG deploy_to_question_bank: ERROR - $errormsg", DEBUG_DEVELOPER);
@@ -276,8 +285,12 @@ class quiz_deployer {
 
         // Ensure context is valid and has a proper ID.
         if (empty($context->id) || $context->id <= 0) {
-            throw new \moodle_exception('error:deployment', 'local_hlai_quizgen', '',
-                "Invalid course context for course ID: $courseid");
+            throw new \moodle_exception(
+                'error:deployment',
+                'local_hlai_quizgen',
+                '',
+                "Invalid course context for course ID: $courseid"
+            );
         }
 
         // Verify the context record exists in the database.
@@ -315,8 +328,8 @@ class quiz_deployer {
         if (!empty($topcategories)) {
             $topcategory = reset($topcategories);
         } else {
-            // Create top category using Moodle's question_get_default_category if available,
-            // otherwise create it manually for course context.
+            // Create top category using Moodle's question_get_default_category if available,.
+            // Otherwise create it manually for course context.
             // Note: question_get_default_category creates a "Default for" category.
             $topcategory = question_get_default_category($context->id);
             if (!$topcategory) {
@@ -374,9 +387,11 @@ class quiz_deployer {
         global $DB, $USER, $CFG;
 
         // DEBUG: Log the start of question conversion.
-        debugging("DEBUG: Starting convert_to_moodle_question for genquestion ID: " .
+        debugging(
+            "DEBUG: Starting convert_to_moodle_question for genquestion ID: " .
             ($genquestion->id ?? 'unknown') . ", type: " . ($genquestion->questiontype ?? 'unknown'),
-            DEBUG_DEVELOPER);
+            DEBUG_DEVELOPER
+        );
 
         // Check Moodle version to determine which fields to use.
         // Moodle 4.0+ removed 'category' from question table, uses question_bank_entries instead.
@@ -402,15 +417,15 @@ class quiz_deployer {
 
         $question->parent = 0;
 
-        // Format question name: Extract clean text snippet for better readability
+        // Format question name: Extract clean text snippet for better readability.
         $questionsnippet = strip_tags($genquestion->questiontext ?? '');
         $questionsnippet = preg_replace('/\s+/', ' ', $questionsnippet); // Remove extra whitespace
         $questionsnippet = trim($questionsnippet);
 
         if (!empty($categoryname)) {
-            // Remove " - AI Generated Questions" suffix for cleaner display
+            // Remove " - AI Generated Questions" suffix for cleaner display.
             $cleanname = str_replace(' - AI Generated Questions', '', $categoryname);
-            // Format: "Quiz Name: Q1 - Question snippet"
+            // Format: "Quiz Name: Q1 - Question snippet".
             $question->name = $cleanname . ': Q' . $questionnumber . ' - ' . substr($questionsnippet, 0, 60);
         } else {
             $question->name = substr($questionsnippet, 0, 100) . '...';
@@ -450,9 +465,13 @@ class quiz_deployer {
             $questionid = $DB->insert_record('question', $question);
             debugging("DEBUG: Successfully inserted question, ID: $questionid", DEBUG_DEVELOPER);
         } catch (\Exception $e) {
-            throw new \moodle_exception('error:deployment', 'local_hlai_quizgen', '',
+            throw new \moodle_exception(
+                'error:deployment',
+                'local_hlai_quizgen',
+                '',
                 "STEP 1 FAILED - Insert into 'question' table failed: " . $e->getMessage() .
-                " | Question data: " . json_encode($question));
+                " | Question data: " . json_encode($question)
+            );
         }
 
         // Create question bank entry and version for Moodle 4.x.
@@ -467,9 +486,13 @@ class quiz_deployer {
             $entryid = $DB->insert_record('question_bank_entries', $qbentry);
             debugging("DEBUG: Successfully inserted question_bank_entries, ID: $entryid", DEBUG_DEVELOPER);
         } catch (\Exception $e) {
-            throw new \moodle_exception('error:deployment', 'local_hlai_quizgen', '',
+            throw new \moodle_exception(
+                'error:deployment',
+                'local_hlai_quizgen',
+                '',
                 "STEP 2 FAILED - Insert into 'question_bank_entries' table failed: " . $e->getMessage() .
-                " | Entry data: " . json_encode($qbentry));
+                " | Entry data: " . json_encode($qbentry)
+            );
         }
 
         $qversion = new \stdClass();
@@ -482,9 +505,13 @@ class quiz_deployer {
             $DB->insert_record('question_versions', $qversion);
             debugging("DEBUG: Successfully inserted question_versions", DEBUG_DEVELOPER);
         } catch (\Exception $e) {
-            throw new \moodle_exception('error:deployment', 'local_hlai_quizgen', '',
+            throw new \moodle_exception(
+                'error:deployment',
+                'local_hlai_quizgen',
+                '',
                 "STEP 3 FAILED - Insert into 'question_versions' table failed: " . $e->getMessage() .
-                " | Version data: " . json_encode($qversion));
+                " | Version data: " . json_encode($qversion)
+            );
         }
 
         // Type-specific data.
@@ -513,8 +540,12 @@ class quiz_deployer {
             }
             debugging("DEBUG: Successfully added type-specific data", DEBUG_DEVELOPER);
         } catch (\Exception $e) {
-            throw new \moodle_exception('error:deployment', 'local_hlai_quizgen', '',
-                "STEP 4 FAILED - Adding type-specific data for '" . $genquestion->questiontype . "' failed: " . $e->getMessage());
+            throw new \moodle_exception(
+                'error:deployment',
+                'local_hlai_quizgen',
+                '',
+                "STEP 4 FAILED - Adding type-specific data for '" . $genquestion->questiontype . "' failed: " . $e->getMessage()
+            );
         }
 
         // Add question tags for better organization and filtering.

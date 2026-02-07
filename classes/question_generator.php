@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Question generator page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Question generator for the AI Quiz Generator plugin.
  *
@@ -37,14 +44,16 @@ defined('MOODLE_INTERNAL') || die();
  * Question generator class.
  */
 class question_generator {
-
     /** @var array Supported question types */
+    /** QUESTION_TYPES constant. */
     const QUESTION_TYPES = ['multichoice', 'truefalse', 'shortanswer', 'essay', 'matching', 'scenario'];
 
     /** @var array Difficulty levels */
+    /** DIFFICULTY_LEVELS constant. */
     const DIFFICULTY_LEVELS = ['easy', 'medium', 'hard'];
 
     /** @var array Bloom's taxonomy levels */
+    /** BLOOMS_LEVELS constant. */
     const BLOOMS_LEVELS = ['remember', 'understand', 'apply', 'analyze', 'evaluate', 'create'];
 
     /**
@@ -104,6 +113,14 @@ class question_generator {
     /** @var array Static cache for content to avoid repeated fetching */
     private static $contentcache = [];
 
+    /**
+     * Generate questions for a given topic.
+     *
+     * @param string $topic The topic to generate questions for.
+     * @param int $count Number of questions to generate.
+     * @param array $options Additional options for generation.
+     * @return array Generated questions.
+     */
     public static function generate_for_topic(int $topicid, int $requestid, array $config): array {
         global $DB;
 
@@ -134,7 +151,7 @@ class question_generator {
             \local_hlai_quizgen\debug_logger::debug('Content extracted for request', [
                 'request_id' => $requestid,
                 'content_length' => strlen(self::$contentcache[$cachekey]),
-                'content_preview' => substr(self::$contentcache[$cachekey], 0, 200)
+                'content_preview' => substr(self::$contentcache[$cachekey], 0, 200),
             ], $requestid);
         }
 
@@ -160,7 +177,7 @@ class question_generator {
         $totalprompt = 0;
         $totalresponse = 0;
 
-        // Get global question index (tracks across all topics)
+        // Get global question index (tracks across all topics).
         $globalindex = $config['global_question_index'] ?? 0;
 
         // OPTIMIZATION: Generate in batches to reduce API calls and tokens.
@@ -183,7 +200,7 @@ class question_generator {
                 }
             }
 
-            // Retry up to 2 times if batch fails
+            // Retry up to 2 times if batch fails.
             $maxretries = 2;
             $batchsuccess = false;
 
@@ -211,7 +228,6 @@ class question_generator {
                     }
 
                     $batchsuccess = true;
-
                 } catch (\Exception $e) {
                     if ($retry >= $maxretries) {
                         // Final retry failed - log error and continue.
@@ -273,17 +289,18 @@ class question_generator {
         $count = count($types);
         $requestid = $config['requestid'] ?? ($topic->requestid ?? 0);
 
-        // Get distributions from config
+        // Get distributions from config.
         $difficultydist = $config['difficulty_distribution'] ?? ['easy' => 20, 'medium' => 60, 'hard' => 20];
         $bloomsdist = $config['blooms_distribution'] ?? [
             'remember' => 20, 'understand' => 25, 'apply' => 25,
-            'analyze' => 15, 'evaluate' => 10, 'create' => 5
+            'analyze' => 15, 'evaluate' => 10, 'create' => 5,
         ];
 
         // DEDUPLICATION: Get previously generated questions for this request.
         $existingquestions = [];
         if ($requestid > 0) {
-            $existingrecords = $DB->get_records('hlai_quizgen_questions',
+            $existingrecords = $DB->get_records(
+                'hlai_quizgen_questions',
                 ['requestid' => $requestid],
                 'id ASC',
                 'id, questiontext'
@@ -323,14 +340,14 @@ class question_generator {
             'topic_title' => $topic->title,
             'payload_content_length' => strlen($payload['topic_content']),
             'num_questions' => count($types),
-            'quality' => $quality
+            'quality' => $quality,
         ], $requestid);
 
         // Call gateway for question generation.
         $response = gateway_client::generate_questions($payload, $quality);
 
         \local_hlai_quizgen\debug_logger::debug('Gateway response received', [
-            'questions_returned' => count($response['questions'] ?? [])
+            'questions_returned' => count($response['questions'] ?? []),
         ], $requestid);
 
         // Extract questions and tokens from response.
@@ -387,8 +404,13 @@ class question_generator {
         $data = json_decode($response, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \moodle_exception('error:questiongeneration', 'local_hlai_quizgen', '', null,
-                'Failed to parse batch JSON: ' . json_last_error_msg());
+            throw new \moodle_exception(
+                'error:questiongeneration',
+                'local_hlai_quizgen',
+                '',
+                null,
+                'Failed to parse batch JSON: ' . json_last_error_msg()
+            );
         }
 
         // Handle both array of questions and single question wrapped in array.
@@ -538,7 +560,7 @@ class question_generator {
         $record->timecreated = $now;
         $record->timemodified = $now;
 
-        // Include validation scores if present
+        // Include validation scores if present.
         if (isset($question->validation_score)) {
             $record->validation_score = $question->validation_score;
         }
@@ -548,18 +570,33 @@ class question_generator {
 
         // Validate required fields.
         if (empty($record->requestid)) {
-            throw new \moodle_exception('error:missingrequestid', 'local_hlai_quizgen', '', null,
-                'Question must have a request ID before saving. RequestID=' . ($question->requestid ?? 'undefined'));
+            throw new \moodle_exception(
+                'error:missingrequestid',
+                'local_hlai_quizgen',
+                '',
+                null,
+                'Question must have a request ID before saving. RequestID=' . ($question->requestid ?? 'undefined')
+            );
         }
 
         if (empty($record->courseid)) {
-            throw new \moodle_exception('error:missingcourseid', 'local_hlai_quizgen', '', null,
-                'Question must have a course ID before saving. CourseID=' . ($question->courseid ?? 'undefined'));
+            throw new \moodle_exception(
+                'error:missingcourseid',
+                'local_hlai_quizgen',
+                '',
+                null,
+                'Question must have a course ID before saving. CourseID=' . ($question->courseid ?? 'undefined')
+            );
         }
 
         if (empty($record->userid)) {
-            throw new \moodle_exception('error:missinguserid', 'local_hlai_quizgen', '', null,
-                'Question must have a user ID before saving. UserID=' . ($question->userid ?? 'undefined'));
+            throw new \moodle_exception(
+                'error:missinguserid',
+                'local_hlai_quizgen',
+                '',
+                null,
+                'Question must have a user ID before saving. UserID=' . ($question->userid ?? 'undefined')
+            );
         }
 
         $questionid = $DB->insert_record('hlai_quizgen_questions', $record);
@@ -687,6 +724,7 @@ class question_generator {
                     }
                 } catch (\Exception $e) {
                     // Silently skip files that fail to extract.
+                    debugging($e->getMessage(), DEBUG_DEVELOPER);
                 } finally {
                     if (file_exists($filepath)) {
                         @unlink($filepath);
@@ -714,19 +752,20 @@ class question_generator {
                             }
                         } catch (\Exception $e) {
                             // Silently skip activities that fail to extract.
+                            debugging($e->getMessage(), DEBUG_DEVELOPER);
                         }
                     }
                 } else if (strpos($source, 'bulk_scan:') === 0) {
-                    // For bulk scans, get content from all topics' descriptions
+                    // For bulk scans, get content from all topics' descriptions.
                     // DEBUG: Log that we're handling bulk scan
                     \local_hlai_quizgen\debug_logger::debug('Handling bulk_scan content source', [
                         'request_id' => $request->id,
-                        'source' => $source
+                        'source' => $source,
                     ], $request->id);
 
                     $topics = $DB->get_records('hlai_quizgen_topics', ['requestid' => $request->id], 'id ASC');
                     \local_hlai_quizgen\debug_logger::debug('Found topics for bulk scan', [
-                        'topic_count' => count($topics)
+                        'topic_count' => count($topics),
                     ], $request->id);
 
                     foreach ($topics as $topic) {
@@ -741,7 +780,7 @@ class question_generator {
 
                     // DEBUG: Log bulk scan content length
                     \local_hlai_quizgen\debug_logger::debug('Bulk scan content extracted', [
-                        'content_length' => strlen($fullcontent)
+                        'content_length' => strlen($fullcontent),
                     ], $request->id);
                 }
             }

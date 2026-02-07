@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Review workflow page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Collaborative review workflow for question quality assurance.
  *
@@ -30,18 +37,26 @@ defined('MOODLE_INTERNAL') || die();
  * Manages peer review and approval workflows for AI-generated questions.
  */
 class review_workflow {
-
     /** @var array Review statuses */
+    /** STATUS_PENDING constant. */
     const STATUS_PENDING = 'pending_review';
+    /** STATUS_IN_REVIEW constant. */
     const STATUS_IN_REVIEW = 'in_review';
+    /** STATUS_APPROVED constant. */
     const STATUS_APPROVED = 'approved';
+    /** STATUS_REJECTED constant. */
     const STATUS_REJECTED = 'rejected';
+    /** STATUS_NEEDS_REVISION constant. */
     const STATUS_NEEDS_REVISION = 'needs_revision';
+    /** STATUS_REVISED constant. */
     const STATUS_REVISED = 'revised';
 
     /** @var array Review roles */
+    /** ROLE_REVIEWER constant. */
     const ROLE_REVIEWER = 'reviewer';
+    /** ROLE_APPROVER constant. */
     const ROLE_APPROVER = 'approver';
+    /** ROLE_EDITOR constant. */
     const ROLE_EDITOR = 'editor';
 
     /**
@@ -91,7 +106,7 @@ class review_workflow {
             'review_id' => $reviewid,
             'message' => 'Question submitted for review',
             'reviewer' => $reviewerid,
-            'due_date' => $review->due_date
+            'due_date' => $review->due_date,
         ];
     }
 
@@ -152,7 +167,7 @@ class review_workflow {
         return [
             'success' => true,
             'comment_id' => $commentid,
-            'has_ratings' => !empty($ratings)
+            'has_ratings' => !empty($ratings),
         ];
     }
 
@@ -212,9 +227,8 @@ class review_workflow {
                 'decision' => $decision,
                 'review_id' => $reviewid,
                 'question_id' => $review->questionid,
-                'message' => 'Question ' . $decision . 'd successfully'
+                'message' => 'Question ' . $decision . 'd successfully',
             ];
-
         } catch (\Exception $e) {
             $transaction->rollback($e);
             throw $e;
@@ -240,8 +254,12 @@ class review_workflow {
 
         // Update review status.
         $DB->set_field('hlai_quizgen_reviews', 'status', self::STATUS_NEEDS_REVISION, ['id' => $reviewid]);
-        $DB->set_field('hlai_quizgen_questions', 'status', self::STATUS_NEEDS_REVISION,
-            ['id' => $review->questionid]);
+        $DB->set_field(
+            'hlai_quizgen_questions',
+            'status',
+            self::STATUS_NEEDS_REVISION,
+            ['id' => $review->questionid]
+        );
 
         // Store revision issues.
         foreach ($issues as $issue) {
@@ -278,7 +296,7 @@ class review_workflow {
             'success' => true,
             'review_id' => $reviewid,
             'issues_count' => count($issues),
-            'message' => 'Revision requested with ' . count($issues) . ' issue(s)'
+            'message' => 'Revision requested with ' . count($issues) . ' issue(s)',
         ];
     }
 
@@ -301,8 +319,12 @@ class review_workflow {
 
         // Update status.
         $DB->set_field('hlai_quizgen_reviews', 'status', self::STATUS_REVISED, ['id' => $reviewid]);
-        $DB->set_field('hlai_quizgen_questions', 'status', self::STATUS_REVISED,
-            ['id' => $review->questionid]);
+        $DB->set_field(
+            'hlai_quizgen_questions',
+            'status',
+            self::STATUS_REVISED,
+            ['id' => $review->questionid]
+        );
 
         // Log changes.
         $changerecord = new \stdClass();
@@ -315,9 +337,14 @@ class review_workflow {
 
         // Mark addressed issues as resolved.
         if (!empty($changes['resolved_issues'])) {
-            list($insql, $params) = $DB->get_in_or_equal($changes['resolved_issues']);
-            $DB->set_field_select('hlai_quizgen_revision_issues', 'is_resolved', 1,
-                "id $insql", $params);
+            [$insql, $params] = $DB->get_in_or_equal($changes['resolved_issues']);
+            $DB->set_field_select(
+                'hlai_quizgen_revision_issues',
+                'is_resolved',
+                1,
+                "id $insql",
+                $params
+            );
         }
 
         // Add comment.
@@ -339,7 +366,7 @@ class review_workflow {
         return [
             'success' => true,
             'review_id' => $reviewid,
-            'message' => 'Revision submitted successfully'
+            'message' => 'Revision submitted successfully',
         ];
     }
 
@@ -356,7 +383,8 @@ class review_workflow {
         $question = $DB->get_record('hlai_quizgen_questions', ['id' => $review->questionid], '*', MUST_EXIST);
 
         // Get comments.
-        $comments = $DB->get_records('hlai_quizgen_review_comments',
+        $comments = $DB->get_records(
+            'hlai_quizgen_review_comments',
             ['reviewid' => $reviewid],
             'timecreated ASC'
         );
@@ -365,13 +393,15 @@ class review_workflow {
         $ratings = $DB->get_records('hlai_quizgen_review_ratings', ['reviewid' => $reviewid]);
 
         // Get issues if any.
-        $issues = $DB->get_records('hlai_quizgen_revision_issues',
+        $issues = $DB->get_records(
+            'hlai_quizgen_revision_issues',
             ['reviewid' => $reviewid],
             'timecreated DESC'
         );
 
         // Get revision history.
-        $revisions = $DB->get_records('hlai_quizgen_revisions',
+        $revisions = $DB->get_records(
+            'hlai_quizgen_revisions',
             ['reviewid' => $reviewid],
             'timecreated DESC'
         );
@@ -387,7 +417,7 @@ class review_workflow {
             'issues' => array_values($issues),
             'revisions' => array_values($revisions),
             'metrics' => $metrics,
-            'timeline' => self::build_review_timeline($reviewid)
+            'timeline' => self::build_review_timeline($reviewid),
         ];
     }
 
@@ -412,7 +442,7 @@ class review_workflow {
         $reviews = $DB->get_records_sql($sql, [
             $userid,
             self::STATUS_PENDING,
-            self::STATUS_IN_REVIEW
+            self::STATUS_IN_REVIEW,
         ]);
 
         foreach ($reviews as $review) {
@@ -436,12 +466,16 @@ class review_workflow {
 
         $metrics = [
             'total_comments' => $DB->count_records('hlai_quizgen_review_comments', ['reviewid' => $reviewid]),
-            'unresolved_comments' => $DB->count_records('hlai_quizgen_review_comments',
-                ['reviewid' => $reviewid, 'is_resolved' => 0]),
+            'unresolved_comments' => $DB->count_records(
+                'hlai_quizgen_review_comments',
+                ['reviewid' => $reviewid, 'is_resolved' => 0]
+            ),
             'total_issues' => $DB->count_records('hlai_quizgen_revision_issues', ['reviewid' => $reviewid]),
-            'resolved_issues' => $DB->count_records('hlai_quizgen_revision_issues',
-                ['reviewid' => $reviewid, 'is_resolved' => 1]),
-            'revision_count' => $DB->count_records('hlai_quizgen_revisions', ['reviewid' => $reviewid])
+            'resolved_issues' => $DB->count_records(
+                'hlai_quizgen_revision_issues',
+                ['reviewid' => $reviewid, 'is_resolved' => 1]
+            ),
+            'revision_count' => $DB->count_records('hlai_quizgen_revisions', ['reviewid' => $reviewid]),
         ];
 
         // Average ratings.
@@ -462,7 +496,7 @@ class review_workflow {
                 'difficulty' => round($avgratings->avg_difficulty ?? 0, 1),
                 'pedagogical_value' => round($avgratings->avg_pedagogical ?? 0, 1),
                 'distractor_quality' => round($avgratings->avg_distractor ?? 0, 1),
-                'overall' => round($avgratings->avg_overall ?? 0, 1)
+                'overall' => round($avgratings->avg_overall ?? 0, 1),
             ];
         }
 
@@ -511,8 +545,11 @@ class review_workflow {
         global $DB;
 
         $request = $DB->get_record('hlai_quizgen_requests', ['id' => $requestid]);
-        return $request && ($request->userid == $userid || has_capability('local/hlai_quizgen:managequestions',
-            \context_course::instance($request->courseid), $userid));
+        return $request && ($request->userid == $userid || has_capability(
+            'local/hlai_quizgen:managequestions',
+            \context_course::instance($request->courseid),
+            $userid
+        ));
     }
 
     /**
@@ -527,8 +564,11 @@ class review_workflow {
 
         $review = $DB->get_record('hlai_quizgen_reviews', ['id' => $reviewid]);
         return $review && ($review->reviewerid == $userid ||
-            has_capability('local/hlai_quizgen:reviewquestions',
-                \context_system::instance(), $userid));
+            has_capability(
+                'local/hlai_quizgen:reviewquestions',
+                \context_system::instance(),
+                $userid
+            ));
     }
 
     /**
@@ -539,8 +579,11 @@ class review_workflow {
      * @return bool
      */
     private static function can_approve(int $reviewid, int $userid): bool {
-        return has_capability('local/hlai_quizgen:approvequestions',
-            \context_system::instance(), $userid);
+        return has_capability(
+            'local/hlai_quizgen:approvequestions',
+            \context_system::instance(),
+            $userid
+        );
     }
 
     /**
@@ -560,8 +603,11 @@ class review_workflow {
 
         $request = $DB->get_record('hlai_quizgen_requests', ['id' => $question->requestid]);
         return $request && ($request->userid == $userid ||
-            has_capability('local/hlai_quizgen:editquestions',
-                \context_course::instance($request->courseid), $userid));
+            has_capability(
+                'local/hlai_quizgen:editquestions',
+                \context_course::instance($request->courseid),
+                $userid
+            ));
     }
 
     /**

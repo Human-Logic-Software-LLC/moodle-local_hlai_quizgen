@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Settings page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Settings for the Human Logic AI Quiz Generator plugin.
  *
@@ -25,7 +32,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
-    // Create settings page
+    // Create settings page.
     $settings = new admin_settingpage('local_hlai_quizgen', get_string('pluginname', 'local_hlai_quizgen'));
 
     // Check gateway availability.
@@ -232,7 +239,7 @@ if ($hassiteconfig) {
         'local_hlai_quizgen/health_check_token',
         get_string('health_check_token', 'local_hlai_quizgen'),
         get_string('health_check_token_desc', 'local_hlai_quizgen'),
-        bin2hex(random_bytes(16)),  // Generate random token
+        bin2hex(random_bytes(16)), // Generate random token
         PARAM_ALPHANUMEXT
     ));
 
@@ -245,10 +252,10 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
-    // Add settings page directly to localplugins (like hlai_grading)
+    // Add settings page directly to localplugins (like hlai_grading).
     $ADMIN->add('localplugins', $settings);
 
-    // Add admin dashboard page directly to localplugins
+    // Add admin dashboard page directly to localplugins.
     $ADMIN->add('localplugins', new admin_externalpage(
         'local_hlai_quizgen_admin',
         get_string('admin_dashboard', 'local_hlai_quizgen'),

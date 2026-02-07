@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Learning outcome mapper page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Learning outcome alignment and mapping.
  *
@@ -30,25 +37,26 @@ defined('MOODLE_INTERNAL') || die();
  * Aligns questions with learning outcomes and competencies.
  */
 class learning_outcome_mapper {
-
     /** Bloom's taxonomy levels. */
+    /** BLOOMS_LEVELS constant. */
     const BLOOMS_LEVELS = [
         'remember' => 1,
         'understand' => 2,
         'apply' => 3,
         'analyze' => 4,
         'evaluate' => 5,
-        'create' => 6
+        'create' => 6,
     ];
 
     /** Common action verbs for each Bloom's level. */
+    /** BLOOMS_VERBS constant. */
     const BLOOMS_VERBS = [
         'remember' => ['define', 'list', 'recall', 'identify', 'name', 'state', 'describe'],
         'understand' => ['explain', 'summarize', 'interpret', 'classify', 'compare', 'exemplify'],
         'apply' => ['use', 'demonstrate', 'implement', 'solve', 'execute', 'operate'],
         'analyze' => ['differentiate', 'organize', 'attribute', 'deconstruct', 'examine'],
         'evaluate' => ['check', 'critique', 'judge', 'test', 'assess', 'appraise'],
-        'create' => ['design', 'construct', 'produce', 'invent', 'develop', 'formulate']
+        'create' => ['design', 'construct', 'produce', 'invent', 'develop', 'formulate'],
     ];
 
     /**
@@ -74,11 +82,12 @@ class learning_outcome_mapper {
                         'shortname' => $competency->get('shortname'),
                         'description' => $competency->get('description'),
                         'idnumber' => $competency->get('idnumber'),
-                        'source' => 'moodle_competency'
+                        'source' => 'moodle_competency',
                     ];
                 }
             } catch (\Exception $e) {
                 // Competencies not available.
+                debugging($e->getMessage(), DEBUG_DEVELOPER);
             }
         }
 
@@ -118,7 +127,7 @@ class learning_outcome_mapper {
             '/(?:students? (?:will|should|can|able to))\s+([^.]+)/i',
             '/(?:learning outcomes?:)\s*([^.]+)/i',
             '/(?:objectives?:)\s*([^.]+)/i',
-            '/(?:by the end|upon completion).*?students?\s+(?:will|should)\s+([^.]+)/i'
+            '/(?:by the end|upon completion).*?students?\s+(?:will|should)\s+([^.]+)/i',
         ];
 
         foreach ($patterns as $pattern) {
@@ -131,7 +140,7 @@ class learning_outcome_mapper {
                             'type' => 'extracted',
                             'description' => $outcome,
                             'blooms_level' => $blooms,
-                            'source' => 'text_extraction'
+                            'source' => 'text_extraction',
                         ];
                     }
                 }
@@ -184,7 +193,7 @@ class learning_outcome_mapper {
             return [
                 'mapped' => false,
                 'reason' => 'no_outcomes_defined',
-                'suggestion' => 'Define learning outcomes in course settings'
+                'suggestion' => 'Define learning outcomes in course settings',
             ];
         }
 
@@ -206,13 +215,13 @@ class learning_outcome_mapper {
                 $matches[] = [
                     'outcome' => $outcome,
                     'alignment_score' => $score,
-                    'confidence' => self::score_to_confidence($score)
+                    'confidence' => self::score_to_confidence($score),
                 ];
             }
         }
 
         // Sort by score.
-        usort($matches, function($a, $b) {
+        usort($matches, function ($a, $b) {
             return $b['alignment_score'] <=> $a['alignment_score'];
         });
 
@@ -228,8 +237,10 @@ class learning_outcome_mapper {
             $mapping->timecreated = time();
 
             // Check if mapping exists.
-            $existing = $DB->get_record('hlai_quizgen_outcome_map',
-                ['questionid' => $questionid]);
+            $existing = $DB->get_record(
+                'hlai_quizgen_outcome_map',
+                ['questionid' => $questionid]
+            );
 
             if ($existing) {
                 $mapping->id = $existing->id;
@@ -244,7 +255,7 @@ class learning_outcome_mapper {
             'question_blooms' => $questionblooms,
             'matches' => array_slice($matches, 0, 5), // Top 5.
             'total_outcomes' => count($outcomes),
-            'total_matches' => count($matches)
+            'total_matches' => count($matches),
         ];
     }
 
@@ -322,7 +333,7 @@ class learning_outcome_mapper {
                       'to', 'for', 'of', 'with', 'is', 'are', 'was', 'were'];
 
         $words = preg_split('/\W+/', $text);
-        $words = array_filter($words, function($word) use ($stopwords) {
+        $words = array_filter($words, function ($word) use ($stopwords) {
             return strlen($word) > 2 && !in_array($word, $stopwords);
         });
 
@@ -366,7 +377,7 @@ class learning_outcome_mapper {
             'outcome_coverage' => [],
             'uncovered_outcomes' => [],
             'coverage_percentage' => 0,
-            'blooms_distribution' => []
+            'blooms_distribution' => [],
         ];
 
         // Map all questions.
@@ -386,7 +397,7 @@ class learning_outcome_mapper {
                 $coveredoutcomes[$outcomeid] = [
                     'outcome' => $match['outcome'],
                     'questions' => [],
-                    'avg_confidence' => 0
+                    'avg_confidence' => 0,
                 ];
             }
             $coveredoutcomes[$outcomeid]['questions'][] = $qid;
@@ -448,7 +459,7 @@ class learning_outcome_mapper {
                 'outcome' => $outcome,
                 'suggested_blooms' => $outcome['blooms_level'] ?? 'understand',
                 'suggested_count' => 2,
-                'rationale' => 'No questions currently assess this outcome'
+                'rationale' => 'No questions currently assess this outcome',
             ];
         }
 
@@ -459,13 +470,13 @@ class learning_outcome_mapper {
             $percentage = $total > 0 ? ($current / $total) * 100 : 0;
 
             // Target distribution: more lower levels, fewer higher levels.
-            $target = match($order) {
+            $target = match ($order) {
                 1 => 15, // Remember 15%
                 2 => 25, // Understand 25%
                 3 => 30, // Apply 30%
                 4 => 20, // Analyze 20%
-                5 => 7,  // Evaluate 7%
-                6 => 3,  // Create 3%
+                5 => 7, // Evaluate 7%
+                6 => 3, // Create 3%
                 default => 15
             };
 
@@ -478,13 +489,13 @@ class learning_outcome_mapper {
                     'current_percentage' => round($percentage, 1),
                     'target_percentage' => $target,
                     'suggested_count' => ceil(($diff / 100) * $total),
-                    'rationale' => "Increase $level level questions to balance assessment"
+                    'rationale' => "Increase $level level questions to balance assessment",
                 ];
             }
         }
 
         // Sort by priority.
-        usort($suggestions, function($a, $b) {
+        usort($suggestions, function ($a, $b) {
             $priority = ['high' => 3, 'medium' => 2, 'low' => 1];
             return ($priority[$b['priority']] ?? 0) <=> ($priority[$a['priority']] ?? 0);
         });
@@ -492,7 +503,7 @@ class learning_outcome_mapper {
         return [
             'coverage_status' => $report['coverage_percentage'],
             'suggestions' => $suggestions,
-            'total_suggested_questions' => array_sum(array_column($suggestions, 'suggested_count'))
+            'total_suggested_questions' => array_sum(array_column($suggestions, 'suggested_count')),
         ];
     }
 }

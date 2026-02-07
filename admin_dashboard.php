@@ -1,19 +1,28 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Admin dashboard page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+// phpcs:disable moodle.Commenting.MissingDocblock.File
+// phpcs:disable moodle.Commenting.FileExpectedTags
 /**
  * AI Quiz Generator - Site Admin Dashboard
  *
@@ -28,66 +37,66 @@
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
-// Require admin login
+// Require admin login.
 admin_externalpage_setup('local_hlai_quizgen_admin');
 
 $context = context_system::instance();
 require_capability('moodle/site:config', $context);
 
-// Page setup
+// Page setup.
 $PAGE->set_url(new moodle_url('/local/hlai_quizgen/admin_dashboard.php'));
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title(get_string('admin_dashboard_title', 'local_hlai_quizgen'));
 $PAGE->set_heading(get_string('admin_dashboard_heading', 'local_hlai_quizgen'));
 
-// Add Bulma CSS Framework
+// Add Bulma CSS Framework.
 $PAGE->requires->css('/local/hlai_quizgen/bulma.css');
 $PAGE->requires->css('/local/hlai_quizgen/styles-bulma.css');
 
-// Add ApexCharts
+// Add ApexCharts.
 $PAGE->requires->js(new moodle_url('/local/hlai_quizgen/apexcharts.js'), true);
 
-// ================= SITE-WIDE DATA COLLECTION =================
+// ================= SITE-WIDE DATA COLLECTION =================.
 
-// 1. Site-Wide Overview Statistics
-$total_questions_generated = $DB->count_records('hlai_quizgen_questions');
-$total_quizzes_created = $DB->count_records('hlai_quizgen_requests', ['status' => 'completed']);
+// 1. Site-Wide Overview Statistics.
+$totalquestionsgenerated = $DB->count_records('hlai_quizgen_questions');
+$totalquizzescreated = $DB->count_records('hlai_quizgen_requests', ['status' => 'completed']);
 
-$active_teachers = $DB->count_records_sql(
+$activeteachers = $DB->count_records_sql(
     "SELECT COUNT(DISTINCT userid) FROM {hlai_quizgen_requests}",
     []
 );
 
-$active_courses = $DB->count_records_sql(
+$activecourses = $DB->count_records_sql(
     "SELECT COUNT(DISTINCT courseid) FROM {hlai_quizgen_requests}",
     []
 );
 
-$avg_quality_score = $DB->get_field_sql(
+$avgqualityscore = $DB->get_field_sql(
     "SELECT AVG(validation_score) FROM {hlai_quizgen_questions}
      WHERE validation_score IS NOT NULL AND validation_score > 0",
     []
 );
-$avg_quality_score = $avg_quality_score ? round($avg_quality_score, 1) : 'N/A';
+$avgqualityscore = $avgqualityscore ? round($avgqualityscore, 1) : 'N/A';
 
-// Site-wide FTAR calculation
-$total_approved = $DB->count_records_sql(
+// Site-wide FTAR calculation.
+$totalapproved = $DB->count_records_sql(
     "SELECT COUNT(*) FROM {hlai_quizgen_questions}
      WHERE status IN ('approved', 'deployed')",
     []
 );
 
-$total_reviewed = $DB->count_records_sql(
+$totalreviewed = $DB->count_records_sql(
     "SELECT COUNT(*) FROM {hlai_quizgen_questions}
      WHERE status IN ('approved', 'rejected', 'deployed')",
     []
 );
 
-$site_ftar = $total_reviewed > 0 ? round(($total_approved / $total_reviewed) * 100, 1) : 0;
+$siteftar = $totalreviewed > 0 ? round(($totalapproved / $totalreviewed) * 100, 1) : 0;
 
-// 2. Adoption Metrics
-$total_users_with_capability = $DB->count_records_sql(
+// 2. Adoption Metrics.
+$totaluserswithcapability = $DB->count_records_sql(
     "SELECT COUNT(DISTINCT ra.userid)
      FROM {role_assignments} ra
      JOIN {role_capabilities} rc ON rc.roleid = ra.roleid
@@ -96,45 +105,45 @@ $total_users_with_capability = $DB->count_records_sql(
     ['local/hlai_quizgen:generatequestions']
 );
 
-$adoption_rate = $total_users_with_capability > 0
-    ? round(($active_teachers / $total_users_with_capability) * 100, 1)
+$adoptionrate = $totaluserswithcapability > 0
+    ? round(($activeteachers / $totaluserswithcapability) * 100, 1)
     : 0;
 
-// Count all courses except site course (id = 1)
-$total_courses = $DB->count_records_select('course', 'id > ?', [1]);
-$course_coverage = $total_courses > 0
-    ? round(($active_courses / $total_courses) * 100, 1)
+// Count all courses except site course (id = 1).
+$totalcourses = $DB->count_records_select('course', 'id > ?', [1]);
+$coursecoverage = $totalcourses > 0
+    ? round(($activecourses / $totalcourses) * 100, 1)
     : 0;
 
-// 3. Usage Trends (Last 30 days) - Use PHP for date grouping for database compatibility
-$thirty_days_ago = time() - (30 * 24 * 60 * 60);
-$raw_usage_data = $DB->get_records_sql(
+// 3. Usage Trends (Last 30 days) - Use PHP for date grouping for database compatibility.
+$thirtydaysago = time() - (30 * 24 * 60 * 60);
+$rawusagedata = $DB->get_records_sql(
     "SELECT timecreated FROM {hlai_quizgen_questions} WHERE timecreated >= ?",
-    [$thirty_days_ago]
+    [$thirtydaysago]
 );
 
-// Group by date in PHP for database compatibility
-$usage_by_date = [];
-foreach ($raw_usage_data as $row) {
+// Group by date in PHP for database compatibility.
+$usagebydate = [];
+foreach ($rawusagedata as $row) {
     $date = date('Y-m-d', $row->timecreated);
-    if (!isset($usage_by_date[$date])) {
-        $usage_by_date[$date] = 0;
+    if (!isset($usagebydate[$date])) {
+        $usagebydate[$date] = 0;
     }
-    $usage_by_date[$date]++;
+    $usagebydate[$date]++;
 }
-ksort($usage_by_date);
+ksort($usagebydate);
 
-// Convert to object array format
-$usage_trend_data = [];
-foreach ($usage_by_date as $date => $count) {
+// Convert to object array format.
+$usagetrenddata = [];
+foreach ($usagebydate as $date => $count) {
     $obj = new stdClass();
     $obj->date = $date;
     $obj->count = $count;
-    $usage_trend_data[] = $obj;
+    $usagetrenddata[] = $obj;
 }
 
-// 4. Question Type Distribution (Site-Wide)
-$question_type_stats = $DB->get_records_sql(
+// 4. Question Type Distribution (Site-Wide).
+$questiontypestats = $DB->get_records_sql(
     "SELECT questiontype, COUNT(*) as count
      FROM {hlai_quizgen_questions}
      WHERE status IN ('approved', 'deployed')
@@ -143,8 +152,8 @@ $question_type_stats = $DB->get_records_sql(
     []
 );
 
-// 5. Difficulty Distribution (Site-Wide)
-$difficulty_stats = $DB->get_records_sql(
+// 5. Difficulty Distribution (Site-Wide).
+$difficultystats = $DB->get_records_sql(
     "SELECT difficulty, COUNT(*) as count
      FROM {hlai_quizgen_questions}
      WHERE status IN ('approved', 'deployed')
@@ -152,8 +161,8 @@ $difficulty_stats = $DB->get_records_sql(
     []
 );
 
-// 6. Bloom's Taxonomy Distribution (Site-Wide)
-$blooms_stats = $DB->get_records_sql(
+// 6. Bloom's Taxonomy Distribution (Site-Wide).
+$bloomsstats = $DB->get_records_sql(
     "SELECT blooms_level, COUNT(*) as count
      FROM {hlai_quizgen_questions}
      WHERE status IN ('approved', 'deployed') AND blooms_level IS NOT NULL
@@ -161,8 +170,8 @@ $blooms_stats = $DB->get_records_sql(
     []
 );
 
-// 7. Top Performers - Courses
-$top_courses = $DB->get_records_sql(
+// 7. Top Performers - Courses.
+$topcourses = $DB->get_records_sql(
     "SELECT c.id, c.fullname, COUNT(q.id) as question_count
      FROM {hlai_quizgen_questions} q
      JOIN {course} c ON q.courseid = c.id
@@ -173,8 +182,8 @@ $top_courses = $DB->get_records_sql(
     []
 );
 
-// 8. Top Performers - Teachers
-$top_teachers = $DB->get_records_sql(
+// 8. Top Performers - Teachers.
+$topteachers = $DB->get_records_sql(
     "SELECT u.id, u.firstname, u.lastname,
             COUNT(*) as total_questions,
             SUM(CASE WHEN q.status IN ('approved', 'deployed') THEN 1 ELSE 0 END) as approved_questions,
@@ -189,23 +198,23 @@ $top_teachers = $DB->get_records_sql(
     []
 );
 
-// 9. System Health Checks
-$pending_generations = $DB->count_records('hlai_quizgen_requests', ['status' => 'pending']);
-$failed_generations = $DB->count_records('hlai_quizgen_requests', ['status' => 'failed']);
+// 9. System Health Checks.
+$pendinggenerations = $DB->count_records('hlai_quizgen_requests', ['status' => 'pending']);
+$failedgenerations = $DB->count_records('hlai_quizgen_requests', ['status' => 'failed']);
 
-// Recent errors (last 7 days)
-$seven_days_ago = time() - (7 * 24 * 60 * 60);
-$recent_errors = $DB->count_records_sql(
+// Recent errors (last 7 days).
+$sevendaysago = time() - (7 * 24 * 60 * 60);
+$recenterrors = $DB->count_records_sql(
     "SELECT COUNT(*) FROM {hlai_quizgen_requests}
      WHERE status = ? AND timecreated >= ?",
-    ['failed', $seven_days_ago]
+    ['failed', $sevendaysago]
 );
 
-// Check AI provider configuration
-$ai_provider_configured = !empty(get_config('local_hlai_quizgen', 'azure_endpoint'))
+// Check AI provider configuration.
+$aiproviderconfigured = !empty(get_config('local_hlai_quizgen', 'azure_endpoint'))
                          && !empty(get_config('local_hlai_quizgen', 'azure_api_key'));
 
-// ================= OUTPUT HTML =================
+// ================= OUTPUT HTML =================.
 
 echo $OUTPUT->header();
 
@@ -543,7 +552,7 @@ echo $OUTPUT->header();
                     <i class="fa fa-question-circle stat-icon-large"></i>
                 </div>
                 <div class="stat-label">Total Questions Generated</div>
-                <div class="stat-value"><?php echo number_format($total_questions_generated); ?></div>
+                <div class="stat-value"><?php echo number_format($totalquestionsgenerated); ?></div>
             </div>
         </div>
 
@@ -554,7 +563,7 @@ echo $OUTPUT->header();
                     <i class="fa fa-file-text-o stat-icon-large"></i>
                 </div>
                 <div class="stat-label">Total Quizzes Created</div>
-                <div class="stat-value"><?php echo number_format($total_quizzes_created); ?></div>
+                <div class="stat-value"><?php echo number_format($totalquizzescreated); ?></div>
             </div>
         </div>
 
@@ -565,8 +574,8 @@ echo $OUTPUT->header();
                     <i class="fa fa-users stat-icon-large"></i>
                 </div>
                 <div class="stat-label">Active Teachers</div>
-                <div class="stat-value"><?php echo number_format($active_teachers); ?></div>
-                <div class="stat-subtext"><?php echo $adoption_rate; ?>% adoption rate</div>
+                <div class="stat-value"><?php echo number_format($activeteachers); ?></div>
+                <div class="stat-subtext"><?php echo $adoptionrate; ?>% adoption rate</div>
             </div>
         </div>
 
@@ -577,8 +586,8 @@ echo $OUTPUT->header();
                     <i class="fa fa-graduation-cap stat-icon-large"></i>
                 </div>
                 <div class="stat-label">Courses Using Plugin</div>
-                <div class="stat-value"><?php echo number_format($active_courses); ?></div>
-                <div class="stat-subtext"><?php echo $course_coverage; ?>% course coverage</div>
+                <div class="stat-value"><?php echo number_format($activecourses); ?></div>
+                <div class="stat-subtext"><?php echo $coursecoverage; ?>% course coverage</div>
             </div>
         </div>
 
@@ -589,7 +598,7 @@ echo $OUTPUT->header();
                     <i class="fa fa-star stat-icon-large"></i>
                 </div>
                 <div class="stat-label">Avg Quality Score</div>
-                <div class="stat-value"><?php echo $avg_quality_score; ?></div>
+                <div class="stat-value"><?php echo $avgqualityscore; ?></div>
             </div>
         </div>
 
@@ -600,7 +609,7 @@ echo $OUTPUT->header();
                     <i class="fa fa-bullseye stat-icon-large"></i>
                 </div>
                 <div class="stat-label">Site-Wide FTAR</div>
-                <div class="stat-value"><?php echo $site_ftar; ?>%</div>
+                <div class="stat-value"><?php echo $siteftar; ?>%</div>
                 <div class="stat-subtext">First-Time Acceptance Rate</div>
             </div>
         </div>
@@ -673,8 +682,8 @@ echo $OUTPUT->header();
                 <h3 class="chart-title">
                     <i class="fa fa-trophy"></i> Top 10 Courses by Questions Generated
                 </h3>
-                <?php if (!empty($top_courses)): ?>
-                    <?php $rank = 1; foreach ($top_courses as $course): ?>
+                <?php if (!empty($topcourses)) : ?>
+                    <?php $rank = 1; foreach ($topcourses as $course) : ?>
                         <div class="top-performer-row">
                             <div class="is-flex is-align-items-center" style="gap: 0.75rem;">
                                 <span class="performer-rank">#<?php echo $rank++; ?></span>
@@ -685,7 +694,7 @@ echo $OUTPUT->header();
                             </span>
                         </div>
                     <?php endforeach; ?>
-                <?php else: ?>
+                <?php else : ?>
                     <p class="has-text-grey">No course data available yet.</p>
                 <?php endif; ?>
             </div>
@@ -696,8 +705,8 @@ echo $OUTPUT->header();
                 <h3 class="chart-title">
                     <i class="fa fa-trophy"></i> Top 10 Teachers by Acceptance Rate
                 </h3>
-                <?php if (!empty($top_teachers)): ?>
-                    <?php $rank = 1; foreach ($top_teachers as $teacher): ?>
+                <?php if (!empty($topteachers)) : ?>
+                    <?php $rank = 1; foreach ($topteachers as $teacher) : ?>
                         <div class="top-performer-row">
                             <div class="is-flex is-align-items-center" style="gap: 0.75rem;">
                                 <span class="performer-rank">#<?php echo $rank++; ?></span>
@@ -713,7 +722,7 @@ echo $OUTPUT->header();
                             </span>
                         </div>
                     <?php endforeach; ?>
-                <?php else: ?>
+                <?php else : ?>
                     <p class="has-text-grey">No teacher data available yet (minimum 10 questions required).</p>
                 <?php endif; ?>
             </div>
@@ -731,27 +740,27 @@ echo $OUTPUT->header();
                 <div class="system-health-grid">
                     <div class="health-metric">
                         <strong>AI Provider Status</strong>
-                        <span class="health-indicator <?php echo $ai_provider_configured ? 'is-healthy' : 'is-error'; ?>">
-                            <i class="fa <?php echo $ai_provider_configured ? 'fa-check-circle' : 'fa-times-circle'; ?>"></i>
-                            <?php echo $ai_provider_configured ? 'Connected' : 'Not Configured'; ?>
+                        <span class="health-indicator <?php echo $aiproviderconfigured ? 'is-healthy' : 'is-error'; ?>">
+                            <i class="fa <?php echo $aiproviderconfigured ? 'fa-check-circle' : 'fa-times-circle'; ?>"></i>
+                            <?php echo $aiproviderconfigured ? 'Connected' : 'Not Configured'; ?>
                         </span>
                     </div>
                     <div class="health-metric">
                         <strong>Pending Generations</strong>
                         <span class="health-value is-warning">
-                            <i class="fa fa-clock"></i> <?php echo $pending_generations; ?>
+                            <i class="fa fa-clock"></i> <?php echo $pendinggenerations; ?>
                         </span>
                     </div>
                     <div class="health-metric">
                         <strong>Recent Errors (7 days)</strong>
-                        <span class="health-value <?php echo $recent_errors > 0 ? 'is-danger' : 'is-success'; ?>">
-                            <i class="fa fa-exclamation-triangle"></i> <?php echo $recent_errors; ?>
+                        <span class="health-value <?php echo $recenterrors > 0 ? 'is-danger' : 'is-success'; ?>">
+                            <i class="fa fa-exclamation-triangle"></i> <?php echo $recenterrors; ?>
                         </span>
                     </div>
                     <div class="health-metric">
                         <strong>Total Failed</strong>
                         <span class="health-value is-dark">
-                            <i class="fa fa-ban"></i> <?php echo $failed_generations; ?>
+                            <i class="fa fa-ban"></i> <?php echo $failedgenerations; ?>
                         </span>
                     </div>
                 </div>
@@ -782,21 +791,21 @@ echo $OUTPUT->header();
 </div>
 
 <script>
-// ================= APEXCHARTS VISUALIZATIONS =================
+// ================= APEXCHARTS VISUALIZATIONS =================.
 
-// 1. Usage Trend Chart (Last 30 Days)
+// 1. Usage Trend Chart (Last 30 Days).
 <?php
-$trend_dates = [];
-$trend_counts = [];
-foreach ($usage_trend_data as $data) {
-    $trend_dates[] = $data->date;
-    $trend_counts[] = $data->count;
+$trenddates = [];
+$trendcounts = [];
+foreach ($usagetrenddata as $data) {
+    $trenddates[] = $data->date;
+    $trendcounts[] = $data->count;
 }
 ?>
 var usageTrendOptions = {
     series: [{
         name: 'Questions Generated',
-        data: <?php echo json_encode($trend_counts); ?>
+        data: <?php echo json_encode($trendcounts); ?>
     }],
     chart: {
         type: 'area',
@@ -819,7 +828,7 @@ var usageTrendOptions = {
         }
     },
     xaxis: {
-        categories: <?php echo json_encode($trend_dates); ?>,
+        categories: <?php echo json_encode($trenddates); ?>,
         labels: { show: true }
     },
     tooltip: {
@@ -829,9 +838,9 @@ var usageTrendOptions = {
 var usageTrendChart = new ApexCharts(document.querySelector("#usageTrendChart"), usageTrendOptions);
 usageTrendChart.render();
 
-// 2. Adoption Donut Chart
+// 2. Adoption Donut Chart.
 var adoptionOptions = {
-    series: [<?php echo $active_teachers; ?>, <?php echo max(0, $total_users_with_capability - $active_teachers); ?>],
+    series: [<?php echo $activeteachers; ?>, <?php echo max(0, $totaluserswithcapability - $activeteachers); ?>],
     chart: {
         type: 'donut',
         height: 250,
@@ -904,19 +913,19 @@ var adoptionOptions = {
 var adoptionChart = new ApexCharts(document.querySelector("#adoptionChart"), adoptionOptions);
 adoptionChart.render();
 
-// 3. Bloom's Taxonomy Distribution (Radar Chart)
+// 3. Bloom's Taxonomy Distribution (Radar Chart).
 <?php
-$blooms_labels = [];
-$blooms_values = [];
-foreach ($blooms_stats as $stat) {
-    $blooms_labels[] = $stat->blooms_level;
-    $blooms_values[] = (int)$stat->count;
+$bloomslabels = [];
+$bloomsvalues = [];
+foreach ($bloomsstats as $stat) {
+    $bloomslabels[] = $stat->blooms_level;
+    $bloomsvalues[] = (int)$stat->count;
 }
 ?>
 var bloomsOptions = {
     series: [{
         name: 'Questions',
-        data: <?php echo json_encode($blooms_values); ?>
+        data: <?php echo json_encode($bloomsvalues); ?>
     }],
     chart: {
         type: 'radar',
@@ -934,7 +943,7 @@ var bloomsOptions = {
         strokeColors: '#fff'
     },
     xaxis: {
-        categories: <?php echo json_encode($blooms_labels); ?>
+        categories: <?php echo json_encode($bloomslabels); ?>
     },
     yaxis: {
         show: false
@@ -946,19 +955,19 @@ var bloomsOptions = {
 var bloomsChart = new ApexCharts(document.querySelector("#bloomsDistributionChart"), bloomsOptions);
 bloomsChart.render();
 
-// 4. Question Type Bar Chart
+// 4. Question Type Bar Chart.
 <?php
-$type_labels = [];
-$type_values = [];
-foreach ($question_type_stats as $stat) {
-    $type_labels[] = ucfirst(str_replace('_', ' ', $stat->questiontype ?? ''));
-    $type_values[] = (int)$stat->count;
+$typelabels = [];
+$typevalues = [];
+foreach ($questiontypestats as $stat) {
+    $typelabels[] = ucfirst(str_replace('_', ' ', $stat->questiontype ?? ''));
+    $typevalues[] = (int)$stat->count;
 }
 ?>
 var questionTypeOptions = {
     series: [{
         name: 'Questions',
-        data: <?php echo json_encode($type_values); ?>
+        data: <?php echo json_encode($typevalues); ?>
     }],
     chart: {
         type: 'bar',
@@ -976,25 +985,25 @@ var questionTypeOptions = {
     colors: ['#06B6D4'],
     dataLabels: { enabled: false },
     xaxis: {
-        categories: <?php echo json_encode($type_labels); ?>
+        categories: <?php echo json_encode($typelabels); ?>
     }
 };
 var questionTypeChart = new ApexCharts(document.querySelector("#questionTypeChart"), questionTypeOptions);
 questionTypeChart.render();
 
-// 5. Difficulty Distribution Chart
+// 5. Difficulty Distribution Chart.
 <?php
-$difficulty_labels = [];
-$difficulty_values = [];
-foreach ($difficulty_stats as $stat) {
-    $difficulty_labels[] = ucfirst($stat->difficulty ?? '');
-    $difficulty_values[] = (int)$stat->count;
+$difficultylabels = [];
+$difficultyvalues = [];
+foreach ($difficultystats as $stat) {
+    $difficultylabels[] = ucfirst($stat->difficulty ?? '');
+    $difficultyvalues[] = (int)$stat->count;
 }
 ?>
 var difficultyOptions = {
     series: [{
         name: 'Questions',
-        data: <?php echo json_encode($difficulty_values); ?>
+        data: <?php echo json_encode($difficultyvalues); ?>
     }],
     chart: {
         type: 'bar',
@@ -1011,7 +1020,7 @@ var difficultyOptions = {
     colors: ['#F59E0B'],
     dataLabels: { enabled: true },
     xaxis: {
-        categories: <?php echo json_encode($difficulty_labels); ?>
+        categories: <?php echo json_encode($difficultylabels); ?>
     }
 };
 var difficultyChart = new ApexCharts(document.querySelector("#difficultyChart"), difficultyOptions);

@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Course scanner page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Course scanner for bulk content extraction.
  *
@@ -35,17 +42,20 @@ defined('MOODLE_INTERNAL') || die();
  * Course scanner class.
  */
 class course_scanner {
-
     /** @var int Maximum content size in bytes (10MB) */
+    /** MAX_CONTENT_SIZE constant. */
     const MAX_CONTENT_SIZE = 10485760;
 
     /** @var array Resource module types that contain static learning content */
+    /** RESOURCE_MODULES constant. */
     const RESOURCE_MODULES = ['page', 'book', 'resource', 'url', 'folder', 'label'];
 
     /** @var array Activity module types that contain structured learning content */
+    /** ACTIVITY_MODULES constant. */
     const ACTIVITY_MODULES = ['lesson', 'scorm', 'forum'];
 
     /** @var array Section names to exclude (non-learning administrative sections) */
+    /** EXCLUDED_SECTION_NAMES constant. */
     const EXCLUDED_SECTION_NAMES = ['assignment', 'assignments', 'assessment', 'assessments', 'certificate', 'certificates', 'completion certificate', 'course completion'];
 
     /**
@@ -62,7 +72,7 @@ class course_scanner {
         $allcontent = '';
         $sources = [];
 
-        // 1. Course Summary
+        // 1. Course Summary.
         $allcontent .= "=== COURSE: " . $course->fullname . " ===\n\n";
         if (!empty($course->summary)) {
             $allcontent .= strip_tags($course->summary) . "\n\n";
@@ -73,10 +83,10 @@ class course_scanner {
             'word_count' => str_word_count($course->summary ?? ''),
         ];
 
-        // 2. Section Summaries (filter out administrative sections)
+        // 2. Section Summaries (filter out administrative sections).
         $sections = $DB->get_records('course_sections', ['course' => $courseid], 'section ASC');
         foreach ($sections as $section) {
-            // Skip administrative sections (assignment, assessment, certificate)
+            // Skip administrative sections (assignment, assessment, certificate).
             $sectionname = strtolower(trim($section->name ?? ''));
             if (in_array($sectionname, self::EXCLUDED_SECTION_NAMES)) {
                 continue;
@@ -94,18 +104,18 @@ class course_scanner {
                 ];
             }
 
-            // Check content size limit
+            // Check content size limit.
             if (strlen($allcontent) > self::MAX_CONTENT_SIZE) {
                 break;
             }
         }
 
-        // 3. Scan all resources (pages, books, etc.) - the actual learning content
+        // 3. Scan all resources (pages, books, etc.) - the actual learning content.
         $resourcescan = self::scan_all_resources($courseid);
         $allcontent .= $resourcescan['text'];
         $sources = array_merge($sources, $resourcescan['sources']);
 
-        // 4. Scan all activities (lessons, SCORM) - structured learning content
+        // 4. Scan all activities (lessons, SCORM) - structured learning content.
         $activityscan = self::scan_all_activities($courseid);
         $allcontent .= $activityscan['text'];
         $sources = array_merge($sources, $activityscan['sources']);
@@ -137,17 +147,17 @@ class course_scanner {
         $seennames = [];
 
         foreach ($modinfo->get_cms() as $cm) {
-            // Only process resource modules
+            // Only process resource modules.
             if (!in_array($cm->modname, self::RESOURCE_MODULES)) {
                 continue;
             }
 
-            // Skip hidden modules
+            // Skip hidden modules.
             if (!$cm->uservisible) {
                 continue;
             }
 
-            // Check content size limit
+            // Check content size limit.
             if (strlen($allcontent) > self::MAX_CONTENT_SIZE) {
                 break;
             }
@@ -177,7 +187,6 @@ class course_scanner {
                     'name' => $result['name'],
                     'word_count' => $result['word_count'],
                 ];
-
             } catch (\Exception $e) {
                 continue;
             }
@@ -259,7 +268,6 @@ class course_scanner {
                     'name' => $result['name'],
                     'word_count' => $result['word_count'],
                 ];
-
             } catch (\Exception $e) {
                 continue;
             }
@@ -285,14 +293,14 @@ class course_scanner {
         $allcontent = '';
         $sources = [];
 
-        // Scan resources
+        // Scan resources.
         $resourceresult = self::scan_all_resources($courseid);
         $allcontent .= $resourceresult['text'];
         $sources = array_merge($sources, $resourceresult['sources']);
 
-        // Check size limit
+        // Check size limit.
         if (strlen($allcontent) < self::MAX_CONTENT_SIZE) {
-            // Scan activities
+            // Scan activities.
             $activityresult = self::scan_all_activities($courseid);
             $allcontent .= $activityresult['text'];
             $sources = array_merge($sources, $activityresult['sources']);
@@ -356,7 +364,7 @@ class course_scanner {
         $stats = self::get_scannable_modules($courseid);
         $estimatedsize = 0;
 
-        // Rough estimate: 1000 words per page, 500 bytes per word
+        // Rough estimate: 1000 words per page, 500 bytes per word.
         switch ($scantype) {
             case 'entire':
                 $estimatedsize = ($stats['total_resources'] + $stats['total_activities']) * 1000 * 500;

@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Health check page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Health check endpoint for AI Quiz Generator.
  *
@@ -45,7 +52,7 @@ header('Content-Type: application/json');
 $health = [
     'status' => 'healthy',
     'timestamp' => time(),
-    'checks' => []
+    'checks' => [],
 ];
 
 try {
@@ -53,7 +60,7 @@ try {
     global $DB;
     $health['checks']['database'] = [
         'status' => 'ok',
-        'message' => 'Database connection successful'
+        'message' => 'Database connection successful',
     ];
 
     // Check 2: AI provider availability (hlai_hub or hlai_hubproxy).
@@ -66,7 +73,7 @@ try {
             'message' => 'Gateway configured and ready',
             'details' => [
                 'gateway_url' => $gatewayurl,
-            ]
+            ],
         ];
     } else {
         $health['checks']['gateway'] = [
@@ -74,7 +81,7 @@ try {
             'message' => 'Gateway not configured. Please configure AI Service URL and API Key in plugin settings.',
             'details' => [
                 'gateway_url' => $gatewayurl,
-            ]
+            ],
         ];
         $health['status'] = 'unhealthy';
     }
@@ -86,7 +93,7 @@ try {
         'hlai_quizgen_questions',
         'hlai_quizgen_answers',
         'hlai_quizgen_error_log',
-        'hlai_quizgen_cache'
+        'hlai_quizgen_cache',
     ];
 
     $missingtables = [];
@@ -99,12 +106,12 @@ try {
     if (empty($missingtables)) {
         $health['checks']['database_schema'] = [
             'status' => 'ok',
-            'message' => 'All required tables exist'
+            'message' => 'All required tables exist',
         ];
     } else {
         $health['checks']['database_schema'] = [
             'status' => 'error',
-            'message' => 'Missing tables: ' . implode(', ', $missingtables)
+            'message' => 'Missing tables: ' . implode(', ', $missingtables),
         ];
         $health['status'] = 'unhealthy';
     }
@@ -118,7 +125,7 @@ try {
 
     $health['checks']['recent_activity'] = [
         'status' => 'ok',
-        'requests_24h' => $recentrequests
+        'requests_24h' => $recentrequests,
     ];
 
     // Check 5: Error rate.
@@ -141,14 +148,14 @@ try {
             $health['checks']['error_rate'] = [
                 'status' => 'error',
                 'error_rate' => round($errorrate, 2) . '%',
-                'message' => 'High error rate detected'
+                'message' => 'High error rate detected',
             ];
             $health['status'] = 'unhealthy';
         } else if ($errorrate > 20) {
             $health['checks']['error_rate'] = [
                 'status' => 'warning',
                 'error_rate' => round($errorrate, 2) . '%',
-                'message' => 'Elevated error rate'
+                'message' => 'Elevated error rate',
             ];
             if ($health['status'] === 'healthy') {
                 $health['status'] = 'degraded';
@@ -156,14 +163,14 @@ try {
         } else {
             $health['checks']['error_rate'] = [
                 'status' => 'ok',
-                'error_rate' => round($errorrate, 2) . '%'
+                'error_rate' => round($errorrate, 2) . '%',
             ];
         }
     } else {
         $health['checks']['error_rate'] = [
             'status' => 'ok',
             'error_rate' => '0%',
-            'message' => 'No recent requests'
+            'message' => 'No recent requests',
         ];
     }
 
@@ -176,7 +183,7 @@ try {
             'total_entries' => $cachestats['total_entries'],
             'total_hits' => $cachestats['total_hits'],
             'hit_rate' => $cachestats['overall_hit_rate'],
-            'storage_mb' => $cachestats['storage_mb']
+            'storage_mb' => $cachestats['storage_mb'],
         ];
 
         // Warn if cache is getting large.
@@ -187,14 +194,14 @@ try {
     } else {
         $health['checks']['cache'] = [
             'status' => 'disabled',
-            'message' => 'Caching is disabled'
+            'message' => 'Caching is disabled',
         ];
     }
 
     // Check 7: Scheduled tasks.
     $tasks = [
         'local_hlai_quizgen\task\cleanup_old_requests',
-        'local_hlai_quizgen\task\process_generation_queue'
+        'local_hlai_quizgen\task\process_generation_queue',
     ];
 
     $taskstatuses = [];
@@ -204,20 +211,20 @@ try {
             $lastrun = $task->get_last_run_time();
             $taskstatuses[basename(str_replace('\\', '/', $taskclass))] = [
                 'last_run' => $lastrun ? userdate($lastrun) : 'Never',
-                'disabled' => $task->get_disabled()
+                'disabled' => $task->get_disabled(),
             ];
         }
     }
 
     $health['checks']['scheduled_tasks'] = [
         'status' => 'ok',
-        'tasks' => $taskstatuses
+        'tasks' => $taskstatuses,
     ];
 
     // Check 8: File permissions.
     $writabledirs = [
         $CFG->dataroot . '/temp',
-        $CFG->dataroot . '/local_hlai_quizgen'
+        $CFG->dataroot . '/local_hlai_quizgen',
     ];
 
     $permissionissues = [];
@@ -230,13 +237,13 @@ try {
     if (empty($permissionissues)) {
         $health['checks']['file_permissions'] = [
             'status' => 'ok',
-            'message' => 'All directories writable'
+            'message' => 'All directories writable',
         ];
     } else {
         $health['checks']['file_permissions'] = [
             'status' => 'warning',
             'message' => 'Some directories not writable',
-            'directories' => $permissionissues
+            'directories' => $permissionissues,
         ];
         if ($health['status'] === 'healthy') {
             $health['status'] = 'degraded';
@@ -251,7 +258,6 @@ try {
     } else {
         http_response_code(200);
     }
-
 } catch (\Exception $e) {
     $health['status'] = 'error';
     $health['message'] = 'Health check failed: ' . $e->getMessage();

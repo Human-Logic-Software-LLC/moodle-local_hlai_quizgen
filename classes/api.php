@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Api page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Main API for the AI Quiz Generator plugin.
  *
@@ -32,8 +39,8 @@ defined('MOODLE_INTERNAL') || die();
  * AI Quiz Generator API class.
  */
 class api {
-
     /** @var array Valid status values and their allowed transitions */
+    /** REQUEST_STATUSES constant. */
     const REQUEST_STATUSES = [
         'pending' => ['analyzing', 'processing', 'failed'],
         'analyzing' => ['topics_ready', 'failed'],
@@ -65,8 +72,12 @@ class api {
 
         $allowedtransitions = self::REQUEST_STATUSES[$oldstatus];
         if (!in_array($newstatus, $allowedtransitions) && $oldstatus !== $newstatus) {
-            throw new \moodle_exception('error:invalidstatustransition', 'local_hlai_quizgen', '',
-                "Cannot transition from {$oldstatus} to {$newstatus}");
+            throw new \moodle_exception(
+                'error:invalidstatustransition',
+                'local_hlai_quizgen',
+                '',
+                "Cannot transition from {$oldstatus} to {$newstatus}"
+            );
         }
 
         // Update status.
@@ -195,7 +206,8 @@ class api {
 
         // Load answers for each question.
         foreach ($questions as $question) {
-            $question->answers = $DB->get_records('hlai_quizgen_answers',
+            $question->answers = $DB->get_records(
+                'hlai_quizgen_answers',
                 ['questionid' => $question->id],
                 'sortorder ASC'
             );
@@ -615,9 +627,9 @@ class api {
                 'blooms_level' => $question->blooms_level,
                 'processing_mode' => 'balanced',
                 'global_question_index' => 0,
-                'allow_completed' => true,  // FIX: Allow regeneration even when request is completed.
-                'is_regeneration' => true,  // Flag to indicate this is a regeneration.
-                'old_question_text' => $question->questiontext,  // Pass old question to avoid duplicating it.
+                'allow_completed' => true, // FIX: Allow regeneration even when request is completed.
+                'is_regeneration' => true, // Flag to indicate this is a regeneration.
+                'old_question_text' => $question->questiontext, // Pass old question to avoid duplicating it.
             ];
 
             // Generate new question using the same topic and type.
@@ -650,8 +662,12 @@ class api {
             // Only attempt to write if the column exists in DB (older installs may miss it).
             $columns = $DB->get_columns('hlai_quizgen_questions');
             if (isset($columns['regeneration_count'])) {
-                $DB->set_field('hlai_quizgen_questions', 'regeneration_count',
-                    $currentregen + 1, ['id' => $newquestion->id]);
+                $DB->set_field(
+                    'hlai_quizgen_questions',
+                    'regeneration_count',
+                    $currentregen + 1,
+                    ['id' => $newquestion->id]
+                );
                 $newquestion->regeneration_count = $currentregen + 1;
             } else {
                 // Column missing, continue without failing regeneration.
@@ -662,7 +678,6 @@ class api {
             $newquestion->regeneration_count = $newquestion->regeneration_count ?? ($currentregen + 1);
 
             return $newquestion;
-
         } catch (\Exception $e) {
             throw new \moodle_exception(
                 'error:questiongeneration',

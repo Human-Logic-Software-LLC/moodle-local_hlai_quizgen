@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Cache manager page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Cache manager for AI responses.
  *
@@ -30,14 +37,16 @@ defined('MOODLE_INTERNAL') || die();
  * Manages caching of AI responses to reduce API calls and costs.
  */
 class cache_manager {
-
     /** Cache duration for topic analysis (7 days). */
+    /** CACHE_TTL_TOPICS constant. */
     const CACHE_TTL_TOPICS = 604800;
 
     /** Cache duration for question generation (3 days). */
+    /** CACHE_TTL_QUESTIONS constant. */
     const CACHE_TTL_QUESTIONS = 259200;
 
     /** Cache duration for distractor generation (3 days). */
+    /** CACHE_TTL_DISTRACTORS constant. */
     const CACHE_TTL_DISTRACTORS = 259200;
 
     /**
@@ -53,7 +62,7 @@ class cache_manager {
         try {
             $cache = $DB->get_record('hlai_quizgen_cache', [
                 'cachetype' => $cachetype,
-                'cachekey' => $cachekey
+                'cachekey' => $cachekey,
             ]);
 
             if (!$cache) {
@@ -76,7 +85,6 @@ class cache_manager {
             );
 
             return json_decode($cache->data, true);
-
         } catch (\Exception $e) {
             return null;
         }
@@ -98,7 +106,7 @@ class cache_manager {
             // Check if already exists.
             $existing = $DB->get_record('hlai_quizgen_cache', [
                 'cachetype' => $cachetype,
-                'cachekey' => $cachekey
+                'cachekey' => $cachekey,
             ]);
 
             $record = new \stdClass();
@@ -119,7 +127,6 @@ class cache_manager {
             }
 
             return true;
-
         } catch (\Exception $e) {
             return false;
         }
@@ -138,7 +145,7 @@ class cache_manager {
         try {
             $DB->delete_records('hlai_quizgen_cache', [
                 'cachetype' => $cachetype,
-                'cachekey' => $cachekey
+                'cachekey' => $cachekey,
             ]);
             return true;
         } catch (\Exception $e) {
@@ -229,7 +236,7 @@ class cache_manager {
         $stats = [
             'total_entries' => 0,
             'total_hits' => 0,
-            'by_type' => []
+            'by_type' => [],
         ];
 
         $types = ['topics', 'questions', 'distractors'];
@@ -242,7 +249,7 @@ class cache_manager {
             $stats['by_type'][$type] = [
                 'count' => $count,
                 'hits' => $hits,
-                'hit_rate' => $count > 0 ? round($hits / $count, 2) : 0
+                'hit_rate' => $count > 0 ? round($hits / $count, 2) : 0,
             ];
 
             $stats['total_entries'] += $count;

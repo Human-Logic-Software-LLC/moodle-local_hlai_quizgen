@@ -54,6 +54,12 @@ moodledata/
 
 # Composer dependencies (if vendor is not tracked)
 # vendor/
+vendor_local/
+
+# Coding standards check tools
+check_standards.php
+fix_*.php
+fix_*.py
 
 # Gateway subdirectory (excluded from CI)
 gateway/

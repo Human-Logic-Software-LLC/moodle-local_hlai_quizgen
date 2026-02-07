@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Question analytics page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Advanced analytics for question performance and trends.
  *
@@ -30,7 +37,6 @@ defined('MOODLE_INTERNAL') || die();
  * Provides comprehensive analytics on question usage and performance.
  */
 class question_analytics {
-
     /**
      * Get comprehensive analytics for a question.
      *
@@ -43,7 +49,7 @@ class question_analytics {
             'performance' => self::get_performance_stats($questionid),
             'trends' => self::get_trend_analysis($questionid),
             'comparisons' => self::get_comparative_stats($questionid),
-            'recommendations' => self::get_improvement_recommendations($questionid)
+            'recommendations' => self::get_improvement_recommendations($questionid),
         ];
     }
 
@@ -86,7 +92,7 @@ class question_analytics {
             'last_used' => $usage->last_used ?? null,
             'days_in_use' => $usage->first_used
                 ? ceil((time() - $usage->first_used) / 86400)
-                : 0
+                : 0,
         ];
     }
 
@@ -127,7 +133,7 @@ class question_analytics {
             'fully_correct_pct' => $totalattempts > 0
                 ? round(($stats->fully_correct / $totalattempts) * 100, 1)
                 : 0,
-            'average_time_seconds' => round($stats->avg_time_spent ?? 0)
+            'average_time_seconds' => round($stats->avg_time_spent ?? 0),
         ];
     }
 
@@ -159,7 +165,7 @@ class question_analytics {
             $trend[] = [
                 'period' => $data->month,
                 'average_score' => round($data->avg_score * 100, 1),
-                'attempts' => $data->attempt_count
+                'attempts' => $data->attempt_count,
             ];
         }
 
@@ -182,7 +188,7 @@ class question_analytics {
         return [
             'monthly_data' => $trend,
             'trend_direction' => $direction,
-            'months_tracked' => count($trend)
+            'months_tracked' => count($trend),
         ];
     }
 
@@ -248,7 +254,7 @@ class question_analytics {
             'type_average' => round($typeavg * 100, 1),
             'vs_type_avg' => round(($thisavg - $typeavg) * 100, 1),
             'percentile_rank' => $percentile,
-            'performance_category' => self::categorize_performance($percentile)
+            'performance_category' => self::categorize_performance($percentile),
         ];
     }
 
@@ -295,8 +301,8 @@ class question_analytics {
                     'Review question clarity and wording',
                     'Check if content was adequately covered',
                     'Consider providing hints or scaffolding',
-                    'Verify answer key is correct'
-                ]
+                    'Verify answer key is correct',
+                ],
             ];
         }
 
@@ -310,8 +316,8 @@ class question_analytics {
                     'Question may be too easy',
                     'Consider increasing complexity',
                     'Add more plausible distractors',
-                    'Elevate Bloom\'s taxonomy level'
-                ]
+                    'Elevate Bloom\'s taxonomy level',
+                ],
             ];
         }
 
@@ -325,8 +331,8 @@ class question_analytics {
                     'Question may be ambiguous',
                     'Multiple interpretations possible',
                     'Review for clarity',
-                    'Consider partial credit rubric'
-                ]
+                    'Consider partial credit rubric',
+                ],
             ];
         }
 
@@ -340,8 +346,8 @@ class question_analytics {
                     'Content may need refreshing',
                     'Question may have become outdated',
                     'Check if teaching approach changed',
-                    'Review prerequisite knowledge'
-                ]
+                    'Review prerequisite knowledge',
+                ],
             ];
         }
 
@@ -355,8 +361,8 @@ class question_analytics {
                     'Review similar high-performing questions',
                     'Analyze what makes other questions effective',
                     'Consider revising or replacing',
-                    'Consult with peers for feedback'
-                ]
+                    'Consult with peers for feedback',
+                ],
             ];
         }
 
@@ -371,8 +377,8 @@ class question_analytics {
                     'Use in more quizzes to gather data',
                     'Preliminary analysis may not be reliable',
                     'Monitor after more attempts',
-                    'Consider pilot testing'
-                ]
+                    'Consider pilot testing',
+                ],
             ];
         }
 
@@ -380,7 +386,7 @@ class question_analytics {
             'has_recommendations' => !empty($recommendations),
             'recommendation_count' => count($recommendations),
             'recommendations' => $recommendations,
-            'overall_health' => self::calculate_overall_health($performance, $comparative, $trends)
+            'overall_health' => self::calculate_overall_health($performance, $comparative, $trends),
         ];
     }
 
@@ -452,7 +458,7 @@ class question_analytics {
         return [
             'health_score' => round($score),
             'health_category' => $category,
-            'status' => $score >= 50 ? 'healthy' : 'needs_attention'
+            'status' => $score >= 50 ? 'healthy' : 'needs_attention',
         ];
     }
 
@@ -472,9 +478,9 @@ class question_analytics {
                 'total_questions' => count($questions),
                 'analyzed_questions' => 0,
                 'overall_health_avg' => 0,
-                'questions_needing_attention' => 0
+                'questions_needing_attention' => 0,
             ],
-            'questions' => []
+            'questions' => [],
         ];
 
         $healthscores = [];

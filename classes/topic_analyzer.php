@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Topic analyzer page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Topic analyzer for the AI Quiz Generator plugin.
  *
@@ -32,7 +39,6 @@ defined('MOODLE_INTERNAL') || die();
  * Topic analyzer class.
  */
 class topic_analyzer {
-
     /**
      * Analyze content and extract topics.
      *
@@ -92,7 +98,7 @@ class topic_analyzer {
             if (cache_manager::is_caching_enabled()) {
                 cache_manager::set_cached_response('topics', $cachekey, $topics, [
                     'requestid' => $requestid,
-                    'courseid' => $request->courseid
+                    'courseid' => $request->courseid,
                 ]);
             }
 
@@ -122,12 +128,11 @@ class topic_analyzer {
             if (cache_manager::is_caching_enabled()) {
                 cache_manager::set_cached_response('topics', $cachekey, $topics, [
                     'requestid' => $requestid,
-                    'courseid' => $request->courseid
+                    'courseid' => $request->courseid,
                 ]);
             }
 
             return $savedtopics;
-
         } catch (\Exception $e) {
             throw new \moodle_exception(
                 'error:topicanalysis',
@@ -211,8 +216,8 @@ class topic_analyzer {
     public static function extract_topics_from_markers(string $content): array {
         $topics = [];
 
-        // Match TOPIC markers: === TOPIC: Name (Type) ===
-        // Captures: 1=Name, 2=Type (optional)
+        // Match TOPIC markers: === TOPIC: Name (Type) ===.
+        // Captures: 1=Name, 2=Type (optional).
         $pattern = '/===\s*TOPIC:\s*(.+?)\s*(?:\(([^)]+)\))?\s*===/i';
 
         if (preg_match_all($pattern, $content, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE)) {
@@ -221,28 +226,28 @@ class topic_analyzer {
                 $type = isset($match[2]) ? trim($match[2][0]) : 'Content';
                 $startpos = $match[0][1];
 
-                // Skip invalid names
+                // Skip invalid names.
                 if (empty($name) || strlen($name) < 3) {
                     continue;
                 }
 
-                // Skip generic module-only names
-                $lowerName = strtolower($name);
-                if (in_array($lowerName, ['scorm', 'lesson', 'forum', 'page', 'book', 'resource', 'label', 'url', 'folder'])) {
+                // Skip generic module-only names.
+                $lowername = strtolower($name);
+                if (in_array($lowername, ['scorm', 'lesson', 'forum', 'page', 'book', 'resource', 'label', 'url', 'folder'])) {
                     continue;
                 }
 
-                // Get content excerpt (text between this marker and next marker or END TOPIC)
+                // Get content excerpt (text between this marker and next marker or END TOPIC).
                 $excerpt = '';
                 $contentstart = $startpos + strlen($match[0][0]);
 
-                // Find end of this topic section
+                // Find end of this topic section.
                 $endmarker = strpos($content, '=== END TOPIC ===', $contentstart);
                 $nextmarker = strpos($content, '=== TOPIC:', $contentstart);
 
                 if ($endmarker !== false) {
                     $sectionend = $endmarker;
-                } elseif ($nextmarker !== false) {
+                } else if ($nextmarker !== false) {
                     $sectionend = $nextmarker;
                 } else {
                     $sectionend = min($contentstart + 2000, strlen($content));
@@ -250,12 +255,12 @@ class topic_analyzer {
 
                 $sectioncontent = substr($content, $contentstart, $sectionend - $contentstart);
 
-                // Extract first meaningful paragraph as description
+                // Extract first meaningful paragraph as description.
                 $lines = explode("\n", trim($sectioncontent));
                 $desclines = [];
                 foreach ($lines as $line) {
                     $line = trim($line);
-                    // Skip metadata lines
+                    // Skip metadata lines.
                     if (preg_match('/^(Activity Name|Activity Type|---)/', $line)) {
                         continue;
                     }
@@ -275,7 +280,7 @@ class topic_analyzer {
                     $description = substr($description, 0, 297) . '...';
                 }
 
-                // Get content excerpt (first 300 chars of actual content)
+                // Get content excerpt (first 300 chars of actual content).
                 $excerpt = substr(trim($sectioncontent), 0, 300);
                 $excerpt = preg_replace('/^(Activity Name:.*?\n|Activity Type:.*?\n|---\n)+/s', '', $excerpt);
 
@@ -326,9 +331,9 @@ class topic_analyzer {
             }
 
             // CLEAN UP: Remove module type prefixes from titles.
-            // "SCORM: Control Safety Hazards" → "Control Safety Hazards"
-            // "SECTION: Valves: Introduction" → "Valves: Introduction"
-            // "COURSE: Valves" → "Valves"
+            // "SCORM: Control Safety Hazards" → "Control Safety Hazards".
+            // "SECTION: Valves: Introduction" → "Valves: Introduction".
+            // "COURSE: Valves" → "Valves".
             $title = self::clean_topic_title($title);
             $topic['title'] = $title;
 
@@ -523,7 +528,7 @@ class topic_analyzer {
      */
     private static function clean_topic_title(string $title): string {
         // List of prefixes to remove (case-insensitive).
-        $prefixesToRemove = [
+        $prefixestoremove = [
             'SCORM:', 'SECTION:', 'COURSE:', 'LESSON:', 'FORUM:', 'PAGE:',
             'BOOK:', 'RESOURCE:', 'MODULE:', 'ACTIVITY:', 'TOPIC:',
             'LABEL:', 'FOLDER:', 'URL:', 'FILE:', 'QUIZ:', 'ASSIGNMENT:',
@@ -534,7 +539,7 @@ class topic_analyzer {
         $originaltitle = $title;
 
         // Remove prefix if present at the start.
-        foreach ($prefixesToRemove as $prefix) {
+        foreach ($prefixestoremove as $prefix) {
             if (stripos($title, $prefix) === 0) {
                 $title = trim(substr($title, strlen($prefix)));
                 break; // Only remove one prefix.
@@ -748,16 +753,22 @@ class topic_analyzer {
             $originalparent = 0;
             // Find original parent in cached data.
             foreach ($cachedtopics as $cached) {
-                if (($cached['title'] ?? '') === $topic->title &&
-                    isset($cached['parent_topic_id'])) {
+                if (
+                    ($cached['title'] ?? '') === $topic->title &&
+                    isset($cached['parent_topic_id'])
+                ) {
                     $originalparent = $cached['parent_topic_id'];
                     break;
                 }
             }
 
             if ($originalparent > 0 && isset($parentmap[$originalparent])) {
-                $DB->set_field('hlai_quizgen_topics', 'parent_topic_id',
-                    $parentmap[$originalparent], ['id' => $topic->id]);
+                $DB->set_field(
+                    'hlai_quizgen_topics',
+                    'parent_topic_id',
+                    $parentmap[$originalparent],
+                    ['id' => $topic->id]
+                );
             }
         }
 

@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Error handler page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Centralized error handling for the AI Quiz Generator plugin.
  *
@@ -32,12 +39,16 @@ defined('MOODLE_INTERNAL') || die();
  * Error handler class with standardized error handling.
  */
 class error_handler {
-
     /** @var array Error severity levels */
+    /** SEVERITY_DEBUG constant. */
     const SEVERITY_DEBUG = 'debug';
+    /** SEVERITY_INFO constant. */
     const SEVERITY_INFO = 'info';
+    /** SEVERITY_WARNING constant. */
     const SEVERITY_WARNING = 'warning';
+    /** SEVERITY_ERROR constant. */
     const SEVERITY_ERROR = 'error';
+    /** SEVERITY_CRITICAL constant. */
     const SEVERITY_CRITICAL = 'critical';
 
     /**
@@ -118,6 +129,7 @@ class error_handler {
             $DB->insert_record('hlai_quizgen_logs', $log);
         } catch (\Exception $e) {
             // Prevent cascading failures.
+            debugging($e->getMessage(), DEBUG_DEVELOPER);
         }
     }
 

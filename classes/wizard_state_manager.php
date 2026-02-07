@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Wizard state manager page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Wizard state manager for persistent wizard sessions.
  *
@@ -30,7 +37,6 @@ defined('MOODLE_INTERNAL') || die();
  * Manages wizard state persistence across sessions.
  */
 class wizard_state_manager {
-
     /**
      * Save wizard state to database.
      *
@@ -49,7 +55,7 @@ class wizard_state_manager {
         // Check if state exists for this user/course.
         $existing = $DB->get_record('hlai_quizgen_wizard_state', [
             'userid' => $userid,
-            'courseid' => $courseid
+            'courseid' => $courseid,
         ]);
 
         if ($existing) {
@@ -85,7 +91,7 @@ class wizard_state_manager {
 
         $record = $DB->get_record('hlai_quizgen_wizard_state', [
             'userid' => $userid,
-            'courseid' => $courseid
+            'courseid' => $courseid,
         ]);
 
         if (!$record) {
@@ -101,7 +107,7 @@ class wizard_state_manager {
         return [
             'step' => $record->current_step,
             'data' => json_decode($record->state_data, true) ?: [],
-            'request_id' => $record->request_id
+            'request_id' => $record->request_id,
         ];
     }
 
@@ -116,7 +122,7 @@ class wizard_state_manager {
         global $DB;
         $DB->delete_records('hlai_quizgen_wizard_state', [
             'userid' => $userid,
-            'courseid' => $courseid
+            'courseid' => $courseid,
         ]);
     }
 

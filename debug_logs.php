@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Debug logs page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Comprehensive debug log viewer for the AI Quiz Generator plugin.
  *
@@ -43,17 +50,25 @@ $limit = optional_param('limit', 100, PARAM_INT);
 
 // Handle actions.
 if ($action === 'clearfile' && confirm_sesskey()) {
-    debug_logger::clearLogFile();
+    debug_logger::clearlogfile();
     $message = get_string('debuglogs_action_clearfile_success', 'local_hlai_quizgen');
-    redirect(new moodle_url('/local/hlai_quizgen/debug_logs.php', ['tab' => 'file']),
-        $message, null, \core\output\notification::NOTIFY_SUCCESS);
+    redirect(
+        new moodle_url('/local/hlai_quizgen/debug_logs.php', ['tab' => 'file']),
+        $message,
+        null,
+        \core\output\notification::NOTIFY_SUCCESS
+    );
 }
 
 if ($action === 'logsysteminfo' && confirm_sesskey()) {
-    debug_logger::logSystemInfo($requestid);
+    debug_logger::logsysteminfo($requestid);
     $message = get_string('debuglogs_action_logsysteminfo_success', 'local_hlai_quizgen');
-    redirect(new moodle_url('/local/hlai_quizgen/debug_logs.php', ['tab' => $tab]),
-        $message, null, \core\output\notification::NOTIFY_SUCCESS);
+    redirect(
+        new moodle_url('/local/hlai_quizgen/debug_logs.php', ['tab' => $tab]),
+        $message,
+        null,
+        \core\output\notification::NOTIFY_SUCCESS
+    );
 }
 
 if ($action === 'testlog' && confirm_sesskey()) {
@@ -64,8 +79,12 @@ if ($action === 'testlog' && confirm_sesskey()) {
     debug_logger::warning('Test WARNING entry', ['severity' => 'warning']);
     debug_logger::error('Test ERROR entry', ['severity' => 'error']);
     $message = get_string('debuglogs_action_testlog_success', 'local_hlai_quizgen');
-    redirect(new moodle_url('/local/hlai_quizgen/debug_logs.php', ['tab' => $tab]),
-        $message, null, \core\output\notification::NOTIFY_SUCCESS);
+    redirect(
+        new moodle_url('/local/hlai_quizgen/debug_logs.php', ['tab' => $tab]),
+        $message,
+        null,
+        \core\output\notification::NOTIFY_SUCCESS
+    );
 }
 
 // Page setup.
@@ -88,35 +107,35 @@ echo '<div class="box mb-4">';
 echo '<h3 class="title is-6 mb-3">' . get_string('debuglogs_aiprovider_heading', 'local_hlai_quizgen') . '</h3>';
 
 try {
-    $gatewayUrl = \local_hlai_quizgen\gateway_client::get_gateway_url();
-    $gatewayReady = \local_hlai_quizgen\gateway_client::is_ready();
-    $statusClass = $providerInfo['active'] !== 'none' ? 'success' : 'danger';
+    $gatewayurl = \local_hlai_quizgen\gateway_client::get_gateway_url();
+    $gatewayready = \local_hlai_quizgen\gateway_client::is_ready();
+    $statusclass = $providerinfo['active'] !== 'none' ? 'success' : 'danger';
 
     echo '<div class="columns is-multiline is-mobile">';
     echo '<div class="column is-one-third">';
     echo '<strong>' . get_string('debuglogs_activeprovider', 'local_hlai_quizgen') . ':</strong> ';
-    echo '<span class="tag is-' . $statusClass . ' ml-2">' . strtoupper($providerInfo['active']) . '</span>';
+    echo '<span class="tag is-' . $statusclass . ' ml-2">' . strtoupper($providerinfo['active']) . '</span>';
     echo '</div>';
     echo '<div class="column is-one-third">';
     echo '<strong>' . get_string('debuglogs_hubavailable', 'local_hlai_quizgen') . ':</strong> ';
-    $hubbadge = $providerInfo['hub_available']
+    $hubbadge = $providerinfo['hub_available']
         ? '<span class="tag is-success ml-2">' . get_string('debuglogs_yes', 'local_hlai_quizgen') . '</span>'
         : '<span class="tag is-light ml-2">' . get_string('debuglogs_no', 'local_hlai_quizgen') . '</span>';
     echo $hubbadge;
-    if (isset($providerInfo['hub_provider'])) {
-        echo ' (' . htmlspecialchars($providerInfo['hub_provider']) . ')';
+    if (isset($providerinfo['hub_provider'])) {
+        echo ' (' . htmlspecialchars($providerinfo['hub_provider']) . ')';
     }
     echo '</div>';
     echo '<div class="column is-one-third">';
     echo '<strong>' . get_string('debuglogs_proxyavailable', 'local_hlai_quizgen') . ':</strong> ';
-    $proxybadge = $providerInfo['proxy_available']
+    $proxybadge = $providerinfo['proxy_available']
         ? '<span class="tag is-success ml-2">' . get_string('debuglogs_yes', 'local_hlai_quizgen') . '</span>'
         : '<span class="tag is-light ml-2">' . get_string('debuglogs_no', 'local_hlai_quizgen') . '</span>';
     echo $proxybadge;
     echo '</div>';
     echo '</div>';
 
-    if ($providerInfo['active'] === 'none') {
+    if ($providerinfo['active'] === 'none') {
         echo '<div class="notification is-danger is-light mt-3 mb-0">';
         echo '<strong>Warning:</strong> No AI provider is configured! Questions cannot be generated. ';
         echo 'Please configure <code>local_hlai_hub</code> or <code>local_hlai_hubproxy</code>.';
@@ -229,7 +248,7 @@ function display_database_logs(?int $requestid, string $level, int $limit): void
     echo '</div>';
 
     // Get logs.
-    $logs = debug_logger::getRecentDatabaseLogs($limit, $requestid, $level ?: null);
+    $logs = debug_logger::getrecentdatabaselogs($limit, $requestid, $level ?: null);
 
     if (empty($logs)) {
         echo '<div class="notification is-info is-light">No log entries found.</div>';
@@ -295,7 +314,7 @@ function display_database_logs(?int $requestid, string $level, int $limit): void
  * Display file logs.
  */
 function display_file_logs(int $limit): void {
-    $logfile = debug_logger::getLogFilePath();
+    $logfile = debug_logger::getlogfilepath();
 
     echo '<div class="box mb-4">';
     echo '<div class="level mb-3">';
@@ -320,7 +339,7 @@ function display_file_logs(int $limit): void {
             $size = filesize($logfile);
             echo '<p><strong>File size:</strong> ' . format_bytes($size) . '</p>';
 
-            $entries = debug_logger::getRecentFileLogs($limit);
+            $entries = debug_logger::getrecentfilelogs($limit);
 
             if (empty($entries)) {
                 echo '<div class="notification is-info is-light">Log file is empty.</div>';
@@ -330,16 +349,28 @@ function display_file_logs(int $limit): void {
                 foreach (array_reverse($entries) as $entry) {
                     // Color code by level.
                     $entry = htmlspecialchars(trim($entry));
-                    $entry = preg_replace('/\[ERROR\]/',
-                        '<span style="color: #ff6b6b;">[ERROR]</span>', $entry);
-                    $entry = preg_replace('/\[WARNING\]/',
-                        '<span style="color: #ffd93d;">[WARNING]</span>', $entry);
+                    $entry = preg_replace(
+                        '/\[ERROR\]/',
+                        '<span style="color: #ff6b6b;">[ERROR]</span>',
+                        $entry
+                    );
+                    $entry = preg_replace(
+                        '/\[WARNING\]/',
+                        '<span style="color: #ffd93d;">[WARNING]</span>',
+                        $entry
+                    );
                     $criticalspan = '<span style="color: #ff0000; font-weight: bold;">[CRITICAL]</span>';
                     $entry = preg_replace('/\[CRITICAL\]/', $criticalspan, $entry);
-                    $entry = preg_replace('/\[INFO\]/',
-                        '<span style="color: #6bcb77;">[INFO]</span>', $entry);
-                    $entry = preg_replace('/\[DEBUG\]/',
-                        '<span style="color: #4d96ff;">[DEBUG]</span>', $entry);
+                    $entry = preg_replace(
+                        '/\[INFO\]/',
+                        '<span style="color: #6bcb77;">[INFO]</span>',
+                        $entry
+                    );
+                    $entry = preg_replace(
+                        '/\[DEBUG\]/',
+                        '<span style="color: #4d96ff;">[DEBUG]</span>',
+                        $entry
+                    );
                     echo $entry . "\n" . str_repeat('-', 80) . "\n";
                 }
                 echo '</pre>';
@@ -403,7 +434,7 @@ function display_recent_requests(int $limit): void {
             echo '<span class="text-danger" title="' . htmlspecialchars($req->error_message) . '">';
             echo htmlspecialchars(substr($req->error_message, 0, 50)) . '...';
             echo '</span>';
-        } elseif (!empty($req->progress_message)) {
+        } else if (!empty($req->progress_message)) {
             echo '<small>' . htmlspecialchars(substr($req->progress_message, 0, 50)) . '</small>';
         } else {
             echo '-';
@@ -517,17 +548,17 @@ function display_system_info(): void {
 
     // Check pdftotext.
     $pdftotext = @shell_exec('which pdftotext 2>/dev/null') ?: @shell_exec('where pdftotext 2>nul');
-    $pdftotextStatus = !empty(trim($pdftotext ?? ''))
+    $pdftotextstatus = !empty(trim($pdftotext ?? ''))
         ? '<span class="tag is-success">Available</span>'
         : '<span class="tag is-warning">Not Found</span>';
-    echo '<tr><td>pdftotext (poppler-utils)</td><td>' . $pdftotextStatus . '</td></tr>';
+    echo '<tr><td>pdftotext (poppler-utils)</td><td>' . $pdftotextstatus . '</td></tr>';
 
     // Check ghostscript.
     $gs = @shell_exec('which gs 2>/dev/null') ?: @shell_exec('where gswin64c 2>nul');
-    $gsStatus = !empty(trim($gs ?? ''))
+    $gsstatus = !empty(trim($gs ?? ''))
         ? '<span class="tag is-success">Available</span>'
         : '<span class="tag is-warning">Not Found</span>';
-    echo '<tr><td>Ghostscript</td><td>' . $gsStatus . '</td></tr>';
+    echo '<tr><td>Ghostscript</td><td>' . $gsstatus . '</td></tr>';
 
     echo '</table>';
     echo '</div></div>';

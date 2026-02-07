@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Debug logger page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Comprehensive debug logger for the AI Quiz Generator plugin.
  *
@@ -33,15 +40,20 @@ defined('MOODLE_INTERNAL') || die();
  * Debug logger class for comprehensive error and event logging.
  */
 class debug_logger {
-
     /** @var string Log levels */
+    /** LEVEL_DEBUG constant. */
     const LEVEL_DEBUG = 'DEBUG';
+    /** LEVEL_INFO constant. */
     const LEVEL_INFO = 'INFO';
+    /** LEVEL_WARNING constant. */
     const LEVEL_WARNING = 'WARNING';
+    /** LEVEL_ERROR constant. */
     const LEVEL_ERROR = 'ERROR';
+    /** LEVEL_CRITICAL constant. */
     const LEVEL_CRITICAL = 'CRITICAL';
 
     /** @var string Log file name */
+    /** LOG_FILE constant. */
     const LOG_FILE = 'hlai_quizgen_debug.log';
 
     /** @var bool Whether logging is enabled */
@@ -138,7 +150,7 @@ class debug_logger {
             'code' => $exception->getCode(),
             'file' => $exception->getFile(),
             'line' => $exception->getLine(),
-            'trace' => self::formatTrace($exception->getTraceAsString()),
+            'trace' => self::formattrace($exception->getTraceAsString()),
         ];
 
         // Check for previous exception.
@@ -184,7 +196,7 @@ class debug_logger {
                     'total' => $response->tokens->total ?? 0,
                 ];
             }
-        } elseif ($response === null) {
+        } else if ($response === null) {
             $context['response'] = 'NULL';
         }
 
@@ -224,22 +236,22 @@ class debug_logger {
     public static function question_generation(
         int $requestid,
         int $topicid,
-        int $questionsGenerated,
-        int $questionsRequested,
+        int $questionsgenerated,
+        int $questionsrequested,
         array $types
     ): void {
         $context = [
             'topic_id' => $topicid,
-            'questions_generated' => $questionsGenerated,
-            'questions_requested' => $questionsRequested,
+            'questions_generated' => $questionsgenerated,
+            'questions_requested' => $questionsrequested,
             'question_types' => $types,
-            'success' => $questionsGenerated > 0,
+            'success' => $questionsgenerated > 0,
         ];
 
-        $level = $questionsGenerated > 0 ? self::LEVEL_INFO : self::LEVEL_WARNING;
-        $message = $questionsGenerated > 0
-            ? "Generated {$questionsGenerated}/{$questionsRequested} questions for topic {$topicid}"
-            : "FAILED to generate questions for topic {$topicid} (0/{$questionsRequested})";
+        $level = $questionsgenerated > 0 ? self::LEVEL_INFO : self::LEVEL_WARNING;
+        $message = $questionsgenerated > 0
+            ? "Generated {$questionsgenerated}/{$questionsrequested} questions for topic {$topicid}"
+            : "FAILED to generate questions for topic {$topicid} (0/{$questionsrequested})";
 
         self::log($level, $message, $context, $requestid);
     }
@@ -284,8 +296,8 @@ class debug_logger {
         // Add standard context.
         $context['user_id'] = $userid;
         $context['request_id'] = $requestid;
-        $context['memory_usage'] = self::formatBytes(memory_get_usage(true));
-        $context['peak_memory'] = self::formatBytes(memory_get_peak_usage(true));
+        $context['memory_usage'] = self::formatbytes(memory_get_usage(true));
+        $context['peak_memory'] = self::formatbytes(memory_get_peak_usage(true));
 
         // Format log entry for file.
         $logentry = sprintf(
@@ -299,23 +311,23 @@ class debug_logger {
 
         // Add context if not empty.
         if (!empty($context)) {
-            $contextStr = json_encode($context, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-            $logentry .= "    Context: " . str_replace("\n", "\n    ", $contextStr) . "\n";
+            $contextstr = json_encode($context, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            $logentry .= "    Context: " . str_replace("\n", "\n    ", $contextstr) . "\n";
         }
 
         $logentry .= str_repeat('-', 80) . "\n";
 
         // Write to file.
-        self::writeToFile($logentry);
+        self::writetofile($logentry);
 
         // Write to database for errors and above.
         if (in_array($level, [self::LEVEL_ERROR, self::LEVEL_CRITICAL, self::LEVEL_WARNING])) {
-            self::writeToDatabase($level, $message, $context, $requestid, $userid);
+            self::writetodatabase($level, $message, $context, $requestid, $userid);
         }
 
         // Also write to PHP error log for critical errors.
         if ($level === self::LEVEL_CRITICAL) {
-            error_log("HLAI QuizGen CRITICAL: {$message}");
+            debugging("HLAI QuizGen CRITICAL: {$message}");
         }
     }
 
@@ -324,7 +336,7 @@ class debug_logger {
      *
      * @param string $entry Log entry
      */
-    private static function writeToFile(string $entry): void {
+    private static function writetofile(string $entry): void {
         if (self::$logfile) {
             // Rotate log if too large (> 10MB).
             if (file_exists(self::$logfile) && filesize(self::$logfile) > 10 * 1024 * 1024) {
@@ -345,7 +357,7 @@ class debug_logger {
      * @param int|null $requestid Request ID
      * @param int $userid User ID
      */
-    private static function writeToDatabase(
+    private static function writetodatabase(
         string $level,
         string $message,
         array $context,
@@ -368,7 +380,7 @@ class debug_logger {
             $DB->insert_record('hlai_quizgen_logs', $record);
         } catch (\Exception $e) {
             // Silently fail to prevent cascading errors.
-            error_log("HLAI QuizGen: Failed to write to log database: " . $e->getMessage());
+            debugging("HLAI QuizGen: Failed to write to log database: " . $e->getMessage());
         }
     }
 
@@ -378,7 +390,7 @@ class debug_logger {
      * @param int $lines Number of lines to retrieve
      * @return array Log entries
      */
-    public static function getRecentFileLogs(int $lines = 100): array {
+    public static function getrecentfilelogs(int $lines = 100): array {
         self::init();
 
         if (!self::$logfile || !file_exists(self::$logfile)) {
@@ -392,7 +404,7 @@ class debug_logger {
 
         // Split by separator and get recent entries.
         $entries = explode(str_repeat('-', 80), $content);
-        $entries = array_filter($entries, function($e) {
+        $entries = array_filter($entries, function ($e) {
             return !empty(trim($e));
         });
 
@@ -407,7 +419,7 @@ class debug_logger {
      * @param string|null $level Optional filter by level
      * @return array Log records
      */
-    public static function getRecentDatabaseLogs(int $limit = 100, ?int $requestid = null, ?string $level = null): array {
+    public static function getrecentdatabaselogs(int $limit = 100, ?int $requestid = null, ?string $level = null): array {
         global $DB;
 
         $conditions = [];
@@ -439,7 +451,7 @@ class debug_logger {
      *
      * @return string|null Log file path
      */
-    public static function getLogFilePath(): ?string {
+    public static function getlogfilepath(): ?string {
         self::init();
         return self::$logfile;
     }
@@ -449,7 +461,7 @@ class debug_logger {
      *
      * @return bool Success
      */
-    public static function clearLogFile(): bool {
+    public static function clearlogfile(): bool {
         self::init();
 
         if (self::$logfile && file_exists(self::$logfile)) {
@@ -464,7 +476,7 @@ class debug_logger {
      * @param int $bytes Bytes
      * @return string Formatted string
      */
-    private static function formatBytes(int $bytes): string {
+    private static function formatbytes(int $bytes): string {
         $units = ['B', 'KB', 'MB', 'GB'];
         $i = 0;
         while ($bytes >= 1024 && $i < count($units) - 1) {
@@ -480,7 +492,7 @@ class debug_logger {
      * @param string $trace Stack trace
      * @return string Formatted trace
      */
-    private static function formatTrace(string $trace): string {
+    private static function formattrace(string $trace): string {
         // Limit trace length.
         if (strlen($trace) > 2000) {
             $trace = substr($trace, 0, 2000) . "\n... (truncated)";
@@ -493,7 +505,7 @@ class debug_logger {
      *
      * @param int|null $requestid Request ID
      */
-    public static function logSystemInfo(?int $requestid = null): void {
+    public static function logsysteminfo(?int $requestid = null): void {
         global $CFG;
 
         $context = [

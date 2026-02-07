@@ -1,0 +1,26 @@
+# Auto detect text files and perform LF normalization
+* text=auto eol=lf
+
+# PHP files always use LF
+*.php text eol=lf
+
+# YAML files always use LF
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# XML files always use LF
+*.xml text eol=lf
+
+# Shell scripts always use LF
+*.sh text eol=lf
+
+# Markdown and text files
+*.md text eol=lf
+*.txt text eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary

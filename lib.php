@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Lib page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Library functions for the Human Logic AI Quiz Generator plugin.
  *
@@ -34,7 +41,7 @@ defined('MOODLE_INTERNAL') || die();
  */
 function local_hlai_quizgen_extend_navigation_course(navigation_node $navigation, stdClass $course, context_course $context) {
     if (has_capability('local/hlai_quizgen:generatequestions', $context)) {
-        // AI Quiz Generator (Wizard)
+        // AI Quiz Generator (Wizard).
         $navigation->add(
             get_string('navtitle', 'local_hlai_quizgen'),
             new moodle_url('/local/hlai_quizgen/wizard.php', ['courseid' => $course->id]),
@@ -43,7 +50,7 @@ function local_hlai_quizgen_extend_navigation_course(navigation_node $navigation
             'hlai_quizgen_wizard'
         );
 
-        // AI Quiz Dashboard
+        // AI Quiz Dashboard.
         $navigation->add(
             get_string('dashboard', 'local_hlai_quizgen'),
             new moodle_url('/local/hlai_quizgen/index.php', ['courseid' => $course->id]),

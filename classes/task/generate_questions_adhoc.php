@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Generate questions adhoc page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Adhoc task for background question generation with progress tracking.
  *
@@ -30,7 +37,6 @@ defined('MOODLE_INTERNAL') || die();
  * Adhoc task to generate questions in the background.
  */
 class generate_questions_adhoc extends \core\task\adhoc_task {
-
     /**
      * Execute the task.
      */
@@ -74,8 +80,8 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                 $totalfromtopics += $topic->num_questions;
             }
 
-            // CRITICAL FIX: Use request's total_questions as authoritative source
-            // If there's a mismatch, redistribute questions across topics
+            // CRITICAL FIX: Use request's total_questions as authoritative source.
+            // If there's a mismatch, redistribute questions across topics.
             $totalquestionsrequested = $request->total_questions ?? $totalfromtopics;
 
             if ($totalfromtopics != $totalquestionsrequested && $totalquestionsrequested > 0) {
@@ -99,7 +105,7 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
             // Build base config from request (as array, not object).
             $questiontypedist = json_decode($request->question_types ?? '{}', true);
 
-            // If stored as expanded array (old format), convert to distribution
+            // If stored as expanded array (old format), convert to distribution.
             if (isset($questiontypedist[0])) {
                 $dist = [];
                 foreach ($questiontypedist as $type) {
@@ -108,8 +114,8 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                 $questiontypedist = $dist;
             }
 
-            // CRITICAL FIX: Expand question types into a global array for all questions
-            // This ensures correct distribution across all topics
+            // CRITICAL FIX: Expand question types into a global array for all questions.
+            // This ensures correct distribution across all topics.
             $globalquestiontypes = [];
             if (!empty($questiontypedist)) {
                 foreach ($questiontypedist as $type => $count) {
@@ -118,7 +124,7 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                     }
                 }
             }
-            // Fallback if no types specified
+            // Fallback if no types specified.
             if (empty($globalquestiontypes)) {
                 for ($i = 0; $i < $totalquestionsrequested; $i++) {
                     $globalquestiontypes[] = 'multichoice';
@@ -129,10 +135,10 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                 'processing_mode' => $request->processing_mode ?? 'balanced',
                 'difficulty_distribution' => json_decode($request->difficulty_distribution ?? '{}', true),
                 'blooms_distribution' => json_decode($request->blooms_distribution ?? '{}', true),
-                'question_type_distribution' => $questiontypedist,  // Store as distribution
+                'question_type_distribution' => $questiontypedist, // Store as distribution
                 'custom_instructions' => $request->custom_instructions ?? '',
                 'global_question_index' => 0,
-                'global_question_types' => $globalquestiontypes  // Pass the expanded global array
+                'global_question_types' => $globalquestiontypes, // Pass the expanded global array
             ];
 
             // Generate questions for each topic with progress updates.
@@ -150,7 +156,7 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                 $topicconfig['num_questions'] = $topic->num_questions;
                 $topicconfig['global_question_index'] = $currentquestion;
 
-                // ITEM 7 FIX: Use topic-specific distributions if available, fallback to request-level
+                // ITEM 7 FIX: Use topic-specific distributions if available, fallback to request-level.
                 if (!empty($topic->difficulty_distribution)) {
                     $topicconfig['difficulty_distribution'] = json_decode($topic->difficulty_distribution, true);
                 }
@@ -158,17 +164,17 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                     $topicconfig['blooms_distribution'] = json_decode($topic->blooms_distribution, true);
                 }
 
-                // CRITICAL FIX: Extract this topic's slice from the global question types array
-                // This ensures each topic gets its correct share of each question type
+                // CRITICAL FIX: Extract this topic's slice from the global question types array.
+                // This ensures each topic gets its correct share of each question type.
                 $topicquestiontypes = [];
                 if (!empty($globalquestiontypes)) {
-                    // Get the slice of question types for this topic based on global index
+                    // Get the slice of question types for this topic based on global index.
                     for ($i = 0; $i < $topic->num_questions; $i++) {
                         $globalindex = $currentquestion + $i;
                         if (isset($globalquestiontypes[$globalindex])) {
                             $topicquestiontypes[] = $globalquestiontypes[$globalindex];
                         } else {
-                            // Fallback: wrap around if we exceed array bounds
+                            // Fallback: wrap around if we exceed array bounds.
                             $topicquestiontypes[] = $globalquestiontypes[$globalindex % count($globalquestiontypes)];
                         }
                     }
@@ -189,9 +195,11 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                 // Delete excess questions if more were generated than requested.
                 if ($questionsgenerated > $topic->num_questions) {
                     // Get all questions for this topic in this request.
-                    $topicquestions = $DB->get_records('hlai_quizgen_questions',
+                    $topicquestions = $DB->get_records(
+                        'hlai_quizgen_questions',
                         ['requestid' => $requestid, 'topicid' => $topic->id],
-                        'id ASC');
+                        'id ASC'
+                    );
                     $excess = $questionsgenerated - $topic->num_questions;
                     $deleted = 0;
                     // Delete the last N questions (keep the first ones).
@@ -215,7 +223,7 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                 );
             }
 
-            // Update request with actual generated count
+            // Update request with actual generated count.
             $DB->set_field('hlai_quizgen_requests', 'total_questions', $totalquestionsgenerated, ['id' => $requestid]);
 
             // POST-GENERATION: Check for duplicates and flag them.
@@ -236,7 +244,6 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
 
             // Update request status.
             \local_hlai_quizgen\api::update_request_status($requestid, 'completed');
-
         } catch (\Exception $e) {
             // Log the exception with full details.
             \local_hlai_quizgen\debug_logger::exception($e, 'generate_questions_adhoc', $requestid);

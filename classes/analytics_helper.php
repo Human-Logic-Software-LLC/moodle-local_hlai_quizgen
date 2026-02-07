@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Analytics helper page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Analytics data helper class for the AI Quiz Generator.
  *
@@ -33,7 +40,6 @@ defined('MOODLE_INTERNAL') || die();
  * Analytics helper class
  */
 class analytics_helper {
-
     /** @var int User ID */
     protected $userid;
 
@@ -66,7 +72,7 @@ class analytics_helper {
 
         $stats = new \stdClass();
 
-        // Total quizzes created
+        // Total quizzes created.
         $sql = "SELECT COUNT(DISTINCT id) FROM {hlai_quizgen_requests} WHERE userid = ?";
         $params = [$this->userid];
         if ($this->courseid) {
@@ -80,7 +86,7 @@ class analytics_helper {
         $sql .= " AND status = 'completed'";
         $stats->total_quizzes = $DB->count_records_sql($sql, $params);
 
-        // Total questions
+        // Total questions.
         $sql = "SELECT COUNT(*) FROM {hlai_quizgen_questions} WHERE userid = ?";
         $params = [$this->userid];
         if ($this->courseid) {
@@ -93,7 +99,7 @@ class analytics_helper {
         }
         $stats->total_questions = $DB->count_records_sql($sql, $params);
 
-        // Approved questions
+        // Approved questions.
         $sql = "SELECT COUNT(*) FROM {hlai_quizgen_questions} WHERE userid = ? AND status = 'approved'";
         $params = [$this->userid];
         if ($this->courseid) {
@@ -106,7 +112,7 @@ class analytics_helper {
         }
         $stats->approved_questions = $DB->count_records_sql($sql, $params);
 
-        // Pending questions
+        // Pending questions.
         $sql = "SELECT COUNT(*) FROM {hlai_quizgen_questions} WHERE userid = ? AND status = 'pending'";
         $params = [$this->userid];
         if ($this->courseid) {
@@ -119,7 +125,7 @@ class analytics_helper {
         }
         $stats->pending_questions = $DB->count_records_sql($sql, $params);
 
-        // Rejected questions
+        // Rejected questions.
         $sql = "SELECT COUNT(*) FROM {hlai_quizgen_questions} WHERE userid = ? AND status = 'rejected'";
         $params = [$this->userid];
         if ($this->courseid) {
@@ -132,7 +138,7 @@ class analytics_helper {
         }
         $stats->rejected_questions = $DB->count_records_sql($sql, $params);
 
-        // Average quality score
+        // Average quality score.
         $sql = "SELECT AVG(validation_score) FROM {hlai_quizgen_questions}
                 WHERE userid = ? AND validation_score IS NOT NULL";
         $params = [$this->userid];
@@ -147,7 +153,7 @@ class analytics_helper {
         $avg = $DB->get_field_sql($sql, $params);
         $stats->avg_quality = $avg ? round($avg, 1) : 0;
 
-        // First-time acceptance rate
+        // First-time acceptance rate.
         $sql = "SELECT COUNT(*) FROM {hlai_quizgen_questions}
                 WHERE userid = ? AND status = 'approved' AND regeneration_count = 0";
         $params = [$this->userid];
@@ -159,15 +165,15 @@ class analytics_helper {
             $sql .= " AND timecreated >= ?";
             $params[] = $this->timefilter;
         }
-        $first_time = $DB->count_records_sql($sql, $params);
-        $stats->first_time_approved = $first_time;
+        $firsttime = $DB->count_records_sql($sql, $params);
+        $stats->first_time_approved = $firsttime;
 
-        // Calculate rates
+        // Calculate rates.
         $reviewed = $stats->approved_questions + $stats->rejected_questions;
         $stats->acceptance_rate = $reviewed > 0 ? round(($stats->approved_questions / $reviewed) * 100, 1) : 0;
-        $stats->ftar = $stats->total_questions > 0 ? round(($first_time / $stats->total_questions) * 100, 1) : 0;
+        $stats->ftar = $stats->total_questions > 0 ? round(($firsttime / $stats->total_questions) * 100, 1) : 0;
 
-        // Total regenerations
+        // Total regenerations.
         $sql = "SELECT SUM(regeneration_count) FROM {hlai_quizgen_questions} WHERE userid = ?";
         $params = [$this->userid];
         if ($this->courseid) {
@@ -239,11 +245,11 @@ class analytics_helper {
 
         $results = $DB->get_records_sql($sql, $params);
 
-        // Normalize to expected keys
+        // Normalize to expected keys.
         $distribution = [
             'easy' => 0,
             'medium' => 0,
-            'hard' => 0
+            'hard' => 0,
         ];
 
         foreach ($results as $row) {
@@ -282,14 +288,14 @@ class analytics_helper {
 
         $results = $DB->get_records_sql($sql, $params);
 
-        // Normalize to expected keys
+        // Normalize to expected keys.
         $distribution = [
             'remember' => 0,
             'understand' => 0,
             'apply' => 0,
             'analyze' => 0,
             'evaluate' => 0,
-            'create' => 0
+            'create' => 0,
         ];
 
         foreach ($results as $row) {
@@ -317,17 +323,17 @@ class analytics_helper {
         $data = [
             'labels' => [],
             'acceptance_rates' => [],
-            'ftar_rates' => []
+            'ftar_rates' => [],
         ];
 
         for ($i = 0; $i < ceil($days / $interval); $i++) {
             $periodstart = $starttime + ($i * $interval * 24 * 60 * 60);
             $periodend = $periodstart + ($interval * 24 * 60 * 60);
 
-            // Format label
+            // Format label.
             $data['labels'][] = date('M j', $periodstart);
 
-            // Get stats for this period
+            // Get stats for this period.
             $sql = "SELECT
                         COUNT(*) as total,
                         SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
@@ -391,7 +397,7 @@ class analytics_helper {
                 $data[$row->questiontype] = [
                     'total' => (int)$row->total,
                     'total_regenerations' => (int)$row->total_regens,
-                    'avg_regenerations' => round((float)$row->avg_regenerations, 2)
+                    'avg_regenerations' => round((float)$row->avg_regenerations, 2),
                 ];
             }
         }
@@ -412,7 +418,7 @@ class analytics_helper {
             '21-40' => [21, 40],
             '41-60' => [41, 60],
             '61-80' => [61, 80],
-            '81-100' => [81, 100]
+            '81-100' => [81, 100],
         ];
 
         $distribution = [];

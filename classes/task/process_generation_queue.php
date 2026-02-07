@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Process generation queue page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Scheduled task to process question generation queue.
  *
@@ -32,7 +39,6 @@ defined('MOODLE_INTERNAL') || die();
  * Process generation queue task.
  */
 class process_generation_queue extends \core\task\scheduled_task {
-
     /**
      * Get task name.
      *
@@ -115,7 +121,7 @@ class process_generation_queue extends \core\task\scheduled_task {
             mtrace('  Using default question types');
         }
 
-        // Decode Bloom's taxonomy distribution
+        // Decode Bloom's taxonomy distribution.
         $bloomsdist = json_decode($request->blooms_distribution ?? '{}', true);
         if (!is_array($bloomsdist) || empty($bloomsdist)) {
             $bloomsdist = [
@@ -124,7 +130,7 @@ class process_generation_queue extends \core\task\scheduled_task {
                 'apply' => 25,
                 'analyze' => 15,
                 'evaluate' => 10,
-                'create' => 5
+                'create' => 5,
             ];
             mtrace('  Using default Bloom\'s distribution');
         }
@@ -171,7 +177,7 @@ class process_generation_queue extends \core\task\scheduled_task {
                     $topicconfig
                 );
 
-                // Update global index after generating questions
+                // Update global index after generating questions.
                 $globalquestionindex += count($questions);
 
                 $totalgenerated += count($questions);

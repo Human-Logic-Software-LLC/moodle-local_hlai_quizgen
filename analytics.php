@@ -1,19 +1,28 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Analytics page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+// phpcs:disable moodle.Commenting.MissingDocblock.File
+// phpcs:disable moodle.Commenting.FileExpectedTags
 /**
  * AI Quiz Generator - Analytics Page
  *
@@ -37,7 +46,7 @@ require_capability('local/hlai_quizgen:generatequestions', $context);
 
 $course = $DB->get_record('course', ['id' => $courseid], '*', MUST_EXIST);
 
-// Page setup
+// Page setup.
 $PAGE->set_url(new moodle_url('/local/hlai_quizgen/analytics.php', ['courseid' => $courseid]));
 $PAGE->set_context($context);
 $PAGE->set_course($course);
@@ -45,25 +54,25 @@ $PAGE->set_pagelayout('incourse');
 $PAGE->set_title(get_string('pluginname', 'local_hlai_quizgen') . ' - Analytics');
 $PAGE->set_heading($course->fullname);
 
-// Add Bulma CSS Framework (Native/Local - non-minified for debugging)
+// Add Bulma CSS Framework (Native/Local - non-minified for debugging).
 $PAGE->requires->css('/local/hlai_quizgen/bulma.css');
 
-// Add our custom CSS (loaded after Bulma to override and fix Moodle compatibility)
+// Add our custom CSS (loaded after Bulma to override and fix Moodle compatibility).
 $PAGE->requires->css('/local/hlai_quizgen/styles-bulma.css');
 
-// Add ApexCharts (Local - non-minified for debugging)
+// Add ApexCharts (Local - non-minified for debugging).
 $PAGE->requires->js(new moodle_url('/local/hlai_quizgen/apexcharts.js'), true);
 
-// Add our AMD modules
+// Add our AMD modules.
 $PAGE->requires->js_call_amd('local_hlai_quizgen/analytics', 'init', [
     $courseid,
     sesskey(),
-    $timerange
+    $timerange,
 ]);
 
 $userid = $USER->id;
 
-// Calculate time filter
+// Calculate time filter.
 $timefilter = 0;
 switch ($timerange) {
     case '7':
@@ -94,68 +103,68 @@ function get_filtered_sql($basesql, $timefilter, $timefield = 'timecreated') {
     return $basesql;
 }
 
-// ===== SUMMARY STATISTICS =====
+// ===== SUMMARY STATISTICS =====.
 
-// Total questions generated
+// Total questions generated.
 $sql = get_filtered_sql(
     "SELECT COUNT(*) FROM {hlai_quizgen_questions} WHERE userid = ? AND courseid = ?",
     $timefilter
 );
-$total_questions = $DB->count_records_sql($sql, [$userid, $courseid]);
+$totalquestions = $DB->count_records_sql($sql, [$userid, $courseid]);
 
-// Approved questions
+// Approved questions.
 $sql = get_filtered_sql(
     "SELECT COUNT(*) FROM {hlai_quizgen_questions} WHERE userid = ? AND courseid = ? AND status IN ('approved', 'deployed')",
     $timefilter
 );
-$approved_questions = $DB->count_records_sql($sql, [$userid, $courseid]);
+$approvedquestions = $DB->count_records_sql($sql, [$userid, $courseid]);
 
-// Rejected questions
+// Rejected questions.
 $sql = get_filtered_sql(
     "SELECT COUNT(*) FROM {hlai_quizgen_questions} WHERE userid = ? AND courseid = ? AND status = 'rejected'",
     $timefilter
 );
-$rejected_questions = $DB->count_records_sql($sql, [$userid, $courseid]);
+$rejectedquestions = $DB->count_records_sql($sql, [$userid, $courseid]);
 
-// First-time acceptance
+// First-time acceptance.
 $sql = get_filtered_sql(
     "SELECT COUNT(*) FROM {hlai_quizgen_questions} WHERE userid = ? AND courseid = ? " .
     "AND status IN ('approved', 'deployed') AND (regeneration_count = 0 OR regeneration_count IS NULL)",
     $timefilter
 );
-$first_time_approved = $DB->count_records_sql($sql, [$userid, $courseid]);
+$firsttimeapproved = $DB->count_records_sql($sql, [$userid, $courseid]);
 
-// Calculate rates
-$reviewed = $approved_questions + $rejected_questions;
-$acceptance_rate = $reviewed > 0 ? round(($approved_questions / $reviewed) * 100, 1) : 0;
-$ftar = $reviewed > 0 ? round(($first_time_approved / $reviewed) * 100, 1) : 0;
+// Calculate rates.
+$reviewed = $approvedquestions + $rejectedquestions;
+$acceptancerate = $reviewed > 0 ? round(($approvedquestions / $reviewed) * 100, 1) : 0;
+$ftar = $reviewed > 0 ? round(($firsttimeapproved / $reviewed) * 100, 1) : 0;
 
-// Average quality score
+// Average quality score.
 $sql = get_filtered_sql(
     "SELECT AVG(validation_score) FROM {hlai_quizgen_questions} WHERE userid = ? AND courseid = ? AND validation_score IS NOT NULL",
     $timefilter
 );
-$avg_quality = $DB->get_field_sql($sql, [$userid, $courseid]);
-$avg_quality = $avg_quality ? round($avg_quality, 1) : 0;
+$avgquality = $DB->get_field_sql($sql, [$userid, $courseid]);
+$avgquality = $avgquality ? round($avgquality, 1) : 0;
 
-// Total regenerations
+// Total regenerations.
 $sql = get_filtered_sql(
     "SELECT SUM(regeneration_count) FROM {hlai_quizgen_questions} WHERE userid = ? AND courseid = ?",
     $timefilter
 );
-$total_regenerations = $DB->get_field_sql($sql, [$userid, $courseid]) ?: 0;
+$totalregenerations = $DB->get_field_sql($sql, [$userid, $courseid]) ?: 0;
 
-// Average regenerations per question
-$avg_regenerations = $total_questions > 0 ? round($total_regenerations / $total_questions, 2) : 0;
+// Average regenerations per question.
+$avgregenerations = $totalquestions > 0 ? round($totalregenerations / $totalquestions, 2) : 0;
 
-// Total quizzes/requests
+// Total quizzes/requests.
 $sql = get_filtered_sql(
     "SELECT COUNT(*) FROM {hlai_quizgen_requests} WHERE userid = ? AND courseid = ?",
     $timefilter
 );
-$total_requests = $DB->count_records_sql($sql, [$userid, $courseid]);
+$totalrequests = $DB->count_records_sql($sql, [$userid, $courseid]);
 
-// ===== QUESTION TYPE BREAKDOWN =====
+// ===== QUESTION TYPE BREAKDOWN =====.
 $sql = get_filtered_sql(
     "SELECT questiontype, COUNT(*) as count,
             SUM(CASE WHEN status IN ('approved', 'deployed') THEN 1 ELSE 0 END) as approved,
@@ -166,9 +175,9 @@ $sql = get_filtered_sql(
      WHERE userid = ? AND courseid = ?",
     $timefilter
 );
-$type_stats = $DB->get_records_sql($sql . " GROUP BY questiontype", [$userid, $courseid]);
+$typestats = $DB->get_records_sql($sql . " GROUP BY questiontype", [$userid, $courseid]);
 
-// ===== DIFFICULTY BREAKDOWN =====
+// ===== DIFFICULTY BREAKDOWN =====.
 $sql = get_filtered_sql(
     "SELECT difficulty, COUNT(*) as count,
             SUM(CASE WHEN status IN ('approved', 'deployed') THEN 1 ELSE 0 END) as approved,
@@ -177,9 +186,9 @@ $sql = get_filtered_sql(
      WHERE userid = ? AND courseid = ?",
     $timefilter
 );
-$difficulty_stats = $DB->get_records_sql($sql . " GROUP BY difficulty", [$userid, $courseid]);
+$difficultystats = $DB->get_records_sql($sql . " GROUP BY difficulty", [$userid, $courseid]);
 
-// ===== BLOOM'S TAXONOMY BREAKDOWN =====
+// ===== BLOOM'S TAXONOMY BREAKDOWN =====.
 $sql = get_filtered_sql(
     "SELECT blooms_level, COUNT(*) as count,
             SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
@@ -188,21 +197,21 @@ $sql = get_filtered_sql(
      WHERE userid = ? AND courseid = ? AND blooms_level IS NOT NULL",
     $timefilter
 );
-$blooms_stats = $DB->get_records_sql($sql . " GROUP BY blooms_level", [$userid, $courseid]);
+$bloomsstats = $DB->get_records_sql($sql . " GROUP BY blooms_level", [$userid, $courseid]);
 
-// ===== REJECTION REASONS =====
+// ===== REJECTION REASONS =====.
 // Note: rejection_reason column doesn't exist in database yet
-// Commenting out until schema is updated
+// Commenting out until schema is updated.
 // $sql = get_filtered_sql(
-//     "SELECT COALESCE(rejection_reason, 'Not specified') as reason, COUNT(*) as count
-//      FROM {hlai_quizgen_questions}
-//      WHERE userid = ? AND courseid = ? AND status = 'rejected'",
-//     $timefilter
-// );
+// "SELECT COALESCE(rejection_reason, 'Not specified') as reason, COUNT(*) as count.
+// FROM {hlai_quizgen_questions}.
+// WHERE userid = ? AND courseid = ? AND status = 'rejected'",.
+// $timefilter
+// );.
 // $rejection_reasons = $DB->get_records_sql($sql . " GROUP BY rejection_reason ORDER BY count DESC LIMIT 10", [$userid, $courseid]);
-$rejection_reasons = []; // Empty array for now
+$rejectionreasons = []; // Empty array for now
 
-// Output starts here
+// Output starts here.
 echo $OUTPUT->header();
 ?>
 
@@ -256,36 +265,36 @@ echo $OUTPUT->header();
         <div class="column is-2">
             <div class="box has-text-centered">
                 <p class="is-size-3"><i class="fa fa-file-text-o" style="color: #3B82F6;"></i></p>
-                <p class="title is-4 mb-1"><?php echo $total_requests; ?></p>
+                <p class="title is-4 mb-1"><?php echo $totalrequests; ?></p>
                 <p class="heading">Quiz Generations</p>
             </div>
         </div>
         <div class="column is-2">
             <div class="box has-text-centered">
                 <p class="is-size-3"><i class="fa fa-question-circle" style="color: #06B6D4;"></i></p>
-                <p class="title is-4 mb-1"><?php echo $total_questions; ?></p>
+                <p class="title is-4 mb-1"><?php echo $totalquestions; ?></p>
                 <p class="heading">Questions Created</p>
             </div>
         </div>
         <div class="column is-2">
             <div class="box has-text-centered">
                 <p class="is-size-3"><i class="fa fa-check-circle" style="color: #10B981;"></i></p>
-                <p class="title is-4 mb-1"><?php echo $approved_questions; ?></p>
+                <p class="title is-4 mb-1"><?php echo $approvedquestions; ?></p>
                 <p class="heading">Approved</p>
-                <p class="help has-text-grey"><?php echo $acceptance_rate; ?>% acceptance</p>
+                <p class="help has-text-grey"><?php echo $acceptancerate; ?>% acceptance</p>
             </div>
         </div>
         <div class="column is-2">
             <div class="box has-text-centered">
                 <p class="is-size-3"><i class="fa fa-times-circle" style="color: #EF4444;"></i></p>
-                <p class="title is-4 mb-1"><?php echo $rejected_questions; ?></p>
+                <p class="title is-4 mb-1"><?php echo $rejectedquestions; ?></p>
                 <p class="heading">Rejected</p>
             </div>
         </div>
         <div class="column is-2">
             <div class="box has-text-centered">
                 <p class="is-size-3"><i class="fa fa-star" style="color: #F59E0B;"></i></p>
-                <p class="title is-4 mb-1"><?php echo $avg_quality; ?></p>
+                <p class="title is-4 mb-1"><?php echo $avgquality; ?></p>
                 <p class="heading">Avg Quality</p>
             </div>
         </div>
@@ -338,8 +347,10 @@ echo $OUTPUT->header();
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($type_stats as $type => $stats):
-                                if (empty($type)) continue;
+                            <?php foreach ($typestats as $type => $stats) :
+                                if (empty($type)) {
+                                    continue;
+                                }
                                 $rate = $stats->count > 0 ? round(($stats->approved / $stats->count) * 100, 1) : 0;
                             ?>
                             <tr>
@@ -398,7 +409,7 @@ echo $OUTPUT->header();
     </div>
 
     <!-- Rejection Analysis -->
-    <?php if (!empty($rejection_reasons)): ?>
+    <?php if (!empty($rejectionreasons)) : ?>
     <div class="box mt-4">
         <p class="title is-6"><i class="fa fa-times-circle" style="color: #EF4444;"></i> Rejection Analysis</p>
         <p class="has-text-grey is-size-7">Common reasons for question rejection</p>
@@ -410,7 +421,7 @@ echo $OUTPUT->header();
                 <div class="box">
                     <p class="title is-6 mb-3">Top Rejection Reasons</p>
                     <ul class="hlai-simple-list">
-                        <?php foreach ($rejection_reasons as $reason): ?>
+                        <?php foreach ($rejectionreasons as $reason) : ?>
                         <li class="is-flex is-justify-content-space-between is-align-items-center">
                             <span><?php echo htmlspecialchars($reason->reason); ?></span>
                             <span class="tag is-danger is-light"><?php echo $reason->count; ?></span>
@@ -435,7 +446,7 @@ echo $OUTPUT->header();
         <p class="title is-6"><i class="fa fa-lightbulb-o" style="color: #F59E0B;"></i> Insights & Recommendations</p>
         <div class="columns">
             <?php
-            // Generate insights based on data
+            // Generate insights based on data.
             $insights = [];
 
             if ($ftar < 50) {
@@ -443,44 +454,44 @@ echo $OUTPUT->header();
                     'type' => 'warning',
                     'icon' => '<i class="fa fa-exclamation-triangle" style="color: #F59E0B;"></i>',
                     'title' => 'Low First-Time Acceptance Rate',
-                    'message' => 'Your FTAR is ' . $ftar . '%. Consider providing more detailed content or selecting more specific topics to improve AI accuracy.'
+                    'message' => 'Your FTAR is ' . $ftar . '%. Consider providing more detailed content or selecting more specific topics to improve AI accuracy.',
                 ];
             } else if ($ftar >= 75) {
                 $insights[] = [
                     'type' => 'success',
                     'icon' => '<i class="fa fa-check-circle" style="color: #10B981;"></i>',
                     'title' => 'Excellent First-Time Acceptance',
-                    'message' => 'Your FTAR of ' . $ftar . '% is excellent! The AI is generating high-quality questions that match your expectations.'
+                    'message' => 'Your FTAR of ' . $ftar . '% is excellent! The AI is generating high-quality questions that match your expectations.',
                 ];
             }
 
-            if ($avg_regenerations > 2) {
+            if ($avgregenerations > 2) {
                 $insights[] = [
                     'type' => 'warning',
                     'icon' => '<i class="fa fa-refresh" style="color: #06B6D4;"></i>',
                     'title' => 'High Regeneration Rate',
-                    'message' => 'On average, questions need ' . $avg_regenerations . ' regenerations. Try using more structured content or clearer learning objectives.'
+                    'message' => 'On average, questions need ' . $avgregenerations . ' regenerations. Try using more structured content or clearer learning objectives.',
                 ];
             }
 
-            // Find best performing question type
-            $best_type = null;
-            $best_rate = 0;
-            foreach ($type_stats as $type => $stats) {
+            // Find best performing question type.
+            $besttype = null;
+            $bestrate = 0;
+            foreach ($typestats as $type => $stats) {
                 if (!empty($type) && $stats->count >= 5) {
                     $rate = $stats->count > 0 ? ($stats->approved / $stats->count) * 100 : 0;
-                    if ($rate > $best_rate) {
-                        $best_rate = $rate;
-                        $best_type = $type;
+                    if ($rate > $bestrate) {
+                        $bestrate = $rate;
+                        $besttype = $type;
                     }
                 }
             }
-            if ($best_type) {
+            if ($besttype) {
                 $insights[] = [
                     'type' => 'info',
                     'icon' => '<i class="fa fa-bar-chart"></i>',
                     'title' => 'Best Performing Type',
-                    'message' => ucfirst($best_type) . ' questions have the highest acceptance rate at ' . round($best_rate, 1) . '%. Consider using more of this type.'
+                    'message' => ucfirst($besttype) . ' questions have the highest acceptance rate at ' . round($bestrate, 1) . '%. Consider using more of this type.',
                 ];
             }
 
@@ -489,11 +500,11 @@ echo $OUTPUT->header();
                     'type' => 'info',
                     'icon' => '<i class="fa fa-info-circle"></i>',
                     'title' => 'Keep Generating!',
-                    'message' => 'Generate more questions to see detailed insights and recommendations based on your usage patterns.'
+                    'message' => 'Generate more questions to see detailed insights and recommendations based on your usage patterns.',
                 ];
             }
 
-            foreach ($insights as $insight):
+            foreach ($insights as $insight) :
             ?>
             <div class="column is-one-third">
                 <div class="notification is-<?php echo $insight['type']; ?> is-light">
@@ -520,18 +531,18 @@ window.hlaiQuizgenAnalytics = {
     ajaxUrl: '<?php echo $CFG->wwwroot; ?>/local/hlai_quizgen/ajax.php',
     timerange: '<?php echo $timerange; ?>',
     stats: {
-        totalQuestions: <?php echo $total_questions; ?>,
-        approved: <?php echo $approved_questions; ?>,
-        rejected: <?php echo $rejected_questions; ?>,
-        pending: <?php echo max(0, $total_questions - $approved_questions - $rejected_questions); ?>,
+        totalQuestions: <?php echo $totalquestions; ?>,
+        approved: <?php echo $approvedquestions; ?>,
+        rejected: <?php echo $rejectedquestions; ?>,
+        pending: <?php echo max(0, $totalquestions - $approvedquestions - $rejectedquestions); ?>,
         ftar: <?php echo $ftar; ?>,
-        avgQuality: <?php echo $avg_quality; ?>,
-        totalRegens: <?php echo $total_regenerations; ?>
+        avgQuality: <?php echo $avgquality; ?>,
+        totalRegens: <?php echo $totalregenerations; ?>
     },
-    typeStats: <?php echo json_encode(array_values($type_stats)); ?>,
-    difficultyStats: <?php echo json_encode(array_values($difficulty_stats)); ?>,
-    bloomsStats: <?php echo json_encode(array_values($blooms_stats)); ?>,
-    rejectionReasons: <?php echo json_encode(array_values($rejection_reasons)); ?>
+    typeStats: <?php echo json_encode(array_values($typestats)); ?>,
+    difficultyStats: <?php echo json_encode(array_values($difficultystats)); ?>,
+    bloomsStats: <?php echo json_encode(array_values($bloomsstats)); ?>,
+    rejectionReasons: <?php echo json_encode(array_values($rejectionreasons)); ?>
 };
 </script>
 

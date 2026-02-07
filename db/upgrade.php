@@ -1,19 +1,26 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/.
 //
-// Moodle is free software: you can redistribute it and/or modify
+// Moodle is free software: you can redistribute it and/or modify.
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
 //
-// Moodle is distributed in the hope that it will be useful,
+// Moodle is distributed in the hope that it will be useful,.
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the.
 // GNU General Public License for more details.
 //
-// You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+// You should have received a copy of the GNU General Public License.
+// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
 
+/**
+ * Upgrade page.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 STARTER
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 /**
  * Database upgrade script for the Human Logic AI Quiz Generator plugin.
  *
@@ -66,10 +73,10 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         $table->add_field('learning_objectives', XMLDB_TYPE_TEXT, null, null, null, null, null);
         $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
 
-        $table->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-        $table->add_key('requestid', XMLDB_KEY_FOREIGN, array('requestid'), 'hlai_quizgen_requests', array('id'));
-        $table->add_key('parent_topic_id', XMLDB_KEY_FOREIGN, array('parent_topic_id'), 'hlai_quizgen_topics', array('id'));
-        $table->add_index('requestid_selected', XMLDB_INDEX_NOTUNIQUE, array('requestid', 'selected'));
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('requestid', XMLDB_KEY_FOREIGN, ['requestid'], 'hlai_quizgen_requests', ['id']);
+        $table->add_key('parent_topic_id', XMLDB_KEY_FOREIGN, ['parent_topic_id'], 'hlai_quizgen_topics', ['id']);
+        $table->add_index('requestid_selected', XMLDB_INDEX_NOTUNIQUE, ['requestid', 'selected']);
 
         $dbman->create_table($table);
 
@@ -93,11 +100,11 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
             $questionstable->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
             $questionstable->add_field('timedeployed', XMLDB_TYPE_INTEGER, '10', null, null, null, null);
 
-            $questionstable->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-            $questionstable->add_key('requestid', XMLDB_KEY_FOREIGN, array('requestid'), 'hlai_quizgen_requests', array('id'));
-            $questionstable->add_key('topicid', XMLDB_KEY_FOREIGN, array('topicid'), 'hlai_quizgen_topics', array('id'));
-            $questionstable->add_index('requestid_status', XMLDB_INDEX_NOTUNIQUE, array('requestid', 'status'));
-            $questionstable->add_index('questiontype', XMLDB_INDEX_NOTUNIQUE, array('questiontype'));
+            $questionstable->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+            $questionstable->add_key('requestid', XMLDB_KEY_FOREIGN, ['requestid'], 'hlai_quizgen_requests', ['id']);
+            $questionstable->add_key('topicid', XMLDB_KEY_FOREIGN, ['topicid'], 'hlai_quizgen_topics', ['id']);
+            $questionstable->add_index('requestid_status', XMLDB_INDEX_NOTUNIQUE, ['requestid', 'status']);
+            $questionstable->add_index('questiontype', XMLDB_INDEX_NOTUNIQUE, ['questiontype']);
 
             $dbman->create_table($questionstable);
         }
@@ -117,9 +124,9 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
             $answerstable->add_field('distractor_reasoning', XMLDB_TYPE_TEXT, null, null, null, null, null);
             $answerstable->add_field('sortorder', XMLDB_TYPE_INTEGER, '5', null, XMLDB_NOTNULL, null, '0');
 
-            $answerstable->add_key('primary', XMLDB_KEY_PRIMARY, array('id'));
-            $answerstable->add_key('questionid', XMLDB_KEY_FOREIGN, array('questionid'), 'hlai_quizgen_questions', array('id'));
-            $answerstable->add_index('questionid_sortorder', XMLDB_INDEX_NOTUNIQUE, array('questionid', 'sortorder'));
+            $answerstable->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+            $answerstable->add_key('questionid', XMLDB_KEY_FOREIGN, ['questionid'], 'hlai_quizgen_questions', ['id']);
+            $answerstable->add_index('questionid_sortorder', XMLDB_INDEX_NOTUNIQUE, ['questionid', 'sortorder']);
 
             $dbman->create_table($answerstable);
         }
@@ -149,7 +156,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         }
 
         // Add index on content_hash for fast duplicate lookups.
-        $index = new xmldb_index('content_hash', XMLDB_INDEX_NOTUNIQUE, array('content_hash'));
+        $index = new xmldb_index('content_hash', XMLDB_INDEX_NOTUNIQUE, ['content_hash']);
         if (!$dbman->index_exists($table, $index)) {
             $dbman->add_index($table, $index);
         }
@@ -209,7 +216,6 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
         }
-
 
         upgrade_plugin_savepoint(true, 2025111307, 'local', 'hlai_quizgen');
     }
@@ -281,7 +287,6 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025111603) {
-
         // Define table hlai_quizgen_outcome_map.
         $table = new xmldb_table('hlai_quizgen_outcome_map');
 
@@ -353,7 +358,6 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025111604) {
-
         // Define table hlai_quizgen_reviews.
         $table = new xmldb_table('hlai_quizgen_reviews');
 
@@ -610,13 +614,13 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         }
 
         // Remove other legacy underscore fields if they exist.
-        $legacy_fields = [
+        $legacyfields = [
             'question_name', 'question_text', 'question_format', 'question_type',
             'general_feedback', 'default_mark', 'grading_criteria', 'ai_confidence',
-            'regeneration_count', 'moodle_question_id', 'category_id', 'timereviewed'
+            'regeneration_count', 'moodle_question_id', 'category_id', 'timereviewed',
         ];
 
-        foreach ($legacy_fields as $fieldname) {
+        foreach ($legacyfields as $fieldname) {
             $field = new xmldb_field($fieldname);
             if ($dbman->field_exists($table, $field)) {
                 // Drop any keys/indexes first.
@@ -1021,9 +1025,11 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
 
         foreach ($contexts as $context) {
             // Get all top-level categories for this context.
-            $categories = $DB->get_records('question_categories',
+            $categories = $DB->get_records(
+                'question_categories',
                 ['contextid' => $context->contextid, 'parent' => 0],
-                'id ASC');
+                'id ASC'
+            );
 
             // Keep the first one as the real top category, fix the rest.
             $first = true;
@@ -1044,7 +1050,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025120300) {
-        // v1.1.0 STABLE RELEASE - ALL ISSUES FIXED:
+        // V1.1.0 STABLE RELEASE - ALL ISSUES FIXED:.
         // - Fixed regeneration button (allow_completed flag).
         // - Fixed excess question generation (strict count enforcement).
         // - CRITICAL: Fixed question bank visibility by removing transaction wrapper.
@@ -1057,7 +1063,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025120301) {
-        // v1.1.1 - Enhanced question naming for better question bank visibility:
+        // V1.1.1 - Enhanced question naming for better question bank visibility:.
         // - Question names now include category name, question number, and snippet.
         // - Format: "Quiz Name: Q1 - Question snippet" (matches working plugin).
         // - Automatically strips " - AI Generated Questions" suffix for cleaner names.
@@ -1069,7 +1075,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025120302) {
-        // v1.1.2 - Fixed duplicate top category error:
+        // V1.1.2 - Fixed duplicate top category error:.
         // - Handles cases where multiple top categories exist for same context.
         // - Uses get_records with LIMIT 1 instead of get_record to avoid "more than one record" error.
         // - Falls back to question_get_top_category() only when no top category exists.
@@ -1080,7 +1086,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025120303) {
-        // v1.1.3 - Moodle coding standards compliance:
+        // V1.1.3 - Moodle coding standards compliance:.
         // - Added proper GPL header to view_logs.php.
         // - Fixed hardcoded Mac path to use ini_get('error_log').
         // - Improved output methods to use $OUTPUT->heading().
@@ -1092,7 +1098,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025120800) {
-        // v1.1.4 - Improved AI topic extraction:
+        // V1.1.4 - Improved AI topic extraction:.
         // - Modified AI prompt to extract EXACT topic/section names from content.
         // - AI now instructed to use existing activity names, module titles, chapter names.
         // - Prevents AI from creating generic/invented topic names.
@@ -1104,7 +1110,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025120801) {
-        // v1.2.0 - MAJOR IMPROVEMENT - Questions generated from FULL activity content:
+        // V1.2.0 - MAJOR IMPROVEMENT - Questions generated from FULL activity content:.
         // - Question generator now fetches complete content from activities, files, URLs.
         // - No longer relies on AI-generated 500-char excerpts.
         // - Retrieves full text from all content sources for each topic.
@@ -1117,7 +1123,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025120802) {
-        // v1.2.1 - TOKEN OPTIMIZATION - Content caching and size limits:
+        // V1.2.1 - TOKEN OPTIMIZATION - Content caching and size limits:.
         // - Content now fetched ONCE per request and cached in memory.
         // - Prevents redundant extraction for multiple topics (saves tokens).
         // - Reduced content limit from 15,000 to 8,000 chars per batch (~2,000 words).
@@ -1130,7 +1136,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025120903) {
-        // v1.2.3 - Production release with all optimizations:
+        // V1.2.3 - Production release with all optimizations:.
         // - Consolidated all previous fixes and improvements.
         // - Regeneration button working with allow_completed flag.
         // - Enhanced question naming (Quiz Name: Q1, Q2, Q3...).
@@ -1145,7 +1151,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025120904) {
-        // v1.2.4 - Structural content parsing:
+        // V1.2.4 - Structural content parsing:.
         // - NEW: html_to_structured_text() method preserves HTML headings (H1-H6) as markdown.
         // - Updated extract_from_page() to preserve heading structure.
         // - Updated extract_from_book() to preserve chapter titles and content headings.
@@ -1161,7 +1167,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025120905) {
-        // v1.2.5 - Topic filtering:
+        // V1.2.5 - Topic filtering:.
         // - NEW: filter_invalid_topics() method removes non-educational topics.
         // - Filters out pure numbers (1, 2, 3.5, etc.).
         // - Filters out symbols and special characters.
@@ -1174,7 +1180,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025121100) {
-        // v1.3.0 - Fix content extraction for URL, Folder, and Resource activities:
+        // V1.3.0 - Fix content extraction for URL, Folder, and Resource activities:.
         // - FIXED: Added extract_from_url_activity() handler for URL activities.
         // - FIXED: Added extract_from_folder_activity() handler for Folder activities.
         // - FIXED: Resource file extraction now passes original filename for proper type detection.
@@ -1188,7 +1194,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025121101) {
-        // v1.3.1 - Fix bulk scan options not working:
+        // V1.3.1 - Fix bulk scan options not working:.
         // - FIXED: Added missing section placeholders for bulk scan checkboxes (scan_course, scan_resources, scan_activities).
         // - FIXED: JavaScript toggleContentSection() now handles missing sections gracefully.
         // - IMPROVED: Bulk scan options now work correctly across all Moodle installations.
@@ -1198,7 +1204,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025121701) {
-        // v1.4.1 - UI/UX Enhancement - Analytics Dashboard Support:
+        // V1.4.1 - UI/UX Enhancement - Analytics Dashboard Support:.
         // - NEW: Add rejection_reason field to questions table for tracking why questions were rejected.
         // - NEW: Add rejection_feedback field for detailed teacher feedback on rejections.
         // - NEW: Add accepted_on_first_try field (boolean) for FTAR metric tracking.
@@ -1285,7 +1291,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
     }
 
     if ($oldversion < 2026020401) {
-        // v1.5.2 - Installation universality fix:
+        // V1.5.2 - Installation universality fix:.
         // - FIXED: Language strings now load properly on all sites with fallbacks.
         // - FIXED: Navigation uses TYPE_SETTING instead of TYPE_CUSTOM for better compatibility.
         // - FIXED: Icon loading failures no longer break navigation display.
