@@ -26,9 +26,8 @@ amd/build/*.min.js.map
 Thumbs.db
 .DS_Store
 
-# Test files (keep in dev, but document them)
-test_*.php
-*_test.php
+# Temporary test files in root (but allow tests/ directory for PHPUnit)
+/test_*.php
 
 # Documentation files that are development-only
 docs/development/

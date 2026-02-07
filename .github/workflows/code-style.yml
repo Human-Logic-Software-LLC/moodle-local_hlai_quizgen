@@ -1,0 +1,56 @@
+name: Code Style Check
+
+on: [push, pull_request]
+
+jobs:
+  codestyle:
+    name: Moodle Coding Style
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+        with:
+          path: plugin
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
+          extensions: mysqli, zip, gd, xmlrpc, soap, intl
+          coverage: none
+
+      - name: Initialise moodle-plugin-ci
+        run: |
+          composer create-project -n --no-dev --prefer-dist moodlehq/moodle-plugin-ci ci ^4
+          echo $(cd ci/bin; pwd) >> $GITHUB_PATH
+          echo $(cd ci/vendor/bin; pwd) >> $GITHUB_PATH
+          sudo locale-gen en_AU.UTF-8
+
+      - name: Install moodle-plugin-ci
+        run: |
+          moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
+        env:
+          DB: 'mysqli'
+          MOODLE_BRANCH: 'MOODLE_404_STABLE'
+
+      - name: PHP Lint
+        run: moodle-plugin-ci phplint
+
+      - name: Moodle Code Checker
+        run: moodle-plugin-ci codechecker --max-warnings 0
+
+      - name: Moodle PHPDoc Checker
+        run: moodle-plugin-ci phpdoc --max-warnings 0
+
+      - name: Validating
+        run: moodle-plugin-ci validate
+
+      - name: Check upgrade savepoints
+        run: moodle-plugin-ci savepoints
+
+      - name: Mustache Lint
+        run: moodle-plugin-ci mustache
+
+      - name: Grunt (JavaScript linting)
+        run: moodle-plugin-ci grunt --max-lint-warnings 0
