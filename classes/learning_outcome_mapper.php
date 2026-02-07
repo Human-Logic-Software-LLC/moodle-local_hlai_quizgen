@@ -30,8 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * Aligns questions with learning outcomes and competencies.
  */
 class learning_outcome_mapper {
-    /** Bloom's taxonomy levels. */
-    /** BLOOMS_LEVELS constant. */
+    /** @var array Bloom's taxonomy levels. */
     const BLOOMS_LEVELS = [
         'remember' => 1,
         'understand' => 2,
@@ -41,8 +40,7 @@ class learning_outcome_mapper {
         'create' => 6,
     ];
 
-    /** Common action verbs for each Bloom's level. */
-    /** BLOOMS_VERBS constant. */
+    /** @var array Common action verbs for each Bloom's level. */
     const BLOOMS_VERBS = [
         'remember' => ['define', 'list', 'recall', 'identify', 'name', 'state', 'describe'],
         'understand' => ['explain', 'summarize', 'interpret', 'classify', 'compare', 'exemplify'],

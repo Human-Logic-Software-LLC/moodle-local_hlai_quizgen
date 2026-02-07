@@ -52,11 +52,11 @@ class question_validator {
 
     /** @var array Quality score thresholds */
     const QUALITY_EXCELLENT = 90;
-    /** QUALITY_GOOD constant. */
+    /** @var int Good quality threshold. */
     const QUALITY_GOOD = 70;
-    /** QUALITY_ACCEPTABLE constant. */
+    /** @var int Acceptable quality threshold. */
     const QUALITY_ACCEPTABLE = 50;
-    /** QUALITY_POOR constant. */
+    /** @var int Poor quality threshold. */
     const QUALITY_POOR = 30;
 
     /**

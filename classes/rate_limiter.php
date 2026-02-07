@@ -30,16 +30,13 @@ defined('MOODLE_INTERNAL') || die();
  * Implements rate limiting to prevent abuse and control costs.
  */
 class rate_limiter {
-    /** Default: 10 requests per user per hour. */
-    /** DEFAULT_LIMIT_PER_HOUR constant. */
+    /** @var int Default: 10 requests per user per hour. */
     const DEFAULT_LIMIT_PER_HOUR = 10;
 
-    /** Default: 50 requests per user per day. */
-    /** DEFAULT_LIMIT_PER_DAY constant. */
+    /** @var int Default: 50 requests per user per day. */
     const DEFAULT_LIMIT_PER_DAY = 50;
 
-    /** Default: 200 requests per site per hour. */
-    /** DEFAULT_SITE_LIMIT_PER_HOUR constant. */
+    /** @var int Default: 200 requests per site per hour. */
     const DEFAULT_SITE_LIMIT_PER_HOUR = 200;
 
     /**

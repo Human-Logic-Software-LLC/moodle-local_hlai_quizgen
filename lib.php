@@ -56,6 +56,8 @@ function local_hlai_quizgen_extend_navigation_course(navigation_node $navigation
 
 /**
  * Ensure Font Awesome is available for all plugin pages (icons rely on it).
+ *
+ * @return void
  */
 function local_hlai_quizgen_before_http_headers() {
     global $PAGE;

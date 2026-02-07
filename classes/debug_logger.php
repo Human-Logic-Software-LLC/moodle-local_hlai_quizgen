@@ -33,15 +33,15 @@ defined('MOODLE_INTERNAL') || die();
  * Debug logger class for comprehensive error and event logging.
  */
 class debug_logger {
-    /** @var string Log levels */
+    /** @var string Debug log level. */
     const LEVEL_DEBUG = 'DEBUG';
-    /** LEVEL_INFO constant. */
+    /** @var string Info log level. */
     const LEVEL_INFO = 'INFO';
-    /** LEVEL_WARNING constant. */
+    /** @var string Warning log level. */
     const LEVEL_WARNING = 'WARNING';
-    /** LEVEL_ERROR constant. */
+    /** @var string Error log level. */
     const LEVEL_ERROR = 'ERROR';
-    /** LEVEL_CRITICAL constant. */
+    /** @var string Critical log level. */
     const LEVEL_CRITICAL = 'CRITICAL';
 
     /** @var string Log file name */

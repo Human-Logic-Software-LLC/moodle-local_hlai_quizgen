@@ -22,18 +22,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// phpcs:disable moodle.Commenting.MissingDocblock.File
-// phpcs:disable moodle.Commenting.FileExpectedTags
-/**
- * AI Quiz Generator - Teacher Dashboard
- *
- * Main dashboard providing overview of quiz generation activity,
- * quality metrics, and quick access to key features.
- *
- * @package    local_hlai_quizgen
- * @copyright  2025 Human Logic Software LLC
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+// phpcs:disable moodle.Commenting.MissingDocblock
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');

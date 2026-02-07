@@ -30,24 +30,24 @@ defined('MOODLE_INTERNAL') || die();
  * Manages peer review and approval workflows for AI-generated questions.
  */
 class review_workflow {
-    /** @var array Review statuses */
+    /** @var string Pending review status. */
     const STATUS_PENDING = 'pending_review';
-    /** STATUS_IN_REVIEW constant. */
+    /** @var string In review status. */
     const STATUS_IN_REVIEW = 'in_review';
-    /** STATUS_APPROVED constant. */
+    /** @var string Approved status. */
     const STATUS_APPROVED = 'approved';
-    /** STATUS_REJECTED constant. */
+    /** @var string Rejected status. */
     const STATUS_REJECTED = 'rejected';
-    /** STATUS_NEEDS_REVISION constant. */
+    /** @var string Needs revision status. */
     const STATUS_NEEDS_REVISION = 'needs_revision';
-    /** STATUS_REVISED constant. */
+    /** @var string Revised status. */
     const STATUS_REVISED = 'revised';
 
-    /** @var array Review roles */
+    /** @var string Reviewer role. */
     const ROLE_REVIEWER = 'reviewer';
-    /** ROLE_APPROVER constant. */
+    /** @var string Approver role. */
     const ROLE_APPROVER = 'approver';
-    /** ROLE_EDITOR constant. */
+    /** @var string Editor role. */
     const ROLE_EDITOR = 'editor';
 
     /**

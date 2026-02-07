@@ -32,15 +32,15 @@ defined('MOODLE_INTERNAL') || die();
  * Error handler class with standardized error handling.
  */
 class error_handler {
-    /** @var array Error severity levels */
+    /** @var string Debug severity level. */
     const SEVERITY_DEBUG = 'debug';
-    /** SEVERITY_INFO constant. */
+    /** @var string Info severity level. */
     const SEVERITY_INFO = 'info';
-    /** SEVERITY_WARNING constant. */
+    /** @var string Warning severity level. */
     const SEVERITY_WARNING = 'warning';
-    /** SEVERITY_ERROR constant. */
+    /** @var string Error severity level. */
     const SEVERITY_ERROR = 'error';
-    /** SEVERITY_CRITICAL constant. */
+    /** @var string Critical severity level. */
     const SEVERITY_CRITICAL = 'critical';
 
     /**

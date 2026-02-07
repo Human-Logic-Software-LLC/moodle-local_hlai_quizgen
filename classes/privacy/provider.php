@@ -34,8 +34,7 @@ use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\contextlist;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
-
-defined('MOODLE_INTERNAL') || die();
+use core_privacy\local\request\transform;
 
 /**
  * Privacy provider class.

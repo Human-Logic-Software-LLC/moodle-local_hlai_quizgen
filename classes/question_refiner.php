@@ -32,17 +32,17 @@ defined('MOODLE_INTERNAL') || die();
  * Uses the ai_provider abstraction to work with either hlai_hub or hlai_hubproxy.
  */
 class question_refiner {
-    /** @var array Refinement types */
+    /** @var string Clarity refinement type. */
     const REFINE_CLARITY = 'clarity';
-    /** REFINE_DIFFICULTY constant. */
+    /** @var string Difficulty refinement type. */
     const REFINE_DIFFICULTY = 'difficulty';
-    /** REFINE_DISTRACTORS constant. */
+    /** @var string Distractors refinement type. */
     const REFINE_DISTRACTORS = 'distractors';
-    /** REFINE_FEEDBACK constant. */
+    /** @var string Feedback refinement type. */
     const REFINE_FEEDBACK = 'feedback';
-    /** REFINE_BLOOMS constant. */
+    /** @var string Bloom's level refinement type. */
     const REFINE_BLOOMS = 'blooms_level';
-    /** REFINE_COMPREHENSIVE constant. */
+    /** @var string Comprehensive refinement type. */
     const REFINE_COMPREHENSIVE = 'comprehensive';
 
     /**

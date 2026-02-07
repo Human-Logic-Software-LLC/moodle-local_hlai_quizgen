@@ -43,6 +43,7 @@ class batch_exporter {
      * @param string $format Export format (moodle_xml, gift, aiken, json, csv)
      * @param array $options Export options
      * @return array Export result with file content
+     * @throws \moodle_exception If format is unsupported or request not found
      */
     public static function export_request(int $requestid, string $format = 'json', array $options = []): array {
         global $DB;

@@ -30,12 +30,10 @@ defined('MOODLE_INTERNAL') || die();
  * Analyzes student performance to automatically calibrate question difficulty.
  */
 class difficulty_calibrator {
-    /** Minimum attempts required for calibration. */
-    /** MIN_ATTEMPTS_FOR_CALIBRATION constant. */
+    /** @var int Minimum attempts required for calibration. */
     const MIN_ATTEMPTS_FOR_CALIBRATION = 10;
 
-    /** Difficulty thresholds based on success rate. */
-    /** DIFFICULTY_THRESHOLDS constant. */
+    /** @var array Difficulty thresholds based on success rate. */
     const DIFFICULTY_THRESHOLDS = [
         'very_easy' => ['min' => 90, 'max' => 100],
         'easy' => ['min' => 70, 'max' => 89],
