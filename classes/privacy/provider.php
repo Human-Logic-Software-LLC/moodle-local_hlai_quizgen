@@ -27,20 +27,23 @@
 namespace local_hlai_quizgen\privacy;
 
 use core_privacy\local\metadata\collection;
+use core_privacy\local\metadata\provider as metadata_provider;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\contextlist;
+use core_privacy\local\request\core_userlist_provider;
+use core_privacy\local\request\plugin\provider as plugin_provider;
+use core_privacy\local\request\transform;
 use core_privacy\local\request\userlist;
 use core_privacy\local\request\writer;
-use core_privacy\local\request\transform;
 
 /**
  * Privacy provider class.
  */
 class provider implements
-    \core_privacy\local\metadata\provider,
-    \core_privacy\local\request\core_userlist_provider,
-    \core_privacy\local\request\plugin\provider {
+    core_userlist_provider,
+    metadata_provider,
+    plugin_provider {
     /**
      * Get metadata about data stored by this plugin.
      *
