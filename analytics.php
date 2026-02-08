@@ -98,7 +98,7 @@ function get_filtered_sql($basesql, $baseparams, $timefilter, $timefield = 'time
 // Summary statistics.
 
 // Total questions generated.
-list($sql, $params) = get_filtered_sql(
+[$sql, $params] = get_filtered_sql(
     "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ?",
     [$userid, $courseid],
     $timefilter
@@ -106,7 +106,7 @@ list($sql, $params) = get_filtered_sql(
 $totalquestions = $DB->count_records_sql($sql, $params);
 
 // Approved questions.
-list($sql, $params) = get_filtered_sql(
+[$sql, $params] = get_filtered_sql(
     "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ? AND status IN ('approved', 'deployed')",
     [$userid, $courseid],
     $timefilter
@@ -114,7 +114,7 @@ list($sql, $params) = get_filtered_sql(
 $approvedquestions = $DB->count_records_sql($sql, $params);
 
 // Rejected questions.
-list($sql, $params) = get_filtered_sql(
+[$sql, $params] = get_filtered_sql(
     "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ? AND status = 'rejected'",
     [$userid, $courseid],
     $timefilter
@@ -122,7 +122,7 @@ list($sql, $params) = get_filtered_sql(
 $rejectedquestions = $DB->count_records_sql($sql, $params);
 
 // First-time acceptance.
-list($sql, $params) = get_filtered_sql(
+[$sql, $params] = get_filtered_sql(
     "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ? " .
     "AND status IN ('approved', 'deployed') AND (regeneration_count = 0 OR regeneration_count IS NULL)",
     [$userid, $courseid],
@@ -136,7 +136,7 @@ $acceptancerate = $reviewed > 0 ? round(($approvedquestions / $reviewed) * 100, 
 $ftar = $reviewed > 0 ? round(($firsttimeapproved / $reviewed) * 100, 1) : 0;
 
 // Average quality score.
-list($sql, $params) = get_filtered_sql(
+[$sql, $params] = get_filtered_sql(
     "SELECT AVG(validation_score) FROM {local_hlai_quizgen_questions}
      WHERE userid = ? AND courseid = ? AND validation_score IS NOT NULL",
     [$userid, $courseid],
@@ -146,7 +146,7 @@ $avgquality = $DB->get_field_sql($sql, $params);
 $avgquality = $avgquality ? round($avgquality, 1) : 0;
 
 // Total regenerations.
-list($sql, $params) = get_filtered_sql(
+[$sql, $params] = get_filtered_sql(
     "SELECT SUM(regeneration_count) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ?",
     [$userid, $courseid],
     $timefilter
@@ -157,7 +157,7 @@ $totalregenerations = $DB->get_field_sql($sql, $params) ?: 0;
 $avgregenerations = $totalquestions > 0 ? round($totalregenerations / $totalquestions, 2) : 0;
 
 // Total quizzes/requests.
-list($sql, $params) = get_filtered_sql(
+[$sql, $params] = get_filtered_sql(
     "SELECT COUNT(*) FROM {local_hlai_quizgen_requests} WHERE userid = ? AND courseid = ?",
     [$userid, $courseid],
     $timefilter
@@ -165,7 +165,7 @@ list($sql, $params) = get_filtered_sql(
 $totalrequests = $DB->count_records_sql($sql, $params);
 
 // Question type breakdown.
-list($sql, $params) = get_filtered_sql(
+[$sql, $params] = get_filtered_sql(
     "SELECT questiontype, COUNT(*) as count,
             SUM(CASE WHEN status IN ('approved', 'deployed') THEN 1 ELSE 0 END) as approved,
             SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected,
@@ -179,7 +179,7 @@ list($sql, $params) = get_filtered_sql(
 $typestats = $DB->get_records_sql($sql . " GROUP BY questiontype", $params);
 
 // Difficulty breakdown.
-list($sql, $params) = get_filtered_sql(
+[$sql, $params] = get_filtered_sql(
     "SELECT difficulty, COUNT(*) as count,
             SUM(CASE WHEN status IN ('approved', 'deployed') THEN 1 ELSE 0 END) as approved,
             AVG(validation_score) as avg_quality
@@ -191,7 +191,7 @@ list($sql, $params) = get_filtered_sql(
 $difficultystats = $DB->get_records_sql($sql . " GROUP BY difficulty", $params);
 
 // Bloom's taxonomy breakdown.
-list($sql, $params) = get_filtered_sql(
+[$sql, $params] = get_filtered_sql(
     "SELECT blooms_level, COUNT(*) as count,
             SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
             AVG(validation_score) as avg_quality

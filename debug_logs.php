@@ -557,8 +557,10 @@ function display_system_info(): void {
     $pdftotextfound = false;
     $pathdirs = explode(PATH_SEPARATOR, getenv('PATH') ?: '');
     foreach ($pathdirs as $dir) {
-        if (is_executable($dir . DIRECTORY_SEPARATOR . 'pdftotext') ||
-            is_executable($dir . DIRECTORY_SEPARATOR . 'pdftotext.exe')) {
+        if (
+            is_executable($dir . DIRECTORY_SEPARATOR . 'pdftotext') ||
+            is_executable($dir . DIRECTORY_SEPARATOR . 'pdftotext.exe')
+        ) {
             $pdftotextfound = true;
             break;
         }
