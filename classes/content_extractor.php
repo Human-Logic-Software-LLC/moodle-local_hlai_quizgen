@@ -192,7 +192,19 @@ class content_extractor {
      * @return string Extracted text content
      */
     private static function extract_pdf_pdftotext(string $filepath): string {
-        $pdftotext = trim(shell_exec('which pdftotext 2>/dev/null') ?? '');
+        $pdftotext = '';
+        $pathdirs = explode(PATH_SEPARATOR, getenv('PATH') ?: '');
+        foreach ($pathdirs as $dir) {
+            $candidate = $dir . DIRECTORY_SEPARATOR . 'pdftotext';
+            $candidateexe = $dir . DIRECTORY_SEPARATOR . 'pdftotext.exe';
+            if (is_executable($candidate)) {
+                $pdftotext = $candidate;
+                break;
+            } else if (is_executable($candidateexe)) {
+                $pdftotext = $candidateexe;
+                break;
+            }
+        }
         if (empty($pdftotext)) {
             return '';
         }
@@ -228,7 +240,18 @@ class content_extractor {
      * @return string Extracted text content
      */
     private static function extract_pdf_ghostscript(string $filepath): string {
-        $gs = trim(shell_exec('which gs 2>/dev/null') ?? '');
+        $gs = '';
+        $pathdirs = explode(PATH_SEPARATOR, getenv('PATH') ?: '');
+        $gsnames = ['gs', 'gs.exe', 'gswin64c.exe', 'gswin32c.exe'];
+        foreach ($pathdirs as $dir) {
+            foreach ($gsnames as $gsname) {
+                $candidate = $dir . DIRECTORY_SEPARATOR . $gsname;
+                if (is_executable($candidate)) {
+                    $gs = $candidate;
+                    break 2;
+                }
+            }
+        }
         if (empty($gs)) {
             return '';
         }

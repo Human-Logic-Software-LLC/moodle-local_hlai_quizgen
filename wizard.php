@@ -38,7 +38,7 @@ use local_hlai_quizgen\debug_logger;
 
 $courseid = required_param('courseid', PARAM_INT);
 $requestid = optional_param('requestid', 0, PARAM_INT);
-$step = optional_param('step', '1', PARAM_RAW); // Can be int or string (e.g., "progress").
+$step = optional_param('step', '1', PARAM_ALPHANUMEXT);
 $action = optional_param('action', '', PARAM_ALPHANUMEXT);
 
 // Verify login and context.

@@ -45,7 +45,14 @@ Thumbs.db
 /test_*.php
 
 # Documentation files that are development-only
-docs/development/
+docs/
+CODING_STANDARDS.md
+COPILOT_GUIDE.md
+COMPLETE_FIX_SUMMARY.md
+FIXES_SUMMARY.md
+GITHUB_ACTIONS_GUIDE.md
+GITHUB_FAILURES_FIX.md
+.github/CICD.md
 
 # Moodle plugin CI cache
 ci/
@@ -60,6 +67,7 @@ vendor_local/
 check_standards.php
 fix_*.php
 fix_*.py
+quick_check.*
 
 # Gateway subdirectory (excluded from CI)
 gateway/

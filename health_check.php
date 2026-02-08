@@ -33,7 +33,7 @@ $expectedtoken = get_config('local_hlai_quizgen', 'health_check_token');
 if (empty($expectedtoken)) {
     require_login();
     require_capability('moodle/site:config', context_system::instance());
-} else if ($token !== $expectedtoken) {
+} else if (!hash_equals($expectedtoken, $token)) {
     http_response_code(401);
     echo json_encode(['status' => 'error', 'message' => 'Invalid token']);
     die();

@@ -237,7 +237,7 @@ echo $OUTPUT->header();
                             echo get_string('quality_needs_attention', 'local_hlai_quizgen');
                         }
                     } else {
-                        echo 'No quality scores available';
+                        echo get_string('no_quality_scores', 'local_hlai_quizgen');
                     }
                     ?>
                 </p>

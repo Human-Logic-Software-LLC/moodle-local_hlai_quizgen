@@ -130,8 +130,7 @@ try {
 
     if ($providerinfo['active'] === 'none') {
         echo '<div class="notification is-danger is-light mt-3 mb-0">';
-        echo '<strong>Warning:</strong> No AI provider is configured! Questions cannot be generated. ';
-        echo 'Please configure <code>local_hlai_hub</code> or <code>local_hlai_hubproxy</code>.';
+        echo get_string('debuglogs_noprovider_warning', 'local_hlai_quizgen');
         echo '</div>';
     }
 } catch (Exception $e) {
@@ -555,17 +554,35 @@ function display_system_info(): void {
     echo '<table class="table is-fullwidth is-narrow">';
 
     // Check pdftotext.
-    $pdftotext = @shell_exec('which pdftotext 2>/dev/null') ?: @shell_exec('where pdftotext 2>nul');
-    $pdftotextstatus = !empty(trim($pdftotext ?? ''))
-        ? '<span class="tag is-success">Available</span>'
-        : '<span class="tag is-warning">Not Found</span>';
-    echo '<tr><td>pdftotext (poppler-utils)</td><td>' . $pdftotextstatus . '</td></tr>';
+    $pdftotextfound = false;
+    $pathdirs = explode(PATH_SEPARATOR, getenv('PATH') ?: '');
+    foreach ($pathdirs as $dir) {
+        if (is_executable($dir . DIRECTORY_SEPARATOR . 'pdftotext') ||
+            is_executable($dir . DIRECTORY_SEPARATOR . 'pdftotext.exe')) {
+            $pdftotextfound = true;
+            break;
+        }
+    }
+    $pdftotextstatus = $pdftotextfound
+        ? '<span class="tag is-success">' . get_string('debuglogs_system_tool_available', 'local_hlai_quizgen') . '</span>'
+        : '<span class="tag is-warning">' . get_string('debuglogs_system_tool_notfound', 'local_hlai_quizgen') . '</span>';
+    echo '<tr><td>' . get_string('debuglogs_system_tool_pdftotext', 'local_hlai_quizgen') . '</td><td>' .
+        $pdftotextstatus . '</td></tr>';
 
     // Check ghostscript.
-    $gs = @shell_exec('which gs 2>/dev/null') ?: @shell_exec('where gswin64c 2>nul');
-    $gsstatus = !empty(trim($gs ?? ''))
-        ? '<span class="tag is-success">Available</span>'
-        : '<span class="tag is-warning">Not Found</span>';
+    $gsfound = false;
+    $gsnames = ['gs', 'gs.exe', 'gswin64c.exe', 'gswin32c.exe'];
+    foreach ($pathdirs as $dir) {
+        foreach ($gsnames as $gsname) {
+            if (is_executable($dir . DIRECTORY_SEPARATOR . $gsname)) {
+                $gsfound = true;
+                break 2;
+            }
+        }
+    }
+    $gsstatus = $gsfound
+        ? '<span class="tag is-success">' . get_string('debuglogs_system_tool_available', 'local_hlai_quizgen') . '</span>'
+        : '<span class="tag is-warning">' . get_string('debuglogs_system_tool_notfound', 'local_hlai_quizgen') . '</span>';
     echo '<tr><td>Ghostscript</td><td>' . $gsstatus . '</td></tr>';
 
     echo '</table>';

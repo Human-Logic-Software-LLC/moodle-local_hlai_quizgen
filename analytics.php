@@ -83,47 +83,52 @@ switch ($timerange) {
  * Helper function for time-filtered queries.
  *
  * @param string $basesql Base SQL query
+ * @param array $baseparams Base parameters for the query
  * @param int $timefilter Time filter timestamp
  * @param string $timefield Time field name
- * @return string Modified SQL
+ * @return array Array of [sql, params]
  */
-function get_filtered_sql($basesql, $timefilter, $timefield = 'timecreated') {
+function get_filtered_sql($basesql, $baseparams, $timefilter, $timefield = 'timecreated') {
     if ($timefilter > 0) {
-        return $basesql . " AND {$timefield} >= {$timefilter}";
+        return [$basesql . " AND {$timefield} >= ?", array_merge($baseparams, [$timefilter])];
     }
-    return $basesql;
+    return [$basesql, $baseparams];
 }
 
 // Summary statistics.
 
 // Total questions generated.
-$sql = get_filtered_sql(
+list($sql, $params) = get_filtered_sql(
     "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ?",
+    [$userid, $courseid],
     $timefilter
 );
-$totalquestions = $DB->count_records_sql($sql, [$userid, $courseid]);
+$totalquestions = $DB->count_records_sql($sql, $params);
 
 // Approved questions.
-$sql = get_filtered_sql(
+list($sql, $params) = get_filtered_sql(
     "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ? AND status IN ('approved', 'deployed')",
+    [$userid, $courseid],
     $timefilter
 );
-$approvedquestions = $DB->count_records_sql($sql, [$userid, $courseid]);
+$approvedquestions = $DB->count_records_sql($sql, $params);
 
 // Rejected questions.
-$sql = get_filtered_sql(
+list($sql, $params) = get_filtered_sql(
     "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ? AND status = 'rejected'",
+    [$userid, $courseid],
     $timefilter
 );
-$rejectedquestions = $DB->count_records_sql($sql, [$userid, $courseid]);
+$rejectedquestions = $DB->count_records_sql($sql, $params);
 
 // First-time acceptance.
-$sql = get_filtered_sql(
+list($sql, $params) = get_filtered_sql(
     "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ? " .
     "AND status IN ('approved', 'deployed') AND (regeneration_count = 0 OR regeneration_count IS NULL)",
+    [$userid, $courseid],
     $timefilter
 );
-$firsttimeapproved = $DB->count_records_sql($sql, [$userid, $courseid]);
+$firsttimeapproved = $DB->count_records_sql($sql, $params);
 
 // Calculate rates.
 $reviewed = $approvedquestions + $rejectedquestions;
@@ -131,33 +136,36 @@ $acceptancerate = $reviewed > 0 ? round(($approvedquestions / $reviewed) * 100, 
 $ftar = $reviewed > 0 ? round(($firsttimeapproved / $reviewed) * 100, 1) : 0;
 
 // Average quality score.
-$sql = get_filtered_sql(
+list($sql, $params) = get_filtered_sql(
     "SELECT AVG(validation_score) FROM {local_hlai_quizgen_questions}
      WHERE userid = ? AND courseid = ? AND validation_score IS NOT NULL",
+    [$userid, $courseid],
     $timefilter
 );
-$avgquality = $DB->get_field_sql($sql, [$userid, $courseid]);
+$avgquality = $DB->get_field_sql($sql, $params);
 $avgquality = $avgquality ? round($avgquality, 1) : 0;
 
 // Total regenerations.
-$sql = get_filtered_sql(
+list($sql, $params) = get_filtered_sql(
     "SELECT SUM(regeneration_count) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ?",
+    [$userid, $courseid],
     $timefilter
 );
-$totalregenerations = $DB->get_field_sql($sql, [$userid, $courseid]) ?: 0;
+$totalregenerations = $DB->get_field_sql($sql, $params) ?: 0;
 
 // Average regenerations per question.
 $avgregenerations = $totalquestions > 0 ? round($totalregenerations / $totalquestions, 2) : 0;
 
 // Total quizzes/requests.
-$sql = get_filtered_sql(
+list($sql, $params) = get_filtered_sql(
     "SELECT COUNT(*) FROM {local_hlai_quizgen_requests} WHERE userid = ? AND courseid = ?",
+    [$userid, $courseid],
     $timefilter
 );
-$totalrequests = $DB->count_records_sql($sql, [$userid, $courseid]);
+$totalrequests = $DB->count_records_sql($sql, $params);
 
 // Question type breakdown.
-$sql = get_filtered_sql(
+list($sql, $params) = get_filtered_sql(
     "SELECT questiontype, COUNT(*) as count,
             SUM(CASE WHEN status IN ('approved', 'deployed') THEN 1 ELSE 0 END) as approved,
             SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected,
@@ -165,31 +173,34 @@ $sql = get_filtered_sql(
             AVG(regeneration_count) as avg_regen
      FROM {local_hlai_quizgen_questions}
      WHERE userid = ? AND courseid = ?",
+    [$userid, $courseid],
     $timefilter
 );
-$typestats = $DB->get_records_sql($sql . " GROUP BY questiontype", [$userid, $courseid]);
+$typestats = $DB->get_records_sql($sql . " GROUP BY questiontype", $params);
 
 // Difficulty breakdown.
-$sql = get_filtered_sql(
+list($sql, $params) = get_filtered_sql(
     "SELECT difficulty, COUNT(*) as count,
             SUM(CASE WHEN status IN ('approved', 'deployed') THEN 1 ELSE 0 END) as approved,
             AVG(validation_score) as avg_quality
      FROM {local_hlai_quizgen_questions}
      WHERE userid = ? AND courseid = ?",
+    [$userid, $courseid],
     $timefilter
 );
-$difficultystats = $DB->get_records_sql($sql . " GROUP BY difficulty", [$userid, $courseid]);
+$difficultystats = $DB->get_records_sql($sql . " GROUP BY difficulty", $params);
 
 // Bloom's taxonomy breakdown.
-$sql = get_filtered_sql(
+list($sql, $params) = get_filtered_sql(
     "SELECT blooms_level, COUNT(*) as count,
             SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
             AVG(validation_score) as avg_quality
      FROM {local_hlai_quizgen_questions}
      WHERE userid = ? AND courseid = ? AND blooms_level IS NOT NULL",
+    [$userid, $courseid],
     $timefilter
 );
-$bloomsstats = $DB->get_records_sql($sql . " GROUP BY blooms_level", [$userid, $courseid]);
+$bloomsstats = $DB->get_records_sql($sql . " GROUP BY blooms_level", $params);
 
 // Rejection reasons - column doesn't exist in database yet, using empty array.
 $rejectionreasons = []; // Empty array for now.

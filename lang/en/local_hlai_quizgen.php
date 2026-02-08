@@ -305,6 +305,7 @@ $string['navtitle'] = 'AI Quiz Generator';
 $string['next'] = 'Next';
 $string['no_content_selected'] = 'Please select or upload at least one content source';
 $string['no_questions_approved'] = 'Please approve at least one question';
+$string['no_quality_scores'] = 'No quality scores available';
 $string['no_questions_generated'] = 'No questions were generated. Please try again.';
 $string['no_questions_to_deploy'] = 'No questions available to deploy';
 $string['no_questions_yet'] = 'No questions generated yet for this course.';
