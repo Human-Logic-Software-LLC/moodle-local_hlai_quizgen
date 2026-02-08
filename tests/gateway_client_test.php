@@ -35,8 +35,10 @@ namespace local_hlai_quizgen;
 class gateway_client_test extends \advanced_testcase {
     /**
      * Test that get_gateway_url returns a string.
+     *
+     * @return void
      */
-    public function test_get_gateway_url_returns_string() {
+    public function test_get_gateway_url_returns_string(): void {
         $this->resetAfterTest(true);
 
         // Set a test gateway URL.
@@ -49,8 +51,10 @@ class gateway_client_test extends \advanced_testcase {
 
     /**
      * Test that get_gateway_key returns a string.
+     *
+     * @return void
      */
-    public function test_get_gateway_key_returns_string() {
+    public function test_get_gateway_key_returns_string(): void {
         $this->resetAfterTest(true);
 
         // Set a test gateway key.
@@ -63,8 +67,10 @@ class gateway_client_test extends \advanced_testcase {
 
     /**
      * Test that is_ready returns false when gateway not configured.
+     *
+     * @return void
      */
-    public function test_is_ready_returns_false_when_not_configured() {
+    public function test_is_ready_returns_false_when_not_configured(): void {
         $this->resetAfterTest(true);
 
         // Clear config.
@@ -77,8 +83,10 @@ class gateway_client_test extends \advanced_testcase {
 
     /**
      * Test that is_ready returns true when gateway is configured.
+     *
+     * @return void
      */
-    public function test_is_ready_returns_true_when_configured() {
+    public function test_is_ready_returns_true_when_configured(): void {
         $this->resetAfterTest(true);
 
         // Set config.
@@ -91,8 +99,10 @@ class gateway_client_test extends \advanced_testcase {
 
     /**
      * Test that get_endpoint_for_operation returns correct endpoints.
+     *
+     * @return void
      */
-    public function test_get_endpoint_for_operation() {
+    public function test_get_endpoint_for_operation(): void {
         $this->resetAfterTest(true);
 
         // Test analyze_topics endpoint.

@@ -35,6 +35,8 @@ namespace local_hlai_quizgen;
 final class api_test extends \advanced_testcase {
     /**
      * Test creating a generation request.
+     *
+     * @return void
      */
     public function test_create_request(): void {
         global $DB;
@@ -67,6 +69,8 @@ final class api_test extends \advanced_testcase {
 
     /**
      * Test updating request status.
+     *
+     * @return void
      */
     public function test_update_request_status(): void {
         global $DB;
@@ -101,6 +105,8 @@ final class api_test extends \advanced_testcase {
 
     /**
      * Test getting requests for a course.
+     *
+     * @return void
      */
     public function test_get_requests_for_course(): void {
         global $DB;
@@ -130,6 +136,8 @@ final class api_test extends \advanced_testcase {
 
     /**
      * Test getting request by ID.
+     *
+     * @return void
      */
     public function test_get_request(): void {
         $this->resetAfterTest(true);

@@ -265,6 +265,7 @@ class rate_limiter {
      * @param int $userid User ID
      * @param string $limittype Type of limit exceeded
      * @param array $details Additional details
+     * @return void
      */
     public static function record_violation($userid, $limittype, $details = []) {
         global $DB;
