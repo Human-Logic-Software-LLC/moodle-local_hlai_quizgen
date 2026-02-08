@@ -302,10 +302,9 @@ class rate_limiter {
                 FROM {local_hlai_quizgen_ratelimit_log}
                 WHERE timecreated > ?
                 GROUP BY userid
-                ORDER BY violations DESC
-                LIMIT ?";
+                ORDER BY violations DESC";
 
-        return $DB->get_records_sql($sql, [$since, $limit]);
+        return $DB->get_records_sql($sql, [$since], 0, $limit);
     }
 
     /**

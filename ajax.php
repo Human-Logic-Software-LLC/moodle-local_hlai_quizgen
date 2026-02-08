@@ -255,9 +255,10 @@ try {
                          WHERE q.requestid = r.id AND q.status IN ('approved', 'rejected')) as total
                  FROM {local_hlai_quizgen_requests} r
                  WHERE r.userid = ? AND r.status = 'completed'
-                 ORDER BY r.timecreated ASC
-                 LIMIT ?",
-                [$userid, $limit]
+                 ORDER BY r.timecreated ASC",
+                [$userid],
+                0,
+                $limit
             );
 
             $labels = [];
@@ -362,9 +363,10 @@ try {
                  FROM {local_hlai_quizgen_requests} r
                  JOIN {course} c ON c.id = r.courseid
                  WHERE r.userid = ?
-                 ORDER BY r.timecreated DESC
-                 LIMIT ?",
-                [$userid, $limit]
+                 ORDER BY r.timecreated DESC",
+                [$userid],
+                0,
+                $limit
             );
 
             $items = [];
