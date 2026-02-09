@@ -114,8 +114,8 @@ class gateway_client_test extends \advanced_testcase {
         $endpoint = gateway_client::get_endpoint_for_operation('generate_distractors');
         $this->assertEquals('/generate_distractors', $endpoint);
 
-        // Test health endpoint.
-        $endpoint = gateway_client::get_endpoint_for_operation('health');
-        $this->assertEquals('/health', $endpoint);
+        // Test unknown operation falls back to /generate.
+        $endpoint = gateway_client::get_endpoint_for_operation('unknown_operation');
+        $this->assertEquals('/generate', $endpoint);
     }
 }

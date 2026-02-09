@@ -102,33 +102,23 @@ echo '<h3 class="title is-6 mb-3">' . get_string('debuglogs_aiprovider_heading',
 try {
     $gatewayurl = \local_hlai_quizgen\gateway_client::get_gateway_url();
     $gatewayready = \local_hlai_quizgen\gateway_client::is_ready();
-    $statusclass = $providerinfo['active'] !== 'none' ? 'success' : 'danger';
+    $statusclass = $gatewayready ? 'success' : 'danger';
+    $statuslabel = $gatewayready
+        ? get_string('debuglogs_yes', 'local_hlai_quizgen')
+        : get_string('debuglogs_no', 'local_hlai_quizgen');
 
     echo '<div class="columns is-multiline is-mobile">';
-    echo '<div class="column is-one-third">';
+    echo '<div class="column is-half">';
     echo '<strong>' . get_string('debuglogs_activeprovider', 'local_hlai_quizgen') . ':</strong> ';
-    echo '<span class="tag is-' . $statusclass . ' ml-2">' . strtoupper($providerinfo['active']) . '</span>';
+    echo '<span class="tag is-' . $statusclass . ' ml-2">' . $statuslabel . '</span>';
     echo '</div>';
-    echo '<div class="column is-one-third">';
-    echo '<strong>' . get_string('debuglogs_hubavailable', 'local_hlai_quizgen') . ':</strong> ';
-    $hubbadge = $providerinfo['hub_available']
-        ? '<span class="tag is-success ml-2">' . get_string('debuglogs_yes', 'local_hlai_quizgen') . '</span>'
-        : '<span class="tag is-light ml-2">' . get_string('debuglogs_no', 'local_hlai_quizgen') . '</span>';
-    echo $hubbadge;
-    if (isset($providerinfo['hub_provider'])) {
-        echo ' (' . htmlspecialchars($providerinfo['hub_provider']) . ')';
-    }
-    echo '</div>';
-    echo '<div class="column is-one-third">';
-    echo '<strong>' . get_string('debuglogs_proxyavailable', 'local_hlai_quizgen') . ':</strong> ';
-    $proxybadge = $providerinfo['proxy_available']
-        ? '<span class="tag is-success ml-2">' . get_string('debuglogs_yes', 'local_hlai_quizgen') . '</span>'
-        : '<span class="tag is-light ml-2">' . get_string('debuglogs_no', 'local_hlai_quizgen') . '</span>';
-    echo $proxybadge;
+    echo '<div class="column is-half">';
+    echo '<strong>Gateway URL:</strong> ';
+    echo '<code>' . htmlspecialchars($gatewayurl) . '</code>';
     echo '</div>';
     echo '</div>';
 
-    if ($providerinfo['active'] === 'none') {
+    if (!$gatewayready) {
         echo '<div class="notification is-danger is-light mt-3 mb-0">';
         echo get_string('debuglogs_noprovider_warning', 'local_hlai_quizgen');
         echo '</div>';
