@@ -82,13 +82,13 @@ class provider implements
             'privacy:metadata:local_hlai_quizgen_logs'
         );
 
-        // External data sent to AI Hub.
+        // External data sent to AI gateway.
         $collection->add_external_location_link(
-            'aihub',
+            'aigateway',
             [
-                'content' => 'privacy:metadata:external:aihub:content',
+                'content' => 'privacy:metadata:external:aigateway:content',
             ],
-            'privacy:metadata:external:aihub:purpose'
+            'privacy:metadata:external:aigateway:purpose'
         );
 
         return $collection;

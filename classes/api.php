@@ -355,7 +355,7 @@ class api {
     }
 
     /**
-     * Check if AI provider is available (hlai_hub or hlai_hubproxy).
+     * Check if AI gateway service is available.
      *
      * @return bool True if available
      */

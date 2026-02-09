@@ -31,6 +31,5 @@ $plugin->supported = [401, 405];        // Moodle 4.1.9+ to 4.5.x.
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->release   = '1.6.5';
 
-// Note: Requires an AI provider plugin for functionality, but no hard dependency enforced.
-// Supports either local_hlai_hub (direct AI connection) or local_hlai_hubproxy (proxy server).
-// Install at least one of these plugins for the quiz generator to work.
+// Note: Requires a Human Logic API key for functionality. No external plugin dependencies.
+// Configure your API key in: Site Administration > Plugins > Local plugins > AI Quiz Generator.

@@ -16,44 +16,21 @@ The AI Quiz Generator plugin automates the creation of high-quality quiz questio
 - **5 Question Types:** Multiple Choice, True/False, Short Answer, Essay, Matching
 - **Wizard-Based Interface:** 5-step guided workflow for complete control
 - **Instructor Review:** Edit, regenerate, or approve every question before deployment
-- **Dual AI Provider Support:** Works with either `hlai_hub` (direct AI) or `hlai_hubproxy` (proxy server)
+- **Commercial AI Service:** Powered by the Human Logic AI gateway (API key required)
 - **Privacy-First:** No student data sent to AI—only course content
 
 ## Prerequisites
 
-### Required Dependencies
+### Required
 
 1. **Moodle 4.1+** (optimized for Moodle 4.5+)
-2. **AI Provider Plugin** - Install **ONE** of the following:
-   - `local_hlai_hub` - Direct AI connection (Azure OpenAI, etc.)
-   - `local_hlai_hubproxy` - Proxy server connection for centralized AI management
+2. **Human Logic API Key** - Contact support@human-logic.com for access
 3. **PHP 8.0+**
 4. **MySQL 5.7+ / PostgreSQL 10+ / MariaDB 10.3+**
 
-### Optional Dependencies
-
-For content parsing from uploaded files:
-- `smalot/pdfparser` - PDF extraction (LGPL)
-- `phpoffice/phpword` - DOCX extraction (LGPL)
-- `phpoffice/phppresentation` - PPTX extraction (LGPL)
-
-These can be installed via Composer if needed.
-
 ## Installation
 
-### Step 1: Install AI Provider Plugin
-
-Install and configure at least one AI provider plugin:
-
-**Option A: Direct AI Connection (`hlai_hub`)**
-- Best for organizations with their own AI service accounts
-- See: `local/hlai_hub/README.md` for installation instructions
-
-**Option B: Proxy Server (`hlai_hubproxy`)**
-- Best for centralized AI management across multiple Moodle sites
-- See: `local/hlai_hubproxy/README.md` for installation instructions
-
-### Step 2: Install Quiz Generator Plugin
+### Step 1: Install Quiz Generator Plugin
 
 1. Download or clone this plugin to `moodle/local/hlai_quizgen`
 2. Login as administrator

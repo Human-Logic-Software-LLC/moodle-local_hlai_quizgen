@@ -56,7 +56,7 @@ try {
         'message' => 'Database connection successful',
     ];
 
-    // Check 2: AI provider availability (hlai_hub or hlai_hubproxy).
+    // Check 2: AI gateway availability.
     $gatewayurl = \local_hlai_quizgen\gateway_client::get_gateway_url();
     $providerready = \local_hlai_quizgen\gateway_client::is_ready();
 

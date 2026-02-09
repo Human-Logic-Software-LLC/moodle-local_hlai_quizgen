@@ -140,14 +140,6 @@ if ($hassiteconfig) {
         PARAM_INT
     ));
 
-    // AI provider fallback.
-    $settings->add(new admin_setting_configcheckbox(
-        'local_hlai_quizgen/enable_provider_fallback',
-        get_string('enable_provider_fallback', 'local_hlai_quizgen'),
-        get_string('enable_provider_fallback_desc', 'local_hlai_quizgen'),
-        1 // Enabled by default.
-    ));
-
     // Content hash deduplication.
     $settings->add(new admin_setting_configcheckbox(
         'local_hlai_quizgen/enable_content_deduplication',
