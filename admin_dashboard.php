@@ -201,8 +201,7 @@ $recenterrors = $DB->count_records_sql(
 );
 
 // Check AI provider configuration.
-$aiproviderconfigured = !empty(get_config('local_hlai_quizgen', 'azure_endpoint'))
-                         && !empty(get_config('local_hlai_quizgen', 'azure_api_key'));
+$aiproviderconfigured = \local_hlai_quizgen\gateway_client::is_ready();
 
 // Output HTML.
 
