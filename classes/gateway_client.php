@@ -31,29 +31,16 @@ namespace local_hlai_quizgen;
  * Thin gateway client for commercial Human Logic AI routing.
  */
 class gateway_client {
-    /** @var string Fixed gateway endpoint (locked by design). */
-    private const FIXED_GATEWAY_URL = 'https://ai.human-logic.com';
+    /** @var string Hardcoded gateway endpoint. */
+    private const GATEWAY_URL = 'https://ai.human-logic.com/ai';
 
     /**
-     * Return locked gateway base URL.
+     * Return the gateway base URL.
      *
      * @return string
      */
     public static function get_gateway_url(): string {
-        // Check environment variable override first (for development/testing).
-        $override = trim((string)getenv('HL_GATEWAY_URL'));
-        if ($override !== '') {
-            return $override;
-        }
-
-        // Check configured URL.
-        $configured = trim((string)get_config('local_hlai_quizgen', 'gatewayurl'));
-        if ($configured !== '') {
-            return $configured;
-        }
-
-        // Fall back to the fixed default gateway URL.
-        return self::FIXED_GATEWAY_URL;
+        return self::GATEWAY_URL;
     }
 
     /**

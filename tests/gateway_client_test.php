@@ -34,19 +34,14 @@ namespace local_hlai_quizgen;
  */
 class gateway_client_test extends \advanced_testcase {
     /**
-     * Test that get_gateway_url returns a string.
+     * Test that get_gateway_url returns the hardcoded URL.
      *
      * @return void
      */
-    public function test_get_gateway_url_returns_string(): void {
-        $this->resetAfterTest(true);
-
-        // Set a test gateway URL.
-        set_config('gateway_url', 'http://localhost:8000', 'local_hlai_quizgen');
-
+    public function test_get_gateway_url_returns_hardcoded_url(): void {
         $url = gateway_client::get_gateway_url();
         $this->assertIsString($url);
-        $this->assertEquals('http://localhost:8000', $url);
+        $this->assertStringStartsWith('https://', $url);
     }
 
     /**
@@ -58,7 +53,7 @@ class gateway_client_test extends \advanced_testcase {
         $this->resetAfterTest(true);
 
         // Set a test gateway key.
-        set_config('gateway_api_key', 'test_key_12345', 'local_hlai_quizgen');
+        set_config('gatewaykey', 'test_key_12345', 'local_hlai_quizgen');
 
         $key = gateway_client::get_gateway_key();
         $this->assertIsString($key);
@@ -74,8 +69,7 @@ class gateway_client_test extends \advanced_testcase {
         $this->resetAfterTest(true);
 
         // Clear config.
-        set_config('gateway_url', '', 'local_hlai_quizgen');
-        set_config('gateway_api_key', '', 'local_hlai_quizgen');
+        set_config('gatewaykey', '', 'local_hlai_quizgen');
 
         $ready = gateway_client::is_ready();
         $this->assertFalse($ready);
@@ -89,9 +83,8 @@ class gateway_client_test extends \advanced_testcase {
     public function test_is_ready_returns_true_when_configured(): void {
         $this->resetAfterTest(true);
 
-        // Set config.
-        set_config('gateway_url', 'http://localhost:8000', 'local_hlai_quizgen');
-        set_config('gateway_api_key', 'test_key_12345', 'local_hlai_quizgen');
+        // Set API key.
+        set_config('gatewaykey', 'test_key_12345', 'local_hlai_quizgen');
 
         $ready = gateway_client::is_ready();
         $this->assertTrue($ready);

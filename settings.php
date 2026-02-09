@@ -33,8 +33,7 @@ if ($hassiteconfig) {
 
     // Show warning if gateway is not configured.
     if (!$gatewayready) {
-        $warningmsg = 'AI Service gateway not configured. Please configure the AI Service URL ' .
-            'and API Key below to enable quiz generation.';
+        $warningmsg = 'AI Service not configured. Please enter your API Key below to enable quiz generation.';
         $settings->add(new admin_setting_heading(
             'local_hlai_quizgen/gateway_warning',
             '',
@@ -46,23 +45,9 @@ if ($hassiteconfig) {
     $settings->add(new admin_setting_heading(
         'local_hlai_quizgen/gateway_heading',
         'Human Logic AI Service Configuration',
-        'Configure your Human Logic AI service gateway endpoint and API key. ' .
+        'Enter your Human Logic API key to enable AI-powered quiz generation. ' .
         'This plugin requires a commercial license to function. Contact Human Logic Software LLC for access.'
     ));
-
-    // Gateway URL setting (locked).
-    $gatewayurlsetting = new admin_setting_configtext(
-        'local_hlai_quizgen/gatewayurl',
-        'AI Service URL',
-        'Human Logic AI gateway endpoint (requires license)',
-        'https://ai.human-logic.com',
-        PARAM_URL
-    );
-    $gatewayurlsetting->set_locked_flag_options(
-        admin_setting_flag::ENABLED,
-        true
-    );
-    $settings->add($gatewayurlsetting);
 
     // Gateway API Key setting.
     $settings->add(new admin_setting_configpasswordunmask(
