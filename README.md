@@ -130,7 +130,6 @@ Install and configure at least one AI provider plugin:
 - `\local_hlai_quizgen\content_extractor` - Content parsing
 - `\local_hlai_quizgen\topic_analyzer` - Topic extraction
 - `\local_hlai_quizgen\question_generator` - Question generation
-- `\local_hlai_quizgen\distractor_generator` - Distractor creation
 - `\local_hlai_quizgen\quiz_deployer` - Quiz deployment
 - `\local_hlai_quizgen\task\process_generation_queue` - Background processing
 

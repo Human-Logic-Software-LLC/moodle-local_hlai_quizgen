@@ -3737,8 +3737,6 @@ function cleanup_request_files(int $requestid, int $contextid): int {
 /**
  * Check plugin dependencies and requirements.
  *
- * Uses the ai_provider abstraction to check for either hlai_hub or hlai_hubproxy.
- *
  * @return array Array of error messages (empty if all OK)
  */
 function check_plugin_dependencies(): array {
