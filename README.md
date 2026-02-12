@@ -129,8 +129,9 @@ This plugin was developed in 4 phases:
 
 ## Support
 
-- **Website:** humanlogicsoftware.com
-- **Email:** support@humanlogicsoftware.com
+- **Website:** human-logic.com
+- **Support:** support@human-logic.com
+- **Sales:** sales@human-logic.com
 - **Documentation:** See `/docs` folder for detailed guides
 
 ## License
