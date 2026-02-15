@@ -204,11 +204,11 @@ echo $OUTPUT->header();
                 <p class="is-size-3"><i class="fa fa-file-text-o" style="color: #3B82F6;"></i></p>
                 <p class="title is-3 mb-1"><?php echo $totalquizzes; ?></p>
                 <p class="heading"><?php echo get_string('quizzes_created', 'local_hlai_quizgen'); ?></p>
-                <?php if ($coursequizzes > 0) : ?>
-                <p class="help has-text-success">
-                    <?php echo get_string('in_this_course', 'local_hlai_quizgen', $coursequizzes); ?>
+                <p class="help <?php echo $coursequizzes > 0 ? 'has-text-success' : ''; ?>">
+                    <?php echo $coursequizzes > 0
+                        ? get_string('in_this_course', 'local_hlai_quizgen', $coursequizzes)
+                        : '&nbsp;'; ?>
                 </p>
-                <?php endif; ?>
             </div>
         </div>
         <div class="column">
@@ -216,6 +216,7 @@ echo $OUTPUT->header();
                 <p class="is-size-3"><i class="fa fa-question-circle" style="color: #06B6D4;"></i></p>
                 <p class="title is-3 mb-1"><?php echo $totalquestions; ?></p>
                 <p class="heading"><?php echo get_string('questions_generated_heading', 'local_hlai_quizgen'); ?></p>
+                <p class="help has-text-grey">&nbsp;</p>
             </div>
         </div>
         <div class="column">

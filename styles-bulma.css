@@ -1151,16 +1151,44 @@ body.path-local-hlai_quizgen.hlai-step-2 #page-footer {
     padding: 1rem 1.5rem;
 }
 
-/* Columns gap adjustment */
+/* Columns gap adjustment - Force flexbox (Moodle overrides Bulma) */
 .hlai-quizgen-wrapper .columns,
 .hlai-quizgen-wizard .columns {
     margin-left: -0.75rem;
     margin-right: -0.75rem;
+    display: flex !important;
+    flex-wrap: wrap !important;
 }
 
 .hlai-quizgen-wrapper .column,
 .hlai-quizgen-wizard .column {
     padding: 0.75rem;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Dashboard header - Force flex layout for .level */
+.hlai-quizgen-wrapper .level {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.hlai-quizgen-wrapper .level-left,
+.hlai-quizgen-wrapper .level-right {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.hlai-quizgen-wrapper .level-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* KPI equal-width columns */
+.hlai-quizgen-wrapper .columns.mb-5 > .column {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
 }
 
 /* ==========================================================================
@@ -1172,6 +1200,13 @@ body.path-local-hlai_quizgen.hlai-step-2 #page-footer {
     padding: 1.75rem 1.5rem;
     border-radius: var(--hlai-radius-xl);
     transition: transform var(--hlai-transition-fast), box-shadow var(--hlai-transition-fast);
+    text-align: center !important;
+    min-height: 180px;
+    width: 100%;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .hlai-quizgen-wrapper .box.has-text-centered:hover,
@@ -1180,12 +1215,28 @@ body.path-local-hlai_quizgen.hlai-step-2 #page-footer {
     box-shadow: var(--hlai-shadow-md);
 }
 
+/* All <p> inside stat cards - force centered */
+.hlai-quizgen-wrapper .box.has-text-centered p,
+.hlai-quizgen-wizard .box.has-text-centered p {
+    width: 100%;
+    text-align: center !important;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Icon spacing */
+.hlai-quizgen-wrapper .box.has-text-centered .is-size-3,
+.hlai-quizgen-wizard .box.has-text-centered .is-size-3 {
+    margin-bottom: 0.25rem;
+}
+
 .hlai-quizgen-wrapper .box.has-text-centered .title.is-3,
 .hlai-quizgen-wizard .box.has-text-centered .title.is-3 {
     font-size: 2rem;
     font-weight: 700;
     color: var(--hlai-gray-800);
     margin-bottom: 0.25rem;
+    text-align: center !important;
 }
 
 .hlai-quizgen-wrapper .box.has-text-centered .heading,
@@ -1195,12 +1246,15 @@ body.path-local-hlai_quizgen.hlai-step-2 #page-footer {
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 0.5rem;
+    text-align: center !important;
 }
 
 .hlai-quizgen-wrapper .box.has-text-centered .help,
 .hlai-quizgen-wizard .box.has-text-centered .help {
     font-size: 0.8rem;
-    margin-top: 0.5rem;
+    margin-top: auto;
+    padding-top: 0.5rem;
+    text-align: center !important;
 }
 
 /* ==========================================================================
