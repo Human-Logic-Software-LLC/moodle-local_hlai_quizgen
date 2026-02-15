@@ -256,21 +256,23 @@ echo $OUTPUT->header();
 
     <!-- Summary Stats Row -->
     <div class="columns is-multiline mb-5">
-        <div class="column is-2">
+        <div class="column">
             <div class="box has-text-centered">
                 <p class="is-size-3"><i class="fa fa-file-text-o" style="color: #3B82F6;"></i></p>
                 <p class="title is-4 mb-1"><?php echo $totalrequests; ?></p>
                 <p class="heading">Quiz Generations</p>
+                <p class="help has-text-grey">&nbsp;</p>
             </div>
         </div>
-        <div class="column is-2">
+        <div class="column">
             <div class="box has-text-centered">
                 <p class="is-size-3"><i class="fa fa-question-circle" style="color: #06B6D4;"></i></p>
                 <p class="title is-4 mb-1"><?php echo $totalquestions; ?></p>
                 <p class="heading">Questions Created</p>
+                <p class="help has-text-grey">&nbsp;</p>
             </div>
         </div>
-        <div class="column is-2">
+        <div class="column">
             <div class="box has-text-centered">
                 <p class="is-size-3"><i class="fa fa-check-circle" style="color: #10B981;"></i></p>
                 <p class="title is-4 mb-1"><?php echo $approvedquestions; ?></p>
@@ -278,25 +280,28 @@ echo $OUTPUT->header();
                 <p class="help has-text-grey"><?php echo $acceptancerate; ?>% acceptance</p>
             </div>
         </div>
-        <div class="column is-2">
+        <div class="column">
             <div class="box has-text-centered">
                 <p class="is-size-3"><i class="fa fa-times-circle" style="color: #EF4444;"></i></p>
                 <p class="title is-4 mb-1"><?php echo $rejectedquestions; ?></p>
                 <p class="heading">Rejected</p>
+                <p class="help has-text-grey">&nbsp;</p>
             </div>
         </div>
-        <div class="column is-2">
+        <div class="column">
             <div class="box has-text-centered">
                 <p class="is-size-3"><i class="fa fa-star" style="color: #F59E0B;"></i></p>
                 <p class="title is-4 mb-1"><?php echo $avgquality; ?></p>
                 <p class="heading">Avg Quality</p>
+                <p class="help has-text-grey">&nbsp;</p>
             </div>
         </div>
-        <div class="column is-2">
+        <div class="column">
             <div class="box has-text-centered">
                 <p class="is-size-3"><i class="fa fa-bullseye" style="color: #10B981;"></i></p>
                 <p class="title is-4 mb-1"><?php echo $ftar; ?>%</p>
                 <p class="heading">FTAR</p>
+                <p class="help has-text-grey">&nbsp;</p>
             </div>
         </div>
     </div>

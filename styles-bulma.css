@@ -1239,6 +1239,15 @@ body.path-local-hlai_quizgen.hlai-step-2 #page-footer {
     text-align: center !important;
 }
 
+.hlai-quizgen-wrapper .box.has-text-centered .title.is-4,
+.hlai-quizgen-wizard .box.has-text-centered .title.is-4 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--hlai-gray-800);
+    margin-bottom: 0.25rem;
+    text-align: center !important;
+}
+
 .hlai-quizgen-wrapper .box.has-text-centered .heading,
 .hlai-quizgen-wizard .box.has-text-centered .heading {
     font-size: 0.8rem;
@@ -9017,14 +9026,16 @@ body.path-local-hlai_quizgen.hlai-step-2 #page-footer {
 /* Fix for all title/heading icons */
 .title i.fas,
 .title i.far,
-h1 i.fas, h1 i.far,
-h2 i.fas, h2 i.far,
-h3 i.fas, h3 i.far,
-h4 i.fas, h4 i.far,
-h5 i.fas, h5 i.far,
-h6 i.fas, h6 i.far,
+.title i.fa,
+h1 i.fas, h1 i.far, h1 i.fa,
+h2 i.fas, h2 i.far, h2 i.fa,
+h3 i.fas, h3 i.far, h3 i.fa,
+h4 i.fas, h4 i.far, h4 i.fa,
+h5 i.fas, h5 i.far, h5 i.fa,
+h6 i.fas, h6 i.far, h6 i.fa,
 .panel-heading i.fas,
-.panel-heading i.far {
+.panel-heading i.far,
+.panel-heading i.fa {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -9035,10 +9046,13 @@ h6 i.fas, h6 i.far,
 /* Fix for icons in paragraphs and divs */
 p i.fas,
 p i.far,
+p i.fa,
 div i.fas,
 div i.far,
+div i.fa,
 span i.fas,
-span i.far {
+span i.far,
+span i.fa {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -9047,7 +9061,8 @@ span i.far {
 
 /* Fix for icons in lists */
 li i.fas,
-li i.far {
+li i.far,
+li i.fa {
     display: inline-flex !important;
     align-items: center !important;
     vertical-align: middle !important;
@@ -9056,10 +9071,13 @@ li i.far {
 /* Fix for icons in buttons and links */
 button i.fas,
 button i.far,
+button i.fa,
 a i.fas,
 a i.far,
+a i.fa,
 .button i.fas,
-.button i.far {
+.button i.far,
+.button i.fa {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -9069,8 +9087,10 @@ a i.far,
 /* Fix for stat card icons */
 .stat-card i.fas,
 .stat-card i.far,
+.stat-card i.fa,
 .box i.fas,
-.box i.far {
+.box i.far,
+.box i.fa {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;

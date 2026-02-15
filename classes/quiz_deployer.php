@@ -730,7 +730,7 @@ class quiz_deployer {
             $answerrecord->question = $questionid;
             $answerrecord->answer = $answer->answer;
             $answerrecord->answerformat = FORMAT_MOODLE;
-            $answerrecord->fraction = $answer->fraction;
+            $answerrecord->fraction = self::normalize_fraction((float)$answer->fraction);
             $answerrecord->feedback = $answer->feedback ?? '';
             $answerrecord->feedbackformat = FORMAT_MOODLE;
 
@@ -759,7 +759,7 @@ class quiz_deployer {
             $answerrecord->question = $questionid;
             $answerrecord->answer = $answer->answer; // Contains true or false value.
             $answerrecord->answerformat = FORMAT_MOODLE;
-            $answerrecord->fraction = $answer->fraction;
+            $answerrecord->fraction = self::normalize_fraction((float)$answer->fraction);
             $answerrecord->feedback = $answer->feedback ?? '';
             $answerrecord->feedbackformat = FORMAT_MOODLE;
 
@@ -807,7 +807,7 @@ class quiz_deployer {
             $answerrecord->question = $questionid;
             $answerrecord->answer = $answer->answer;
             $answerrecord->answerformat = FORMAT_MOODLE;
-            $answerrecord->fraction = $answer->fraction;
+            $answerrecord->fraction = self::normalize_fraction((float)$answer->fraction);
             $answerrecord->feedback = $answer->feedback ?? '';
             $answerrecord->feedbackformat = FORMAT_MOODLE;
 
@@ -1006,5 +1006,21 @@ class quiz_deployer {
         quiz_update_sumgrades($quiz);
 
         return $added;
+    }
+
+    /**
+     * Normalize a fraction value from percentage (0-100) to decimal (0.0-1.0).
+     *
+     * AI may return fraction as 100 (percentage) for correct answers,
+     * but Moodle expects 1.0 (decimal).
+     *
+     * @param float $fraction The fraction value to normalize
+     * @return float Normalized fraction between 0.0 and 1.0
+     */
+    private static function normalize_fraction(float $fraction): float {
+        if ($fraction > 1.0) {
+            $fraction = $fraction / 100.0;
+        }
+        return max(0.0, min(1.0, $fraction));
     }
 }
