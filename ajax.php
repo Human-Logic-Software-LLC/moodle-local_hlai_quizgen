@@ -51,7 +51,7 @@ header('Content-Type: application/json; charset=utf-8');
  * @param string $message Response message
  * @return void
  */
-function send_response($success, $data = [], $message = '') {
+function local_hlai_quizgen_send_response($success, $data = [], $message = '') {
     echo json_encode([
         'success' => $success,
         'data' => $data,
@@ -68,9 +68,9 @@ function send_response($success, $data = [], $message = '') {
  * @param int $code HTTP status code
  * @return void
  */
-function send_error($message, $code = 400) {
+function local_hlai_quizgen_send_error($message, $code = 400) {
     http_response_code($code);
-    send_response(false, [], $message);
+    local_hlai_quizgen_send_response(false, [], $message);
 }
 
 // Context validation for course-specific actions.
@@ -145,7 +145,7 @@ try {
                 [$userid]
             );
 
-            send_response(true, [
+            local_hlai_quizgen_send_response(true, [
                 'total_quizzes' => (int)$totalquizzes,
                 'total_questions' => (int)$totalquestions,
                 'approved_questions' => (int)$approvedquestions,
@@ -184,7 +184,7 @@ try {
                 $values[] = (int)$type->count;
             }
 
-            send_response(true, [
+            local_hlai_quizgen_send_response(true, [
                 'labels' => $labels,
                 'values' => $values,
             ]);
@@ -209,7 +209,7 @@ try {
                 }
             }
 
-            send_response(true, $dist);
+            local_hlai_quizgen_send_response(true, $dist);
             break;
 
         case 'bloomsdist':
@@ -239,7 +239,7 @@ try {
                 }
             }
 
-            send_response(true, $dist);
+            local_hlai_quizgen_send_response(true, $dist);
             break;
 
         case 'acceptancetrend':
@@ -266,23 +266,36 @@ try {
             $ftarrates = [];
             $i = 1;
 
+            // Batch-fetch FTAR counts to avoid N+1 query pattern.
+            $requestids = array_keys($requests);
+            $ftarcounts = [];
+            if (!empty($requestids)) {
+                [$insql, $inparams] = $DB->get_in_or_equal($requestids);
+                $ftarrecords = $DB->get_records_sql(
+                    "SELECT requestid, COUNT(*) as cnt
+                     FROM {local_hlai_quizgen_questions}
+                     WHERE requestid $insql AND status = 'approved' AND regeneration_count = 0
+                     GROUP BY requestid",
+                    $inparams
+                );
+                foreach ($ftarrecords as $rec) {
+                    $ftarcounts[$rec->requestid] = (int)$rec->cnt;
+                }
+            }
+
             foreach ($requests as $r) {
-                $labels[] = 'Gen ' . $i;
+                $labels[] = get_string('ajax_gen_label', 'local_hlai_quizgen', $i);
                 $rate = $r->total > 0 ? round(($r->approved / $r->total) * 100, 1) : 0;
                 $acceptancerates[] = $rate;
 
-                // Calculate FTAR for this generation.
-                $firsttime = $DB->count_records_sql(
-                    "SELECT COUNT(*) FROM {local_hlai_quizgen_questions}
-                     WHERE requestid = ? AND status = 'approved' AND regeneration_count = 0",
-                    [$r->id]
-                );
+                // Use pre-fetched FTAR count.
+                $firsttime = $ftarcounts[$r->id] ?? 0;
                 $ftar = $r->approved > 0 ? round(($firsttime / $r->approved) * 100, 1) : 0;
                 $ftarrates[] = $ftar;
                 $i++;
             }
 
-            send_response(true, [
+            local_hlai_quizgen_send_response(true, [
                 'labels' => $labels,
                 'acceptance_rates' => $acceptancerates,
                 'ftar_rates' => $ftarrates,
@@ -315,7 +328,7 @@ try {
                 ];
             }
 
-            send_response(true, $data);
+            local_hlai_quizgen_send_response(true, $data);
             break;
 
         case 'qualitydist':
@@ -345,7 +358,7 @@ try {
                 $distribution[] = (int)$count;
             }
 
-            send_response(true, [
+            local_hlai_quizgen_send_response(true, [
                 'labels' => array_keys($ranges),
                 'values' => $distribution,
             ]);
@@ -369,12 +382,26 @@ try {
                 $limit
             );
 
+            // Batch-fetch approved counts to avoid N+1 query pattern.
+            $requestids = array_keys($requests);
+            $approvedcounts = [];
+            if (!empty($requestids)) {
+                [$insql, $inparams] = $DB->get_in_or_equal($requestids);
+                $approvedrecords = $DB->get_records_sql(
+                    "SELECT requestid, COUNT(*) as cnt
+                     FROM {local_hlai_quizgen_questions}
+                     WHERE requestid $insql AND status = 'approved'
+                     GROUP BY requestid",
+                    $inparams
+                );
+                foreach ($approvedrecords as $rec) {
+                    $approvedcounts[$rec->requestid] = (int)$rec->cnt;
+                }
+            }
+
             $items = [];
             foreach ($requests as $r) {
-                $approved = $DB->count_records('local_hlai_quizgen_questions', [
-                    'requestid' => $r->id,
-                    'status' => 'approved',
-                ]);
+                $approved = $approvedcounts[$r->id] ?? 0;
 
                 $items[] = [
                     'id' => $r->id,
@@ -389,7 +416,7 @@ try {
                 ];
             }
 
-            send_response(true, ['requests' => $items]);
+            local_hlai_quizgen_send_response(true, ['requests' => $items]);
             break;
 
         // PROGRESS MONITORING (AJAX Polling for Step 3.5).
@@ -397,14 +424,14 @@ try {
         case 'getprogress':
             // Get current generation progress for a request.
             if (!$requestid) {
-                send_error('Request ID required');
+                local_hlai_quizgen_send_error(get_string('ajax_requestid_required', 'local_hlai_quizgen'));
             }
 
             $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid], '*', MUST_EXIST);
 
             // Verify user owns this request.
             if ($request->userid != $USER->id) {
-                send_error('Access denied', 403);
+                local_hlai_quizgen_send_error(get_string('ajax_access_denied', 'local_hlai_quizgen'), 403);
             }
 
             // Get questions generated so far.
@@ -434,7 +461,7 @@ try {
             foreach ($questions as $q) {
                 $activities[] = [
                     'type' => 'question_generated',
-                    'message' => "Generated {$q->questiontype} on \"{$q->topic_title}\"",
+                    'message' => get_string('ajax_generated_question_on_topic', 'local_hlai_quizgen', (object)['type' => $q->questiontype, 'topic' => $q->topic_title]),
                     'difficulty' => $q->difficulty,
                     'blooms' => $q->blooms_level,
                 ];
@@ -454,7 +481,7 @@ try {
                 }
             }
 
-            send_response(true, [
+            local_hlai_quizgen_send_response(true, [
                 'status' => $request->status,
                 'progress' => round((float)$request->progress, 1),
                 'message' => $request->progress_message,
@@ -473,22 +500,22 @@ try {
         case 'updatequestion':
             // Update question text inline.
             if (!$questionid) {
-                send_error('Question ID required');
+                local_hlai_quizgen_send_error(get_string('ajax_questionid_required', 'local_hlai_quizgen'));
             }
 
             $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
 
             // Verify user owns this question.
             if ($question->userid != $USER->id) {
-                send_error('Access denied', 403);
+                local_hlai_quizgen_send_error(get_string('ajax_access_denied', 'local_hlai_quizgen'), 403);
             }
 
             $field = required_param('field', PARAM_ALPHA);
-            $value = required_param('value', PARAM_RAW);
+            $value = required_param('value', PARAM_CLEANHTML);
 
             $allowedfields = ['questiontext', 'difficulty', 'blooms_level', 'generalfeedback'];
             if (!in_array($field, $allowedfields)) {
-                send_error('Invalid field');
+                local_hlai_quizgen_send_error(get_string('ajax_invalid_field', 'local_hlai_quizgen'));
             }
 
             // Sanitize based on field type.
@@ -501,7 +528,7 @@ try {
             $DB->set_field('local_hlai_quizgen_questions', $field, $value, ['id' => $questionid]);
             $DB->set_field('local_hlai_quizgen_questions', 'timemodified', time(), ['id' => $questionid]);
 
-            send_response(true, ['field' => $field, 'value' => $value]);
+            local_hlai_quizgen_send_response(true, ['field' => $field, 'value' => $value]);
             break;
 
         case 'updateanswer':
@@ -513,15 +540,15 @@ try {
 
             // Verify user owns the question.
             if ($question->userid != $USER->id) {
-                send_error('Access denied', 403);
+                local_hlai_quizgen_send_error(get_string('ajax_access_denied', 'local_hlai_quizgen'), 403);
             }
 
             $field = required_param('field', PARAM_ALPHA);
-            $value = required_param('value', PARAM_RAW);
+            $value = required_param('value', PARAM_CLEANHTML);
 
             $allowedfields = ['answer', 'feedback', 'fraction'];
             if (!in_array($field, $allowedfields)) {
-                send_error('Invalid field');
+                local_hlai_quizgen_send_error(get_string('ajax_invalid_field', 'local_hlai_quizgen'));
             }
 
             if ($field === 'fraction') {
@@ -532,25 +559,26 @@ try {
 
             $DB->set_field('local_hlai_quizgen_answers', $field, $value, ['id' => $answerid]);
 
-            send_response(true, ['field' => $field, 'value' => $value]);
+            local_hlai_quizgen_send_response(true, ['field' => $field, 'value' => $value]);
             break;
 
         case 'reorderanswers':
             // Reorder answers for a question (drag & drop).
             if (!$questionid) {
-                send_error('Question ID required');
+                local_hlai_quizgen_send_error(get_string('ajax_questionid_required', 'local_hlai_quizgen'));
             }
 
             $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
             if ($question->userid != $USER->id) {
-                send_error('Access denied', 403);
+                local_hlai_quizgen_send_error(get_string('ajax_access_denied', 'local_hlai_quizgen'), 403);
             }
 
+            // PARAM_RAW required for JSON input, validated via json_decode below.
             $order = required_param('order', PARAM_RAW);
             $order = json_decode($order, true);
 
             if (!is_array($order)) {
-                send_error('Invalid order format');
+                local_hlai_quizgen_send_error(get_string('ajax_invalid_order_format', 'local_hlai_quizgen'));
             }
 
             foreach ($order as $sortorder => $answerid) {
@@ -560,18 +588,18 @@ try {
                 ]);
             }
 
-            send_response(true, ['reordered' => count($order)]);
+            local_hlai_quizgen_send_response(true, ['reordered' => count($order)]);
             break;
 
         case 'approvequestion':
             // Approve a question with optional confidence rating.
             if (!$questionid) {
-                send_error('Question ID required');
+                local_hlai_quizgen_send_error(get_string('ajax_questionid_required', 'local_hlai_quizgen'));
             }
 
             $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
             if ($question->userid != $USER->id) {
-                send_error('Access denied', 403);
+                local_hlai_quizgen_send_error(get_string('ajax_access_denied', 'local_hlai_quizgen'), 403);
             }
 
             $confidence = optional_param('confidence', 0, PARAM_INT);
@@ -594,18 +622,18 @@ try {
                 ]);
             }
 
-            send_response(true, ['status' => 'approved']);
+            local_hlai_quizgen_send_response(true, ['status' => 'approved']);
             break;
 
         case 'rejectquestion':
             // Reject a question with reason.
             if (!$questionid) {
-                send_error('Question ID required');
+                local_hlai_quizgen_send_error(get_string('ajax_questionid_required', 'local_hlai_quizgen'));
             }
 
             $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
             if ($question->userid != $USER->id) {
-                send_error('Access denied', 403);
+                local_hlai_quizgen_send_error(get_string('ajax_access_denied', 'local_hlai_quizgen'), 403);
             }
 
             $reason = optional_param('reason', '', PARAM_TEXT);
@@ -629,54 +657,66 @@ try {
                 'timecreated' => time(),
             ]);
 
-            send_response(true, ['status' => 'rejected', 'reason' => $reason]);
+            local_hlai_quizgen_send_response(true, ['status' => 'rejected', 'reason' => $reason]);
             break;
 
         case 'bulkapprove':
             // Bulk approve multiple questions.
+            // PARAM_RAW required for JSON input, validated via json_decode below.
             $questionids = required_param('questionids', PARAM_RAW);
             $questionids = json_decode($questionids, true);
 
             if (!is_array($questionids) || empty($questionids)) {
-                send_error('No questions specified');
+                local_hlai_quizgen_send_error(get_string('ajax_no_questions_specified', 'local_hlai_quizgen'));
             }
 
+            // Bulk-fetch all questions in one query to avoid N+1 SELECT per question ID.
+            [$insql, $inparams] = $DB->get_in_or_equal(array_map('intval', $questionids));
+            $questions = $DB->get_records_select(
+                'local_hlai_quizgen_questions',
+                "id $insql AND userid = ?",
+                array_merge($inparams, [$USER->id])
+            );
             $approved = 0;
-            foreach ($questionids as $qid) {
-                $qid = (int)$qid;
-                $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $qid]);
-                if ($question && $question->userid == $USER->id) {
-                    $DB->set_field('local_hlai_quizgen_questions', 'status', 'approved', ['id' => $qid]);
-                    $DB->set_field('local_hlai_quizgen_questions', 'timemodified', time(), ['id' => $qid]);
-                    $approved++;
-                }
+            $now = time();
+            foreach ($questions as $q) {
+                $q->status = 'approved';
+                $q->timemodified = $now;
+                $DB->update_record('local_hlai_quizgen_questions', $q);
+                $approved++;
             }
 
-            send_response(true, ['approved' => $approved]);
+            local_hlai_quizgen_send_response(true, ['approved' => $approved]);
             break;
 
         case 'bulkreject':
             // Bulk reject multiple questions.
+            // PARAM_RAW required for JSON input, validated via json_decode below.
             $questionids = required_param('questionids', PARAM_RAW);
             $questionids = json_decode($questionids, true);
             $reason = optional_param('reason', '', PARAM_TEXT);
 
             if (!is_array($questionids) || empty($questionids)) {
-                send_error('No questions specified');
+                local_hlai_quizgen_send_error(get_string('ajax_no_questions_specified', 'local_hlai_quizgen'));
             }
 
+            // Bulk-fetch all questions in one query to avoid N+1 SELECT per question ID.
+            [$insql, $inparams] = $DB->get_in_or_equal(array_map('intval', $questionids));
+            $questions = $DB->get_records_select(
+                'local_hlai_quizgen_questions',
+                "id $insql AND userid = ?",
+                array_merge($inparams, [$USER->id])
+            );
             $rejected = 0;
-            foreach ($questionids as $qid) {
-                $qid = (int)$qid;
-                $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $qid]);
-                if ($question && $question->userid == $USER->id) {
-                    $DB->set_field('local_hlai_quizgen_questions', 'status', 'rejected', ['id' => $qid]);
-                    $DB->set_field('local_hlai_quizgen_questions', 'timemodified', time(), ['id' => $qid]);
-                    $rejected++;
-                }
+            $now = time();
+            foreach ($questions as $q) {
+                $q->status = 'rejected';
+                $q->timemodified = $now;
+                $DB->update_record('local_hlai_quizgen_questions', $q);
+                $rejected++;
             }
 
-            send_response(true, ['rejected' => $rejected, 'reason' => $reason]);
+            local_hlai_quizgen_send_response(true, ['rejected' => $rejected, 'reason' => $reason]);
             break;
 
         // TOPIC MANAGEMENT (Step 2).
@@ -689,13 +729,13 @@ try {
             $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $topic->requestid], '*', MUST_EXIST);
 
             if ($request->userid != $USER->id) {
-                send_error('Access denied', 403);
+                local_hlai_quizgen_send_error(get_string('ajax_access_denied', 'local_hlai_quizgen'), 403);
             }
 
             $title = required_param('title', PARAM_TEXT);
             $DB->set_field('local_hlai_quizgen_topics', 'title', $title, ['id' => $topicid]);
 
-            send_response(true, ['title' => $title]);
+            local_hlai_quizgen_send_response(true, ['title' => $title]);
             break;
 
         case 'mergetopics':
@@ -708,12 +748,12 @@ try {
 
             // Verify same request and user owns it.
             if ($topic1->requestid != $topic2->requestid) {
-                send_error('Topics must be from same request');
+                local_hlai_quizgen_send_error(get_string('ajax_topics_same_request', 'local_hlai_quizgen'));
             }
 
             $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $topic1->requestid]);
             if ($request->userid != $USER->id) {
-                send_error('Access denied', 403);
+                local_hlai_quizgen_send_error(get_string('ajax_access_denied', 'local_hlai_quizgen'), 403);
             }
 
             // Merge: combine titles, sum questions, keep first topic.
@@ -736,7 +776,7 @@ try {
             // Delete topic2.
             $DB->delete_records('local_hlai_quizgen_topics', ['id' => $topicid2]);
 
-            send_response(true, [
+            local_hlai_quizgen_send_response(true, [
                 'merged_into' => $topicid1,
                 'deleted' => $topicid2,
                 'new_title' => $newtitle,
@@ -752,14 +792,14 @@ try {
             $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $topic->requestid]);
 
             if ($request->userid != $USER->id) {
-                send_error('Access denied', 403);
+                local_hlai_quizgen_send_error(get_string('ajax_access_denied', 'local_hlai_quizgen'), 403);
             }
 
             // Delete associated questions first.
             $DB->delete_records('local_hlai_quizgen_questions', ['topicid' => $topicid]);
             $DB->delete_records('local_hlai_quizgen_topics', ['id' => $topicid]);
 
-            send_response(true, ['deleted' => $topicid]);
+            local_hlai_quizgen_send_response(true, ['deleted' => $topicid]);
             break;
 
         // ANALYTICS DATA.
@@ -767,7 +807,7 @@ try {
         case 'courseanalytics':
             // Get analytics for a specific course.
             if (!$courseid) {
-                send_error('Course ID required');
+                local_hlai_quizgen_send_error(get_string('ajax_courseid_required', 'local_hlai_quizgen'));
             }
 
             $context = context_course::instance($courseid);
@@ -805,7 +845,7 @@ try {
                 [$courseid, time() - (30 * 24 * 60 * 60)] // Last 30 days.
             );
 
-            send_response(true, [
+            local_hlai_quizgen_send_response(true, [
                 'by_type' => array_values($types),
                 'by_difficulty' => array_values($difficulties),
                 'trend' => array_values($recent),
@@ -840,14 +880,14 @@ try {
             $chunks = array_chunk($confidences, $chunksize);
             foreach ($chunks as $i => $chunk) {
                 $averages[] = [
-                    'group' => 'Group ' . ($i + 1),
+                    'group' => get_string('ajax_group_label', 'local_hlai_quizgen', ($i + 1)),
                     'avg' => round(array_sum($chunk) / count($chunk), 2),
                 ];
             }
 
             $overallavg = count($confidences) > 0 ? round(array_sum($confidences) / count($confidences), 2) : 0;
 
-            send_response(true, [
+            local_hlai_quizgen_send_response(true, [
                 'overall_average' => $overallavg,
                 'total_ratings' => count($confidences),
                 'trend' => $averages,
@@ -859,14 +899,14 @@ try {
         case 'uploadfile':
             // Handle file upload via AJAX.
             if (!$courseid) {
-                send_error('Course ID required');
+                local_hlai_quizgen_send_error(get_string('ajax_courseid_required', 'local_hlai_quizgen'));
             }
 
             $context = context_course::instance($courseid);
             require_capability('local/hlai_quizgen:generatequestions', $context);
 
             if (empty($_FILES['file'])) {
-                send_error('No file uploaded');
+                local_hlai_quizgen_send_error(get_string('ajax_no_file_uploaded', 'local_hlai_quizgen'));
             }
 
             $file = $_FILES['file'];
@@ -881,7 +921,7 @@ try {
             $maxsize = 50 * 1024 * 1024; // 50MB.
 
             if ($file['size'] > $maxsize) {
-                send_error('File too large (max 50MB)');
+                local_hlai_quizgen_send_error(get_string('ajax_file_too_large', 'local_hlai_quizgen'));
             }
 
             // Get file info.
@@ -890,7 +930,7 @@ try {
 
             $allowedextensions = ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'txt'];
             if (!in_array($extension, $allowedextensions)) {
-                send_error('File type not allowed');
+                local_hlai_quizgen_send_error(get_string('ajax_file_type_not_allowed', 'local_hlai_quizgen'));
             }
 
             // Store in Moodle file area.
@@ -906,7 +946,7 @@ try {
 
             $storedfile = $fs->create_file_from_pathname($fileinfo, $file['tmp_name']);
 
-            send_response(true, [
+            local_hlai_quizgen_send_response(true, [
                 'filename' => $filename,
                 'size' => $file['size'],
                 'size_formatted' => display_size($file['size']),
@@ -920,7 +960,7 @@ try {
             $itemid = required_param('itemid', PARAM_INT);
 
             if (!$courseid) {
-                send_error('Course ID required');
+                local_hlai_quizgen_send_error(get_string('ajax_courseid_required', 'local_hlai_quizgen'));
             }
 
             $context = context_course::instance($courseid);
@@ -931,7 +971,7 @@ try {
                 $file->delete();
             }
 
-            send_response(true, ['removed' => $itemid]);
+            local_hlai_quizgen_send_response(true, ['removed' => $itemid]);
             break;
 
         // TEMPLATES AND PRESETS.
@@ -939,11 +979,12 @@ try {
         case 'savetemplate':
             // Save current configuration as template.
             $name = required_param('name', PARAM_TEXT);
+            // PARAM_RAW required for JSON input, validated via json_decode below.
             $config = required_param('config', PARAM_RAW);
 
             $configdata = json_decode($config, true);
             if (!$configdata) {
-                send_error('Invalid configuration');
+                local_hlai_quizgen_send_error(get_string('ajax_invalid_configuration', 'local_hlai_quizgen'));
             }
 
             // Save as user setting.
@@ -960,7 +1001,7 @@ try {
                 'timemodified' => time(),
             ]);
 
-            send_response(true, ['saved' => $name]);
+            local_hlai_quizgen_send_response(true, ['saved' => $name]);
             break;
 
         case 'gettemplates':
@@ -986,7 +1027,7 @@ try {
                 }
             }
 
-            send_response(true, ['templates' => $items]);
+            local_hlai_quizgen_send_response(true, ['templates' => $items]);
             break;
 
         case 'deletetemplate':
@@ -995,12 +1036,12 @@ try {
 
             $template = $DB->get_record('local_hlai_quizgen_settings', ['id' => $templateid]);
             if (!$template || $template->userid != $USER->id) {
-                send_error('Template not found or access denied', 403);
+                local_hlai_quizgen_send_error(get_string('ajax_template_not_found', 'local_hlai_quizgen'), 403);
             }
 
             $DB->delete_records('local_hlai_quizgen_settings', ['id' => $templateid]);
 
-            send_response(true, ['deleted' => $templateid]);
+            local_hlai_quizgen_send_response(true, ['deleted' => $templateid]);
             break;
 
         // SESSION AND STATE MANAGEMENT.
@@ -1008,10 +1049,11 @@ try {
         case 'savewizardstate':
             // Save wizard state for session resumption.
             if (!$courseid) {
-                send_error('Course ID required');
+                local_hlai_quizgen_send_error(get_string('ajax_courseid_required', 'local_hlai_quizgen'));
             }
 
             $step = required_param('step', PARAM_INT);
+            // PARAM_RAW required for JSON input, validated via json_decode below.
             $state = required_param('state', PARAM_RAW);
 
             $statedata = json_decode($state, true);
@@ -1044,13 +1086,13 @@ try {
                 ]);
             }
 
-            send_response(true, ['step' => $step]);
+            local_hlai_quizgen_send_response(true, ['step' => $step]);
             break;
 
         case 'getwizardstate':
             // Get saved wizard state.
             if (!$courseid) {
-                send_error('Course ID required');
+                local_hlai_quizgen_send_error(get_string('ajax_courseid_required', 'local_hlai_quizgen'));
             }
 
             $state = $DB->get_record('local_hlai_quizgen_wizard_state', [
@@ -1059,9 +1101,9 @@ try {
             ]);
 
             if (!$state) {
-                send_response(true, ['hasstate' => false]);
+                local_hlai_quizgen_send_response(true, ['hasstate' => false]);
             } else {
-                send_response(true, [
+                local_hlai_quizgen_send_response(true, [
                     'hasstate' => true,
                     'step' => (int)$state->current_step,
                     'state' => json_decode($state->state_data, true),
@@ -1074,7 +1116,7 @@ try {
         case 'clearwizardstate':
             // Clear wizard state.
             if (!$courseid) {
-                send_error('Course ID required');
+                local_hlai_quizgen_send_error(get_string('ajax_courseid_required', 'local_hlai_quizgen'));
             }
 
             $DB->delete_records('local_hlai_quizgen_wizard_state', [
@@ -1082,7 +1124,7 @@ try {
                 'courseid' => $courseid,
             ]);
 
-            send_response(true, ['cleared' => true]);
+            local_hlai_quizgen_send_response(true, ['cleared' => true]);
             break;
 
         // DIAGNOSTIC ENDPOINT.
@@ -1090,7 +1132,7 @@ try {
         case 'fixcategory':
             // Force-fix the question.category field by adding it if missing.
             if (!$courseid) {
-                send_error('Course ID required');
+                local_hlai_quizgen_send_error(get_string('ajax_courseid_required', 'local_hlai_quizgen'));
             }
 
             $coursecontext = context_course::instance($courseid);
@@ -1137,22 +1179,19 @@ try {
                             $current = $DB->get_field('question', 'category', ['id' => $q->questionid]);
                             // If we got here, column exists - update it.
                             if (empty($current) || $current != $q->questioncategoryid) {
-                                $DB->execute(
-                                    "UPDATE {question} SET category = ? WHERE id = ?",
-                                    [$q->questioncategoryid, $q->questionid]
-                                );
+                                $DB->set_field('question', 'category', $q->questioncategoryid, ['id' => $q->questionid]);
                                 $result['questions_fixed']++;
                             }
                         } catch (Exception $e) {
                             // Column truly doesn't exist, can't fix.
-                            $result['errors'][] = "Question {$q->questionid}: Column doesn't exist - " . $e->getMessage();
+                            $result['errors'][] = get_string('ajax_question_column_missing', 'local_hlai_quizgen', (object)['id' => $q->questionid, 'error' => $e->getMessage()]);
                         }
                     }
                     if ($hascategory) {
                         $result['questions_fixed']++;
                     }
                 } catch (Exception $e) {
-                    $result['errors'][] = "Question {$q->questionid}: " . $e->getMessage();
+                    $result['errors'][] = get_string('ajax_question_error', 'local_hlai_quizgen', (object)['id' => $q->questionid, 'error' => $e->getMessage()]);
                 }
             }
 
@@ -1163,7 +1202,7 @@ try {
                     $sample = $DB->get_record('question', ['id' => $questions[$sampleid]->questionid]);
                     $result['sample_question'] = [
                         'id' => $sample->id,
-                        'category' => $sample->category ?? 'NOT SET',
+                        'category' => $sample->category ?? get_string('ajax_not_set', 'local_hlai_quizgen'),
                         'qtype' => $sample->qtype,
                     ];
                 } catch (Exception $e) {
@@ -1171,15 +1210,19 @@ try {
                 }
             }
 
-            $result['message'] = "Checked {$result['questions_checked']} questions, fixed {$result['questions_fixed']}.";
+            $stringparams = (object)[
+                'checked' => $result['questions_checked'],
+                'fixed' => $result['questions_fixed'],
+            ];
+            $result['message'] = get_string('ajax_questions_checked_fixed', 'local_hlai_quizgen', $stringparams);
 
-            send_response(true, $result);
+            local_hlai_quizgen_send_response(true, $result);
             break;
 
         case 'checkqtypes':
             // Check if question type-specific data exists for our questions.
             if (!$courseid) {
-                send_error('Course ID required');
+                local_hlai_quizgen_send_error(get_string('ajax_courseid_required', 'local_hlai_quizgen'));
             }
 
             $coursecontext = context_course::instance($courseid);
@@ -1269,19 +1312,21 @@ try {
                 }
             }
 
-            $result['message'] = "Found " . count($result['missing_type_data']) .
-                                 " questions with missing type data. Found " .
-                                 count($result['draft_status']) .
-                                 " questions with non-ready status (repaired {$result['repaired_status']}).";
+            $stringparams = (object)[
+                'missing' => count($result['missing_type_data']),
+                'notready' => count($result['draft_status']),
+                'repaired' => $result['repaired_status'],
+            ];
+            $result['message'] = get_string('ajax_checkqtypes_result', 'local_hlai_quizgen', $stringparams);
 
-            send_response(true, $result);
+            local_hlai_quizgen_send_response(true, $result);
             break;
 
         case 'repairquestions':
             // Repair questions that have NULL category field.
             // This fixes the "Invalid context id" error when viewing questions.
             if (!$courseid) {
-                send_error('Course ID required');
+                local_hlai_quizgen_send_error(get_string('ajax_courseid_required', 'local_hlai_quizgen'));
             }
 
             $coursecontext = context_course::instance($courseid);
@@ -1301,8 +1346,7 @@ try {
 
             if (!$hascategorycolumn) {
                 // Moodle 4.x without category column - check question_bank_entries instead.
-                $result['message'] = "Your Moodle version doesn't have the 'category' column in the question table. " .
-                                     "This is expected for Moodle 4.x. Questions should work through question_bank_entries.";
+                $result['message'] = get_string('ajax_no_category_column', 'local_hlai_quizgen');
 
                 // Verify question_bank_entries are properly linked.
                 $sql = "SELECT COUNT(*) as cnt
@@ -1342,35 +1386,35 @@ try {
                             $DB->set_field('question', 'category', $q->questioncategoryid, ['id' => $q->questionid]);
                             $repaired++;
                         } catch (Exception $e) {
-                            $errors[] = "Question {$q->questionid}: " . $e->getMessage();
+                            $errors[] = get_string('ajax_question_error', 'local_hlai_quizgen', (object)['id' => $q->questionid, 'error' => $e->getMessage()]);
                         }
                     }
                 }
 
                 $result['repaired'] = $repaired;
                 $result['errors'] = $errors;
-                $result['message'] = "Found {$result['found']} questions. Repaired $repaired. You should now be able to view them.";
+                $result['message'] = get_string('ajax_repair_result', 'local_hlai_quizgen', (object)['found' => $result['found'], 'repaired' => $repaired]);
             }
 
-            send_response(true, $result);
+            local_hlai_quizgen_send_response(true, $result);
             break;
 
         case 'diagnose':
             // Diagnose question deployment status.
             // Can use requestid OR courseid.
             if (!$requestid && !$courseid) {
-                send_error('Request ID or Course ID required');
+                local_hlai_quizgen_send_error(get_string('ajax_requestid_or_courseid_required', 'local_hlai_quizgen'));
             }
 
             if ($requestid) {
                 // Diagnose specific request.
                 $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid]);
                 if (!$request) {
-                    send_error('Request not found', 404);
+                    local_hlai_quizgen_send_error(get_string('ajax_request_not_found', 'local_hlai_quizgen'), 404);
                 }
                 $coursecontext = context_course::instance($request->courseid);
                 if ($request->userid != $USER->id && !has_capability('moodle/site:config', context_system::instance())) {
-                    send_error('Access denied', 403);
+                    local_hlai_quizgen_send_error(get_string('ajax_access_denied', 'local_hlai_quizgen'), 403);
                 }
                 $diagnostic = \local_hlai_quizgen\api::diagnose_deployment($requestid);
             } else {
@@ -1413,12 +1457,12 @@ try {
                 }
             }
 
-            send_response(true, $diagnostic);
+            local_hlai_quizgen_send_response(true, $diagnostic);
             break;
 
         default:
-            send_error('Unknown action: ' . $action, 400);
+            local_hlai_quizgen_send_error(get_string('ajax_unknown_action', 'local_hlai_quizgen', $action), 400);
     }
 } catch (Exception $e) {
-    send_error('Error: ' . $e->getMessage(), 500);
+    local_hlai_quizgen_send_error(get_string('ajax_error', 'local_hlai_quizgen', $e->getMessage()), 500);
 }

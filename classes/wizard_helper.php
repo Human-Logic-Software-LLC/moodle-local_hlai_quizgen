@@ -26,6 +26,8 @@
 
 namespace local_hlai_quizgen;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Helper class for wizard functionality.
  *

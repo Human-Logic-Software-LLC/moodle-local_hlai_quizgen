@@ -27,6 +27,8 @@
 
 namespace local_hlai_quizgen;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Debug logger class for comprehensive error and event logging.
  */
@@ -62,11 +64,8 @@ class debug_logger {
             // Always enable logging for now (can be made configurable later).
             self::$enabled = true;
 
-            // Set up log file path in moodledata.
-            $logdir = $CFG->dataroot . '/local_hlai_quizgen_logs';
-            if (!is_dir($logdir)) {
-                @mkdir($logdir, 0777, true);
-            }
+            // Set up log file path in moodledata using Moodle's temp directory API.
+            $logdir = make_temp_directory('local_hlai_quizgen/logs');
             self::$logfile = $logdir . '/' . self::LOG_FILE;
         }
     }

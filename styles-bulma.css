@@ -1151,26 +1151,30 @@ body.path-local-hlai_quizgen.hlai-step-2 #page-footer {
     padding: 1rem 1.5rem;
 }
 
-/* Columns gap adjustment - Force flexbox (Moodle overrides Bulma) */
+/* Columns gap adjustment - force flexbox to override Moodle */
 .hlai-quizgen-wrapper .columns,
 .hlai-quizgen-wizard .columns {
-    margin-left: -0.75rem;
-    margin-right: -0.75rem;
     display: flex !important;
     flex-wrap: wrap !important;
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
 }
 
 .hlai-quizgen-wrapper .column,
 .hlai-quizgen-wizard .column {
-    padding: 0.75rem;
     display: flex !important;
     flex-direction: column !important;
+    padding: 0.75rem;
 }
 
-/* Dashboard header - Force flex layout for .level */
+/* ==========================================================================
+   DASHBOARD HEADER - Level layout fix for Moodle
+   ========================================================================== */
+
 .hlai-quizgen-wrapper .level {
     display: flex !important;
     align-items: center !important;
+    justify-content: space-between !important;
 }
 
 .hlai-quizgen-wrapper .level-left,
@@ -1182,31 +1186,31 @@ body.path-local-hlai_quizgen.hlai-step-2 #page-footer {
 .hlai-quizgen-wrapper .level-item {
     display: flex !important;
     align-items: center !important;
-    justify-content: center !important;
-}
-
-/* KPI equal-width columns */
-.hlai-quizgen-wrapper .columns.mb-5 > .column {
-    flex: 1 1 0 !important;
-    min-width: 0 !important;
 }
 
 /* ==========================================================================
    STAT CARDS - KPI Style (Soft, Modern)
    ========================================================================== */
 
+/* KPI row: ensure all stat columns are equal width */
+.hlai-quizgen-wrapper .columns.mb-5 > .column {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+}
+
 .hlai-quizgen-wrapper .box.has-text-centered,
 .hlai-quizgen-wizard .box.has-text-centered {
     padding: 1.75rem 1.5rem;
     border-radius: var(--hlai-radius-xl);
     transition: transform var(--hlai-transition-fast), box-shadow var(--hlai-transition-fast);
-    text-align: center !important;
-    min-height: 180px;
-    width: 100%;
+    flex: 1 !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
+    text-align: center !important;
+    min-height: 180px;
+    width: 100%;
 }
 
 .hlai-quizgen-wrapper .box.has-text-centered:hover,
@@ -1215,16 +1219,14 @@ body.path-local-hlai_quizgen.hlai-step-2 #page-footer {
     box-shadow: var(--hlai-shadow-md);
 }
 
-/* All <p> inside stat cards - force centered */
 .hlai-quizgen-wrapper .box.has-text-centered p,
 .hlai-quizgen-wizard .box.has-text-centered p {
-    width: 100%;
+    width: 100% !important;
     text-align: center !important;
-    margin-left: auto;
-    margin-right: auto;
+    margin-left: auto !important;
+    margin-right: auto !important;
 }
 
-/* Icon spacing */
 .hlai-quizgen-wrapper .box.has-text-centered .is-size-3,
 .hlai-quizgen-wizard .box.has-text-centered .is-size-3 {
     margin-bottom: 0.25rem;
@@ -9021,21 +9023,22 @@ body.path-local-hlai_quizgen.hlai-step-2 #page-footer {
 }
 /* ==========================================================================
    GLOBAL ICON ALIGNMENT FIX - Ensures all icons align vertically with text
+   Covers i.fa (FA4), i.fas, i.far (FA5)
    ========================================================================== */
 
 /* Fix for all title/heading icons */
+.title i.fa,
 .title i.fas,
 .title i.far,
-.title i.fa,
-h1 i.fas, h1 i.far, h1 i.fa,
-h2 i.fas, h2 i.far, h2 i.fa,
-h3 i.fas, h3 i.far, h3 i.fa,
-h4 i.fas, h4 i.far, h4 i.fa,
-h5 i.fas, h5 i.far, h5 i.fa,
-h6 i.fas, h6 i.far, h6 i.fa,
+h1 i.fa, h1 i.fas, h1 i.far,
+h2 i.fa, h2 i.fas, h2 i.far,
+h3 i.fa, h3 i.fas, h3 i.far,
+h4 i.fa, h4 i.fas, h4 i.far,
+h5 i.fa, h5 i.fas, h5 i.far,
+h6 i.fa, h6 i.fas, h6 i.far,
+.panel-heading i.fa,
 .panel-heading i.fas,
-.panel-heading i.far,
-.panel-heading i.fa {
+.panel-heading i.far {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -9044,15 +9047,15 @@ h6 i.fas, h6 i.far, h6 i.fa,
 }
 
 /* Fix for icons in paragraphs and divs */
+p i.fa,
 p i.fas,
 p i.far,
-p i.fa,
+div i.fa,
 div i.fas,
 div i.far,
-div i.fa,
+span i.fa,
 span i.fas,
-span i.far,
-span i.fa {
+span i.far {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -9060,24 +9063,24 @@ span i.fa {
 }
 
 /* Fix for icons in lists */
+li i.fa,
 li i.fas,
-li i.far,
-li i.fa {
+li i.far {
     display: inline-flex !important;
     align-items: center !important;
     vertical-align: middle !important;
 }
 
 /* Fix for icons in buttons and links */
+button i.fa,
 button i.fas,
 button i.far,
-button i.fa,
+a i.fa,
 a i.fas,
 a i.far,
-a i.fa,
+.button i.fa,
 .button i.fas,
-.button i.far,
-.button i.fa {
+.button i.far {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -9085,12 +9088,12 @@ a i.fa,
 }
 
 /* Fix for stat card icons */
+.stat-card i.fa,
 .stat-card i.fas,
 .stat-card i.far,
-.stat-card i.fa,
+.box i.fa,
 .box i.fas,
-.box i.far,
-.box i.fa {
+.box i.far {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -9130,14 +9133,17 @@ a i.fa,
 }
 
 /* Ensure Bulma columns with icons align properly */
+.column i.fa,
 .column i.fas,
 .column i.far {
     vertical-align: middle !important;
 }
 
 /* Fix for notification/message boxes */
+.notification i.fa,
 .notification i.fas,
 .notification i.far,
+.message i.fa,
 .message i.fas,
 .message i.far {
     display: inline-flex !important;
@@ -9146,6 +9152,7 @@ a i.fa,
 }
 
 /* Analytics dashboard specific fixes */
+.hlai-insight-item i.fa,
 .hlai-insight-item i.fas,
 .hlai-insight-item i.far {
     display: inline-flex !important;
@@ -9168,8 +9175,10 @@ a i.fa,
 }
 
 /* Fix for badges with icons */
+.badge i.fa,
 .badge i.fas,
 .badge i.far,
+.tag i.fa,
 .tag i.fas,
 .tag i.far {
     display: inline-flex !important;
@@ -9178,6 +9187,7 @@ a i.fa,
 }
 
 /* Fix for label icons */
+label i.fa,
 label i.fas,
 label i.far {
     display: inline-flex !important;
@@ -9531,3 +9541,361 @@ body.path-local-hlai_quizgen #page-footer .purgecaches {
 .hlai-quizgen-wizard.hlai-step-4 .level-right .level-item + .level-item {
     margin-left: 0.5rem !important;
 }
+
+/* ==========================================================================
+   Admin Dashboard Styles
+   Extracted from admin_dashboard.php inline styles
+   ========================================================================== */
+
+/* Iksha-inspired Clean Design System */
+:root {
+    --admin-primary: #3B82F6;
+    --admin-primary-light: #EFF6FF;
+    --admin-success: #10B981;
+    --admin-success-light: #ECFDF5;
+    --admin-warning: #F59E0B;
+    --admin-warning-light: #FFFBEB;
+    --admin-danger: #EF4444;
+    --admin-danger-light: #FEF2F2;
+    --admin-info: #06B6D4;
+    --admin-info-light: #ECFEFF;
+    --admin-gray-50: #F8FAFC;
+    --admin-gray-100: #F1F5F9;
+    --admin-gray-200: #E2E8F0;
+    --admin-gray-700: #334155;
+    --admin-gray-800: #1E293B;
+}
+
+.admin-stat-card {
+    background: #fff;
+    border: 1px solid var(--admin-gray-200);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    transition: all 0.2s ease;
+    height: 100%;
+}
+
+.admin-stat-card:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    border-color: var(--admin-gray-200);
+}
+
+.stat-icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+}
+
+.stat-icon-container.is-primary {
+    background: var(--admin-primary-light);
+    color: var(--admin-primary);
+}
+
+.stat-icon-container.is-success {
+    background: var(--admin-success-light);
+    color: var(--admin-success);
+}
+
+.stat-icon-container.is-warning {
+    background: var(--admin-warning-light);
+    color: var(--admin-warning);
+}
+
+.stat-icon-container.is-info {
+    background: var(--admin-info-light);
+    color: var(--admin-info);
+}
+
+.stat-icon-container.is-danger {
+    background: var(--admin-danger-light);
+    color: var(--admin-danger);
+}
+
+.stat-icon-large {
+    font-size: 1.5rem;
+}
+
+.stat-label {
+    font-size: 0.8125rem;
+    color: var(--admin-gray-700);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--admin-gray-800);
+    line-height: 1.2;
+}
+
+.stat-subtext {
+    font-size: 0.75rem;
+    color: var(--admin-gray-700);
+    margin-top: 0.25rem;
+}
+
+.section-header {
+    border-left: 3px solid var(--admin-primary);
+    padding-left: 1rem;
+    margin: 2.5rem 0 1.5rem 0;
+}
+
+.section-header h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--admin-gray-800);
+    margin: 0;
+}
+
+.chart-container {
+    background: white;
+    border: 1px solid var(--admin-gray-200);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    margin-bottom: 1.5rem;
+}
+
+.chart-container:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+.chart-title {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--admin-gray-800);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.chart-title i {
+    color: var(--admin-primary);
+}
+
+.health-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.8125rem;
+}
+
+.health-indicator.is-healthy {
+    background: var(--admin-success-light);
+    color: var(--admin-success);
+}
+
+.health-indicator.is-error {
+    background: var(--admin-danger-light);
+    color: var(--admin-danger);
+}
+
+.top-performer-row {
+    padding: 0.875rem;
+    border-bottom: 1px solid var(--admin-gray-100);
+    transition: background 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.top-performer-row:last-child {
+    border-bottom: none;
+}
+
+.top-performer-row:hover {
+    background: var(--admin-gray-50);
+}
+
+.performer-rank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: var(--admin-gray-100);
+    color: var(--admin-gray-700);
+    font-weight: 700;
+    font-size: 0.8125rem;
+}
+
+.performer-name {
+    font-weight: 600;
+    color: var(--admin-gray-800);
+    font-size: 0.875rem;
+}
+
+.performer-details {
+    font-size: 0.75rem;
+    color: var(--admin-gray-700);
+    margin-top: 0.125rem;
+}
+
+.performer-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    background: var(--admin-primary-light);
+    color: var(--admin-primary);
+}
+
+.page-title-section {
+    margin-top: 2rem;
+    margin-bottom: 2.5rem;
+}
+
+.page-title-section h1 {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: var(--admin-gray-800);
+    margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+    font-size: 0.9375rem;
+    color: var(--admin-gray-700);
+}
+
+.system-health-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.health-metric {
+    padding: 1rem;
+    background: var(--admin-gray-50);
+    border-radius: 6px;
+}
+
+.health-metric strong {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--admin-gray-700);
+    margin-bottom: 0.5rem;
+}
+
+.health-value {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.health-value.is-warning {
+    background: var(--admin-warning-light);
+    color: var(--admin-warning);
+}
+
+.health-value.is-success {
+    background: var(--admin-success-light);
+    color: var(--admin-success);
+}
+
+.health-value.is-danger {
+    background: var(--admin-danger-light);
+    color: var(--admin-danger);
+}
+
+.health-value.is-dark {
+    background: var(--admin-gray-200);
+    color: var(--admin-gray-700);
+}
+
+.config-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.config-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    border: 1px solid var(--admin-gray-200);
+    border-radius: 6px;
+    background: white;
+    color: var(--admin-gray-700);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    transition: all 0.15s ease;
+}
+
+.config-button:hover {
+    background: var(--admin-gray-50);
+    border-color: var(--admin-primary);
+    color: var(--admin-primary);
+    text-decoration: none;
+}
+
+.config-button i {
+    font-size: 0.875rem;
+}
+
+/* Utility classes to replace inline styles */
+body.path-local-hlai_quizgen .hlai-icon-primary { color: #3B82F6; }
+body.path-local-hlai_quizgen .hlai-icon-success { color: #10B981; }
+body.path-local-hlai_quizgen .hlai-icon-warning { color: #F59E0B; }
+body.path-local-hlai_quizgen .hlai-icon-danger { color: #EF4444; }
+body.path-local-hlai_quizgen .hlai-icon-info { color: #06B6D4; }
+body.path-local-hlai_quizgen .hlai-icon-secondary { color: #64748B; }
+body.path-local-hlai_quizgen .hlai-icon-purple { color: #8B5CF6; }
+body.path-local-hlai_quizgen .hlai-icon-white { color: #FFFFFF; }
+body.path-local-hlai_quizgen .hlai-icon-muted { color: #CBD5E1; }
+body.path-local-hlai_quizgen .hlai-chart-h250 { height: 250px; }
+body.path-local-hlai_quizgen .hlai-chart-h280 { height: 280px; }
+body.path-local-hlai_quizgen .hlai-chart-h300 { height: 300px; }
+body.path-local-hlai_quizgen .hlai-chart-h350 { height: 350px; }
+body.path-local-hlai_quizgen .hlai-chart-h400 { height: 400px; }
+body.path-local-hlai_quizgen .hlai-mt-2rem { margin-top: 2rem; }
+body.path-local-hlai_quizgen .hlai-gap-075 { gap: 0.75rem; }
+body.path-local-hlai_quizgen .hlai-w-full { width: 100%; }
+body.path-local-hlai_quizgen .hlai-hidden { display: none; }
+body.path-local-hlai_quizgen .hlai-word-break-all { word-break: break-all; }
+body.path-local-hlai_quizgen .hlai-font-lg { font-size: 1.5rem; }
+body.path-local-hlai_quizgen .hlai-font-xl { font-size: 2rem; }
+body.path-local-hlai_quizgen .hlai-font-xxl { font-size: 3rem; }
+body.path-local-hlai_quizgen .hlai-input-sm { width: 100px; }
+body.path-local-hlai_quizgen .hlai-input-md { width: 120px; }
+body.path-local-hlai_quizgen .hlai-spacer-60 { height: 60px; }
+body.path-local-hlai_quizgen .hlai-log-error { color: #ff6b6b; }
+body.path-local-hlai_quizgen .hlai-log-warning { color: #ffd93d; }
+body.path-local-hlai_quizgen .hlai-log-critical { color: #ff0000; font-weight: bold; }
+body.path-local-hlai_quizgen .hlai-log-info { color: #6bcb77; }
+body.path-local-hlai_quizgen .hlai-log-debug { color: #4d96ff; }
+body.path-local-hlai_quizgen .hlai-admin-hr { border-color: var(--admin-gray-200); margin: 1.5rem 0; }
+body.path-local-hlai_quizgen .hlai-icon-admin-primary { color: var(--admin-primary); }
+body.path-local-hlai_quizgen .hlai-wizard-heading { font-size: 1.75rem; color: var(--hlai-gray-800); }
+body.path-local-hlai_quizgen .hlai-border-top { border-top: 1px solid #dbdbdb; }
+body.path-local-hlai_quizgen .hlai-font-lg-mr { font-size: 1.5rem; margin-right: 0.5rem; }
+body.path-local-hlai_quizgen .hlai-card-header-clean { box-shadow: none; border-bottom: 1px solid var(--hlai-gray-100); }
+body.path-local-hlai_quizgen .hlai-checkbox-flex { display: flex; align-items: center; }
+body.path-local-hlai_quizgen .hlai-checkbox-scale { transform: scale(1.1); cursor: pointer; }
+body.path-local-hlai_quizgen .hlai-model-answer { padding: 1rem; border-radius: 6px; background-color: #f0f9ff; border-left: 4px solid #3b82f6; }
+body.path-local-hlai_quizgen .hlai-answer-row { padding: 0.5rem; border-radius: 4px; display: flex; align-items: flex-start; margin-bottom: 0.35rem; }
+body.path-local-hlai_quizgen .hlai-answer-correct { background-color: #effaf3; color: #257942; }
+body.path-local-hlai_quizgen .hlai-answer-neutral { background-color: #f5f5f5; }
+body.path-local-hlai_quizgen .hlai-deploy-label { display: flex; align-items: flex-start; gap: 0.5rem; }
+body.path-local-hlai_quizgen .hlai-radio-mt { margin-top: 4px; }
+body.path-local-hlai_quizgen .hlai-flex-center { display: flex; align-items: center; }
+body.path-local-hlai_quizgen .hlai-flex-center-all { display: flex; align-items: center; justify-content: center; }

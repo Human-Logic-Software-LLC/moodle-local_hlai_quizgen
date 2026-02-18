@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Upgrade the local_hlai_quizgen plugin.
  *
@@ -1325,8 +1327,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         // - IMPROVED: String loading with fallbacks prevents [[pluginname]] display issues.
         // No database schema changes - this is purely a compatibility/UX fix.
 
-        // Force cache purge to ensure language strings load.
-        purge_all_caches();
+        // Moodle automatically purges caches after upgrade.
 
         upgrade_plugin_savepoint(true, 2026020401, 'local', 'hlai_quizgen');
     }

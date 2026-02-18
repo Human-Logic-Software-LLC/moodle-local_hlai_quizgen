@@ -31,6 +31,8 @@
 
 namespace local_hlai_quizgen;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Question generator class.
  */
@@ -220,16 +222,15 @@ class question_generator {
             }
         }
 
-        // Update request token totals.
+        // Update request token totals using DML helper.
         if ($totalprompt > 0 || $totalresponse > 0) {
-            $DB->execute(
-                "UPDATE {local_hlai_quizgen_requests}
-                 SET prompt_tokens = prompt_tokens + ?,
-                     response_tokens = response_tokens + ?,
-                     total_tokens = total_tokens + ?
-                 WHERE id = ?",
-                [$totalprompt, $totalresponse, ($totalprompt + $totalresponse), $requestid]
-            );
+            $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid]);
+            if ($request) {
+                $request->prompt_tokens = $request->prompt_tokens + $totalprompt;
+                $request->response_tokens = $request->response_tokens + $totalresponse;
+                $request->total_tokens = $request->total_tokens + ($totalprompt + $totalresponse);
+                $DB->update_record('local_hlai_quizgen_requests', $request);
+            }
         }
 
         // Log the completion of topic generation.

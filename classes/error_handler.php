@@ -26,6 +26,8 @@
 
 namespace local_hlai_quizgen;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Error handler class with standardized error handling.
  */

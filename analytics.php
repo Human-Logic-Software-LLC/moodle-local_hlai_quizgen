@@ -42,7 +42,7 @@ $PAGE->set_url(new moodle_url('/local/hlai_quizgen/analytics.php', ['courseid' =
 $PAGE->set_context($context);
 $PAGE->set_course($course);
 $PAGE->set_pagelayout('incourse');
-$PAGE->set_title(get_string('pluginname', 'local_hlai_quizgen') . ' - Analytics');
+$PAGE->set_title(get_string('pluginname', 'local_hlai_quizgen') . ' - ' . get_string('analytics_title', 'local_hlai_quizgen'));
 $PAGE->set_heading($course->fullname);
 
 // Add Bulma CSS Framework (Native/Local - non-minified for debugging).
@@ -53,13 +53,6 @@ $PAGE->requires->css('/local/hlai_quizgen/styles-bulma.css');
 
 // Add ApexCharts (Local - non-minified for debugging).
 $PAGE->requires->js(new moodle_url('/local/hlai_quizgen/apexcharts.js'), true);
-
-// Add our AMD modules.
-$PAGE->requires->js_call_amd('local_hlai_quizgen/analytics', 'init', [
-    $courseid,
-    sesskey(),
-    $timerange,
-]);
 
 $userid = $USER->id;
 
@@ -88,7 +81,7 @@ switch ($timerange) {
  * @param string $timefield Time field name
  * @return array Array of [sql, params]
  */
-function get_filtered_sql($basesql, $baseparams, $timefilter, $timefield = 'timecreated') {
+function local_hlai_quizgen_get_filtered_sql($basesql, $baseparams, $timefilter, $timefield = 'timecreated') {
     if ($timefilter > 0) {
         return [$basesql . " AND {$timefield} >= ?", array_merge($baseparams, [$timefilter])];
     }
@@ -98,7 +91,7 @@ function get_filtered_sql($basesql, $baseparams, $timefilter, $timefield = 'time
 // Summary statistics.
 
 // Total questions generated.
-[$sql, $params] = get_filtered_sql(
+[$sql, $params] = local_hlai_quizgen_get_filtered_sql(
     "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ?",
     [$userid, $courseid],
     $timefilter
@@ -106,7 +99,7 @@ function get_filtered_sql($basesql, $baseparams, $timefilter, $timefield = 'time
 $totalquestions = $DB->count_records_sql($sql, $params);
 
 // Approved questions.
-[$sql, $params] = get_filtered_sql(
+[$sql, $params] = local_hlai_quizgen_get_filtered_sql(
     "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ? AND status IN ('approved', 'deployed')",
     [$userid, $courseid],
     $timefilter
@@ -114,7 +107,7 @@ $totalquestions = $DB->count_records_sql($sql, $params);
 $approvedquestions = $DB->count_records_sql($sql, $params);
 
 // Rejected questions.
-[$sql, $params] = get_filtered_sql(
+[$sql, $params] = local_hlai_quizgen_get_filtered_sql(
     "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ? AND status = 'rejected'",
     [$userid, $courseid],
     $timefilter
@@ -122,7 +115,7 @@ $approvedquestions = $DB->count_records_sql($sql, $params);
 $rejectedquestions = $DB->count_records_sql($sql, $params);
 
 // First-time acceptance.
-[$sql, $params] = get_filtered_sql(
+[$sql, $params] = local_hlai_quizgen_get_filtered_sql(
     "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ? " .
     "AND status IN ('approved', 'deployed') AND (regeneration_count = 0 OR regeneration_count IS NULL)",
     [$userid, $courseid],
@@ -136,7 +129,7 @@ $acceptancerate = $reviewed > 0 ? round(($approvedquestions / $reviewed) * 100, 
 $ftar = $reviewed > 0 ? round(($firsttimeapproved / $reviewed) * 100, 1) : 0;
 
 // Average quality score.
-[$sql, $params] = get_filtered_sql(
+[$sql, $params] = local_hlai_quizgen_get_filtered_sql(
     "SELECT AVG(validation_score) FROM {local_hlai_quizgen_questions}
      WHERE userid = ? AND courseid = ? AND validation_score IS NOT NULL",
     [$userid, $courseid],
@@ -146,7 +139,7 @@ $avgquality = $DB->get_field_sql($sql, $params);
 $avgquality = $avgquality ? round($avgquality, 1) : 0;
 
 // Total regenerations.
-[$sql, $params] = get_filtered_sql(
+[$sql, $params] = local_hlai_quizgen_get_filtered_sql(
     "SELECT SUM(regeneration_count) FROM {local_hlai_quizgen_questions} WHERE userid = ? AND courseid = ?",
     [$userid, $courseid],
     $timefilter
@@ -157,7 +150,7 @@ $totalregenerations = $DB->get_field_sql($sql, $params) ?: 0;
 $avgregenerations = $totalquestions > 0 ? round($totalregenerations / $totalquestions, 2) : 0;
 
 // Total quizzes/requests.
-[$sql, $params] = get_filtered_sql(
+[$sql, $params] = local_hlai_quizgen_get_filtered_sql(
     "SELECT COUNT(*) FROM {local_hlai_quizgen_requests} WHERE userid = ? AND courseid = ?",
     [$userid, $courseid],
     $timefilter
@@ -165,7 +158,7 @@ $avgregenerations = $totalquestions > 0 ? round($totalregenerations / $totalques
 $totalrequests = $DB->count_records_sql($sql, $params);
 
 // Question type breakdown.
-[$sql, $params] = get_filtered_sql(
+[$sql, $params] = local_hlai_quizgen_get_filtered_sql(
     "SELECT questiontype, COUNT(*) as count,
             SUM(CASE WHEN status IN ('approved', 'deployed') THEN 1 ELSE 0 END) as approved,
             SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected,
@@ -179,7 +172,7 @@ $totalrequests = $DB->count_records_sql($sql, $params);
 $typestats = $DB->get_records_sql($sql . " GROUP BY questiontype", $params);
 
 // Difficulty breakdown.
-[$sql, $params] = get_filtered_sql(
+[$sql, $params] = local_hlai_quizgen_get_filtered_sql(
     "SELECT difficulty, COUNT(*) as count,
             SUM(CASE WHEN status IN ('approved', 'deployed') THEN 1 ELSE 0 END) as approved,
             AVG(validation_score) as avg_quality
@@ -191,7 +184,7 @@ $typestats = $DB->get_records_sql($sql . " GROUP BY questiontype", $params);
 $difficultystats = $DB->get_records_sql($sql . " GROUP BY difficulty", $params);
 
 // Bloom's taxonomy breakdown.
-[$sql, $params] = get_filtered_sql(
+[$sql, $params] = local_hlai_quizgen_get_filtered_sql(
     "SELECT blooms_level, COUNT(*) as count,
             SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
             AVG(validation_score) as avg_quality
@@ -205,25 +198,45 @@ $bloomsstats = $DB->get_records_sql($sql . " GROUP BY blooms_level", $params);
 // Rejection reasons - column doesn't exist in database yet, using empty array.
 $rejectionreasons = []; // Empty array for now.
 
+// Add our AMD modules (after all data variables are computed).
+$PAGE->requires->js_call_amd('local_hlai_quizgen/analytics', 'init', [[
+    'courseid' => $courseid,
+    'sesskey' => sesskey(),
+    'timerange' => $timerange,
+    'stats' => [
+        'totalQuestions' => $totalquestions,
+        'approved' => $approvedquestions,
+        'rejected' => $rejectedquestions,
+        'pending' => max(0, $totalquestions - $approvedquestions - $rejectedquestions),
+        'ftar' => $ftar,
+        'avgQuality' => $avgquality,
+        'totalRegens' => $totalregenerations,
+    ],
+    'typeStats' => array_values($typestats),
+    'difficultyStats' => array_values($difficultystats),
+    'bloomsStats' => array_values($bloomsstats),
+    'rejectionReasons' => array_values($rejectionreasons),
+]]);
+
 // Output starts here.
 echo $OUTPUT->header();
 ?>
 
-<div class="hlai-quizgen-wrapper local-hlai-iksha" style="margin-top: 2rem;">
+<div class="hlai-quizgen-wrapper local-hlai-iksha hlai-mt-2rem">
     <!-- Page Header -->
     <div class="level mb-5">
         <div class="level-left">
             <div>
-                <h1 class="title is-4 mb-1"><i class="fa fa-bar-chart" style="color: #3B82F6;"></i> Analytics Dashboard</h1>
-                <p class="subtitle is-6 has-text-grey">Detailed insights into your question generation quality and trends</p>
+                <h1 class="title is-4 mb-1"><i class="fa fa-bar-chart hlai-icon-primary"></i> <?php echo get_string('analytics_dashboard', 'local_hlai_quizgen'); ?></h1>
+                <p class="subtitle is-6 has-text-grey"><?php echo get_string('analytics_dashboard_subtitle', 'local_hlai_quizgen'); ?></p>
             </div>
         </div>
         <div class="level-right">
             <div class="buttons">
                 <a href="<?php echo new moodle_url('/local/hlai_quizgen/index.php', ['courseid' => $courseid]); ?>"
                    class="button is-light">
-                    <span><i class="fa fa-arrow-left" style="color: #64748B;"></i></span>
-                    <span>Back to Dashboard</span>
+                    <span><i class="fa fa-arrow-left hlai-icon-secondary"></i></span>
+                    <span><?php echo get_string('analytics_back_to_dashboard', 'local_hlai_quizgen'); ?></span>
                 </a>
             </div>
         </div>
@@ -232,23 +245,23 @@ echo $OUTPUT->header();
     <!-- Time Range Filter -->
     <div class="box mb-4">
         <div class="is-flex is-align-items-center">
-            <span class="has-text-weight-semibold mr-3"><i class="fa fa-calendar" style="color: #06B6D4;"></i> Time Range:</span>
+            <span class="has-text-weight-semibold mr-3"><i class="fa fa-calendar hlai-icon-info"></i> <?php echo get_string('analytics_time_range', 'local_hlai_quizgen'); ?></span>
             <div class="buttons has-addons">
                 <a href="?courseid=<?php echo $courseid; ?>&timerange=7"
                    class="button is-small <?php echo $timerange === '7' ? 'is-primary' : 'is-light'; ?>">
-                    Last 7 Days
+                    <?php echo get_string('analytics_last_7_days', 'local_hlai_quizgen'); ?>
                 </a>
                 <a href="?courseid=<?php echo $courseid; ?>&timerange=30"
                    class="button is-small <?php echo $timerange === '30' ? 'is-primary' : 'is-light'; ?>">
-                    Last 30 Days
+                    <?php echo get_string('analytics_last_30_days', 'local_hlai_quizgen'); ?>
                 </a>
                 <a href="?courseid=<?php echo $courseid; ?>&timerange=90"
                    class="button is-small <?php echo $timerange === '90' ? 'is-primary' : 'is-light'; ?>">
-                    Last 90 Days
+                    <?php echo get_string('analytics_last_90_days', 'local_hlai_quizgen'); ?>
                 </a>
                 <a href="?courseid=<?php echo $courseid; ?>&timerange=all"
                    class="button is-small <?php echo $timerange === 'all' ? 'is-primary' : 'is-light'; ?>">
-                    All Time
+                    <?php echo get_string('analytics_all_time', 'local_hlai_quizgen'); ?>
                 </a>
             </div>
         </div>
@@ -258,49 +271,49 @@ echo $OUTPUT->header();
     <div class="columns is-multiline mb-5">
         <div class="column">
             <div class="box has-text-centered">
-                <p class="is-size-3"><i class="fa fa-file-text-o" style="color: #3B82F6;"></i></p>
+                <p class="is-size-3"><i class="fa fa-file-text-o hlai-icon-primary"></i></p>
                 <p class="title is-4 mb-1"><?php echo $totalrequests; ?></p>
-                <p class="heading">Quiz Generations</p>
+                <p class="heading"><?php echo get_string('analytics_quiz_generations', 'local_hlai_quizgen'); ?></p>
                 <p class="help has-text-grey">&nbsp;</p>
             </div>
         </div>
         <div class="column">
             <div class="box has-text-centered">
-                <p class="is-size-3"><i class="fa fa-question-circle" style="color: #06B6D4;"></i></p>
+                <p class="is-size-3"><i class="fa fa-question-circle hlai-icon-info"></i></p>
                 <p class="title is-4 mb-1"><?php echo $totalquestions; ?></p>
-                <p class="heading">Questions Created</p>
+                <p class="heading"><?php echo get_string('analytics_questions_created', 'local_hlai_quizgen'); ?></p>
                 <p class="help has-text-grey">&nbsp;</p>
             </div>
         </div>
         <div class="column">
             <div class="box has-text-centered">
-                <p class="is-size-3"><i class="fa fa-check-circle" style="color: #10B981;"></i></p>
+                <p class="is-size-3"><i class="fa fa-check-circle hlai-icon-success"></i></p>
                 <p class="title is-4 mb-1"><?php echo $approvedquestions; ?></p>
-                <p class="heading">Approved</p>
-                <p class="help has-text-grey"><?php echo $acceptancerate; ?>% acceptance</p>
+                <p class="heading"><?php echo get_string('approved', 'local_hlai_quizgen'); ?></p>
+                <p class="help has-text-grey"><?php echo get_string('analytics_pct_acceptance', 'local_hlai_quizgen', $acceptancerate); ?></p>
             </div>
         </div>
         <div class="column">
             <div class="box has-text-centered">
-                <p class="is-size-3"><i class="fa fa-times-circle" style="color: #EF4444;"></i></p>
+                <p class="is-size-3"><i class="fa fa-times-circle hlai-icon-danger"></i></p>
                 <p class="title is-4 mb-1"><?php echo $rejectedquestions; ?></p>
-                <p class="heading">Rejected</p>
+                <p class="heading"><?php echo get_string('rejected', 'local_hlai_quizgen'); ?></p>
                 <p class="help has-text-grey">&nbsp;</p>
             </div>
         </div>
         <div class="column">
             <div class="box has-text-centered">
-                <p class="is-size-3"><i class="fa fa-star" style="color: #F59E0B;"></i></p>
+                <p class="is-size-3"><i class="fa fa-star hlai-icon-warning"></i></p>
                 <p class="title is-4 mb-1"><?php echo $avgquality; ?></p>
-                <p class="heading">Avg Quality</p>
+                <p class="heading"><?php echo get_string('analytics_avg_quality', 'local_hlai_quizgen'); ?></p>
                 <p class="help has-text-grey">&nbsp;</p>
             </div>
         </div>
         <div class="column">
             <div class="box has-text-centered">
-                <p class="is-size-3"><i class="fa fa-bullseye" style="color: #10B981;"></i></p>
+                <p class="is-size-3"><i class="fa fa-bullseye hlai-icon-success"></i></p>
                 <p class="title is-4 mb-1"><?php echo $ftar; ?>%</p>
-                <p class="heading">FTAR</p>
+                <p class="heading"><?php echo get_string('analytics_ftar', 'local_hlai_quizgen'); ?></p>
                 <p class="help has-text-grey">&nbsp;</p>
             </div>
         </div>
@@ -310,39 +323,39 @@ echo $OUTPUT->header();
     <div class="columns">
         <div class="column is-half">
             <div class="box">
-                <p class="title is-6"><i class="fa fa-filter" style="color: #06B6D4;"></i> Question Review Funnel</p>
-                <p class="has-text-grey is-size-7">How questions flow from generation to deployment</p>
-                <div id="funnel-chart" style="height: 350px;"></div>
+                <p class="title is-6"><i class="fa fa-filter hlai-icon-info"></i> <?php echo get_string('analytics_review_funnel', 'local_hlai_quizgen'); ?></p>
+                <p class="has-text-grey is-size-7"><?php echo get_string('analytics_review_funnel_desc', 'local_hlai_quizgen'); ?></p>
+                <div id="funnel-chart" class="hlai-chart-h350"></div>
             </div>
         </div>
 
         <div class="column is-half">
             <div class="box">
-                <p class="title is-6"><i class="fa fa-star" style="color: #F59E0B;"></i> Quality Score Distribution</p>
-                <p class="has-text-grey is-size-7">Breakdown of validation scores across all questions</p>
-                <div id="quality-dist-chart" style="height: 350px;"></div>
+                <p class="title is-6"><i class="fa fa-star hlai-icon-warning"></i> <?php echo get_string('analytics_quality_score_dist', 'local_hlai_quizgen'); ?></p>
+                <p class="has-text-grey is-size-7"><?php echo get_string('analytics_quality_score_dist_desc', 'local_hlai_quizgen'); ?></p>
+                <div id="quality-dist-chart" class="hlai-chart-h350"></div>
             </div>
         </div>
     </div>
 
     <!-- Question Type Analysis -->
     <div class="box mt-4">
-        <p class="title is-6"><i class="fa fa-clipboard" style="color: #64748B;"></i> Question Type Performance</p>
-        <p class="has-text-grey is-size-7">Acceptance rates and quality by question type</p>
+        <p class="title is-6"><i class="fa fa-clipboard hlai-icon-secondary"></i> <?php echo get_string('analytics_type_performance', 'local_hlai_quizgen'); ?></p>
+        <p class="has-text-grey is-size-7"><?php echo get_string('analytics_type_performance_desc', 'local_hlai_quizgen'); ?></p>
         <div class="columns">
             <div class="column is-half">
-                <div id="type-acceptance-chart" style="height: 350px;"></div>
+                <div id="type-acceptance-chart" class="hlai-chart-h350"></div>
             </div>
             <div class="column is-half">
                 <div class="table-container">
                     <table class="table is-fullwidth is-striped is-hoverable">
                         <thead>
                             <tr>
-                                <th>Type</th>
-                                <th class="has-text-right">Total</th>
-                                <th class="has-text-right">Approved</th>
-                                <th class="has-text-right">Rate</th>
-                                <th class="has-text-right">Avg Regen</th>
+                                <th><?php echo get_string('question_type', 'local_hlai_quizgen'); ?></th>
+                                <th class="has-text-right"><?php echo get_string('analytics_total', 'local_hlai_quizgen'); ?></th>
+                                <th class="has-text-right"><?php echo get_string('approved', 'local_hlai_quizgen'); ?></th>
+                                <th class="has-text-right"><?php echo get_string('analytics_rate', 'local_hlai_quizgen'); ?></th>
+                                <th class="has-text-right"><?php echo get_string('analytics_avg_regen', 'local_hlai_quizgen'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -380,32 +393,32 @@ echo $OUTPUT->header();
     <div class="columns mt-4">
         <div class="column is-half">
             <div class="box">
-                <p class="title is-6"><i class="fa fa-signal" style="color: #06B6D4;"></i> Difficulty Level Analysis</p>
-                <p class="has-text-grey is-size-7">Distribution and acceptance by difficulty</p>
-                <div id="difficulty-analysis-chart" style="height: 350px;"></div>
+                <p class="title is-6"><i class="fa fa-signal hlai-icon-info"></i> <?php echo get_string('analytics_difficulty_analysis', 'local_hlai_quizgen'); ?></p>
+                <p class="has-text-grey is-size-7"><?php echo get_string('analytics_difficulty_analysis_desc', 'local_hlai_quizgen'); ?></p>
+                <div id="difficulty-analysis-chart" class="hlai-chart-h350"></div>
             </div>
         </div>
         <div class="column is-half">
             <div class="box">
-                <p class="title is-6"><i class="fa fa-lightbulb-o" style="color: #3B82F6;"></i> Bloom's Taxonomy Coverage</p>
-                <p class="has-text-grey is-size-7">Cognitive level distribution</p>
-                <div id="blooms-coverage-chart" style="height: 350px;"></div>
+                <p class="title is-6"><i class="fa fa-lightbulb-o hlai-icon-primary"></i> <?php echo get_string('blooms_coverage', 'local_hlai_quizgen'); ?></p>
+                <p class="has-text-grey is-size-7"><?php echo get_string('analytics_cognitive_level_dist', 'local_hlai_quizgen'); ?></p>
+                <div id="blooms-coverage-chart" class="hlai-chart-h350"></div>
             </div>
         </div>
     </div>
 
     <!-- Regeneration Analysis -->
     <div class="box mt-4">
-        <p class="title is-6"><i class="fa fa-refresh" style="color: #F59E0B;"></i> Regeneration Analysis</p>
-        <p class="has-text-grey is-size-7">Understanding which questions need refinement</p>
+        <p class="title is-6"><i class="fa fa-refresh hlai-icon-warning"></i> <?php echo get_string('analytics_regen_analysis', 'local_hlai_quizgen'); ?></p>
+        <p class="has-text-grey is-size-7"><?php echo get_string('analytics_regen_analysis_desc', 'local_hlai_quizgen'); ?></p>
         <div class="columns">
             <div class="column is-half">
-                <p class="has-text-weight-semibold mb-3">Regeneration Distribution</p>
-                <div id="regen-dist-chart" style="height: 280px;"></div>
+                <p class="has-text-weight-semibold mb-3"><?php echo get_string('analytics_regen_distribution', 'local_hlai_quizgen'); ?></p>
+                <div id="regen-dist-chart" class="hlai-chart-h280"></div>
             </div>
             <div class="column is-half">
-                <p class="has-text-weight-semibold mb-3">Regeneration by Difficulty</p>
-                <div id="regen-by-difficulty-chart" style="height: 280px;"></div>
+                <p class="has-text-weight-semibold mb-3"><?php echo get_string('analytics_regen_by_difficulty', 'local_hlai_quizgen'); ?></p>
+                <div id="regen-by-difficulty-chart" class="hlai-chart-h280"></div>
             </div>
         </div>
     </div>
@@ -413,15 +426,15 @@ echo $OUTPUT->header();
     <!-- Rejection Analysis -->
     <?php if (!empty($rejectionreasons)) : ?>
     <div class="box mt-4">
-        <p class="title is-6"><i class="fa fa-times-circle" style="color: #EF4444;"></i> Rejection Analysis</p>
-        <p class="has-text-grey is-size-7">Common reasons for question rejection</p>
+        <p class="title is-6"><i class="fa fa-times-circle hlai-icon-danger"></i> <?php echo get_string('analytics_rejection_analysis', 'local_hlai_quizgen'); ?></p>
+        <p class="has-text-grey is-size-7"><?php echo get_string('analytics_rejection_analysis_desc', 'local_hlai_quizgen'); ?></p>
         <div class="columns">
             <div class="column is-half">
-                <div id="rejection-reasons-chart" style="height: 300px;"></div>
+                <div id="rejection-reasons-chart" class="hlai-chart-h300"></div>
             </div>
             <div class="column is-half">
                 <div class="box">
-                    <p class="title is-6 mb-3">Top Rejection Reasons</p>
+                    <p class="title is-6 mb-3"><?php echo get_string('analytics_top_rejection_reasons', 'local_hlai_quizgen'); ?></p>
                     <ul class="hlai-simple-list">
                         <?php foreach ($rejectionreasons as $reason) : ?>
                         <li class="is-flex is-justify-content-space-between is-align-items-center">
@@ -438,14 +451,14 @@ echo $OUTPUT->header();
 
     <!-- Trends Over Time -->
     <div class="box mt-4">
-        <p class="title is-6"><i class="fa fa-line-chart" style="color: #3B82F6;"></i> Trends Over Time</p>
-        <p class="has-text-grey is-size-7">Question generation and quality trends</p>
-        <div id="trends-chart" style="height: 350px;"></div>
+        <p class="title is-6"><i class="fa fa-line-chart hlai-icon-primary"></i> <?php echo get_string('analytics_trends_over_time', 'local_hlai_quizgen'); ?></p>
+        <p class="has-text-grey is-size-7"><?php echo get_string('analytics_trends_over_time_desc', 'local_hlai_quizgen'); ?></p>
+        <div id="trends-chart" class="hlai-chart-h350"></div>
     </div>
 
     <!-- Insights & Recommendations -->
     <div class="box mt-4">
-        <p class="title is-6"><i class="fa fa-lightbulb-o" style="color: #F59E0B;"></i> Insights & Recommendations</p>
+        <p class="title is-6"><i class="fa fa-lightbulb-o hlai-icon-warning"></i> <?php echo get_string('analytics_insights_recommendations', 'local_hlai_quizgen'); ?></p>
         <div class="columns">
             <?php
             // Generate insights based on data.
@@ -454,31 +467,25 @@ echo $OUTPUT->header();
             if ($ftar < 50) {
                 $insights[] = [
                     'type' => 'warning',
-                    'icon' => '<i class="fa fa-exclamation-triangle" style="color: #F59E0B;"></i>',
-                    'title' => 'Low First-Time Acceptance Rate',
-                    'message' => 'Your FTAR is ' .
-                        $ftar .
-                        '%. Consider providing more detailed content or selecting more specific topics to improve AI accuracy.',
+                    'icon' => '<i class="fa fa-exclamation-triangle hlai-icon-warning"></i>',
+                    'title' => get_string('analytics_insight_low_ftar_title', 'local_hlai_quizgen'),
+                    'message' => get_string('analytics_insight_low_ftar_msg', 'local_hlai_quizgen', $ftar),
                 ];
             } else if ($ftar >= 75) {
                 $insights[] = [
                     'type' => 'success',
-                    'icon' => '<i class="fa fa-check-circle" style="color: #10B981;"></i>',
-                    'title' => 'Excellent First-Time Acceptance',
-                    'message' => 'Your FTAR of ' .
-                        $ftar .
-                        '% is excellent! The AI is generating high-quality questions that match your expectations.',
+                    'icon' => '<i class="fa fa-check-circle hlai-icon-success"></i>',
+                    'title' => get_string('analytics_insight_high_ftar_title', 'local_hlai_quizgen'),
+                    'message' => get_string('analytics_insight_high_ftar_msg', 'local_hlai_quizgen', $ftar),
                 ];
             }
 
             if ($avgregenerations > 2) {
                 $insights[] = [
                     'type' => 'warning',
-                    'icon' => '<i class="fa fa-refresh" style="color: #06B6D4;"></i>',
-                    'title' => 'High Regeneration Rate',
-                    'message' => 'On average, questions need ' .
-                        $avgregenerations .
-                        ' regenerations. Try using more structured content or clearer learning objectives.',
+                    'icon' => '<i class="fa fa-refresh hlai-icon-info"></i>',
+                    'title' => get_string('analytics_insight_high_regen_title', 'local_hlai_quizgen'),
+                    'message' => get_string('analytics_insight_high_regen_msg', 'local_hlai_quizgen', $avgregenerations),
                 ];
             }
 
@@ -498,11 +505,12 @@ echo $OUTPUT->header();
                 $insights[] = [
                     'type' => 'info',
                     'icon' => '<i class="fa fa-bar-chart"></i>',
-                    'title' => 'Best Performing Type',
-                    'message' => ucfirst($besttype) .
-                        ' questions have the highest acceptance rate at ' .
-                        round($bestrate, 1) .
-                        '%. Consider using more of this type.',
+                    'title' => get_string('analytics_insight_best_type_title', 'local_hlai_quizgen'),
+                    'message' => get_string(
+                        'analytics_insight_best_type_msg',
+                        'local_hlai_quizgen',
+                        (object)['type' => ucfirst($besttype), 'rate' => round($bestrate, 1)]
+                    ),
                 ];
             }
 
@@ -510,9 +518,8 @@ echo $OUTPUT->header();
                 $insights[] = [
                     'type' => 'info',
                     'icon' => '<i class="fa fa-info-circle"></i>',
-                    'title' => 'Keep Generating!',
-                    'message' => 'Generate more questions to see detailed insights'
-                        . ' and recommendations based on your usage patterns.',
+                    'title' => get_string('analytics_insight_keep_generating_title', 'local_hlai_quizgen'),
+                    'message' => get_string('analytics_insight_keep_generating_msg', 'local_hlai_quizgen'),
                 ];
             }
 
@@ -521,7 +528,7 @@ echo $OUTPUT->header();
             <div class="column is-one-third">
                 <div class="notification is-<?php echo $insight['type']; ?> is-light">
                     <div class="is-flex is-align-items-start">
-                        <span class="mr-3" style="font-size: 1.5rem;"><?php echo $insight['icon']; ?></span>
+                        <span class="mr-3 hlai-font-lg"><?php echo $insight['icon']; ?></span>
                         <div>
                             <strong><?php echo $insight['title']; ?></strong>
                             <p class="mt-2"><?php echo $insight['message']; ?></p>
@@ -533,30 +540,7 @@ echo $OUTPUT->header();
         </div>
     </div>
 </div>
-<div style="height: 60px;"></div>
-
-<!-- Pass data to JavaScript -->
-<script>
-window.hlaiQuizgenAnalytics = {
-    courseid: <?php echo $courseid; ?>,
-    sesskey: '<?php echo sesskey(); ?>',
-    ajaxUrl: '<?php echo $CFG->wwwroot; ?>/local/hlai_quizgen/ajax.php',
-    timerange: '<?php echo $timerange; ?>',
-    stats: {
-        totalQuestions: <?php echo $totalquestions; ?>,
-        approved: <?php echo $approvedquestions; ?>,
-        rejected: <?php echo $rejectedquestions; ?>,
-        pending: <?php echo max(0, $totalquestions - $approvedquestions - $rejectedquestions); ?>,
-        ftar: <?php echo $ftar; ?>,
-        avgQuality: <?php echo $avgquality; ?>,
-        totalRegens: <?php echo $totalregenerations; ?>
-    },
-    typeStats: <?php echo json_encode(array_values($typestats)); ?>,
-    difficultyStats: <?php echo json_encode(array_values($difficultystats)); ?>,
-    bloomsStats: <?php echo json_encode(array_values($bloomsstats)); ?>,
-    rejectionReasons: <?php echo json_encode(array_values($rejectionreasons)); ?>
-};
-</script>
+<div class="hlai-spacer-60"></div>
 
 <?php
 echo $OUTPUT->footer();

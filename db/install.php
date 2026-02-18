@@ -23,21 +23,15 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Execute post-installation tasks.
  *
  * @return bool true on success
  */
 function xmldb_local_hlai_quizgen_install() {
-    global $CFG;
-
-    // Force purge all caches to ensure language strings and navigation load properly.
-    purge_all_caches();
-
-    // Log successful installation.
-    if (function_exists('debugging')) {
-        debugging('HLAI Quiz Generator installed successfully. Version: 1.5.2', DEBUG_DEVELOPER);
-    }
-
+    // No custom installation steps required.
+    // Moodle automatically purges caches after plugin installation.
     return true;
 }

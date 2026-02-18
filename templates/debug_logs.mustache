@@ -1,0 +1,100 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_hlai_quizgen/debug_logs
+
+    Debug logs page layout.
+
+    Context variables required for this template:
+    * provider - AI provider status info
+    * tabs - Tab navigation items
+    * actions - Action button URLs
+    * activetab - Which tab content to show
+    * databaselogs - Database logs tab data (optional)
+    * filelogs - File logs tab data (optional)
+    * requests - Requests tab data (optional)
+    * systeminfo - System info tab data (optional)
+
+    Example context (json):
+    {
+        "provider": {"ready": true, "statusclass": "success", "statuslabel": "Yes", "gatewayurl": "https://..."},
+        "tabs": [{"key": "database", "label": "Database", "active": true, "url": "#"}],
+        "actions": {"systeminfourl": "#", "testlogurl": "#", "refreshurl": "#"}
+    }
+}}
+<div class="hlai-quizgen-wrapper local-hlai-iksha">
+
+    {{! AI Provider Status }}
+    <div class="box mb-4">
+        <h3 class="title is-6 mb-3">{{provider.heading}}</h3>
+        {{#provider.available}}
+        <div class="columns is-multiline is-mobile">
+            <div class="column is-half">
+                <strong>{{provider.activelabel}}:</strong>
+                <span class="tag is-{{provider.statusclass}} ml-2">{{provider.statuslabel}}</span>
+            </div>
+            <div class="column is-half">
+                <strong>{{provider.gatewaylabel}}:</strong>
+                <code>{{provider.gatewayurl}}</code>
+            </div>
+        </div>
+        {{#provider.showwarning}}
+        <div class="notification is-danger is-light mt-3 mb-0">
+            {{provider.warningmessage}}
+        </div>
+        {{/provider.showwarning}}
+        {{/provider.available}}
+        {{#provider.error}}
+        <div class="notification is-danger is-light mb-0">
+            {{provider.errormessage}}
+        </div>
+        {{/provider.error}}
+    </div>
+
+    {{! Tab Navigation }}
+    <div class="tabs is-boxed mb-4">
+        <ul>
+            {{#tabs}}
+            <li class="{{#active}}is-active{{/active}}">
+                <a href="{{url}}">{{label}}</a>
+            </li>
+            {{/tabs}}
+        </ul>
+    </div>
+
+    {{! Action Buttons }}
+    <div class="buttons mb-4">
+        <a href="{{actions.systeminfourl}}" class="button is-info">{{actions.systeminfolabel}}</a>
+        <a href="{{actions.testlogurl}}" class="button is-light">{{actions.testloglabel}}</a>
+        <a href="{{actions.refreshurl}}" class="button is-outlined is-primary">{{actions.refreshlabel}}</a>
+    </div>
+
+    {{! Tab Content }}
+    {{#show_database}}
+        {{> local_hlai_quizgen/debug_logs_database}}
+    {{/show_database}}
+    {{#show_file}}
+        {{> local_hlai_quizgen/debug_logs_file}}
+    {{/show_file}}
+    {{#show_requests}}
+        {{> local_hlai_quizgen/debug_logs_requests}}
+    {{/show_requests}}
+    {{#show_system}}
+        {{> local_hlai_quizgen/debug_logs_system}}
+    {{/show_system}}
+
+</div>

@@ -1,0 +1,127 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_hlai_quizgen/debug_logs_system
+
+    System information tab content.
+
+    Context variables required for this template:
+    * systeminfo - Object with system information data
+
+    Example context (json):
+    {
+        "systeminfo": {
+            "php": {"heading": "PHP Configuration", "items": []},
+            "extensions": {"heading": "PHP Extensions", "items": []},
+            "moodle": {"heading": "Moodle Configuration", "items": []},
+            "plugin": {"heading": "Plugin Statistics", "items": []},
+            "tools": {"heading": "System Tools", "items": []}
+        }
+    }
+}}
+<div class="columns">
+    {{! PHP Info }}
+    <div class="column is-half">
+        <div class="box mb-4">
+            <h4 class="title is-6 mb-3">{{systeminfo.php.heading}}</h4>
+            <div class="content">
+                <table class="table is-fullwidth is-narrow">
+                    {{#systeminfo.php.items}}
+                    <tr><td>{{label}}</td><td><code>{{value}}</code></td></tr>
+                    {{/systeminfo.php.items}}
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {{! Extensions }}
+    <div class="column is-half">
+        <div class="box mb-4">
+            <h4 class="title is-6 mb-3">{{systeminfo.extensions.heading}}</h4>
+            <div class="content">
+                <table class="table is-fullwidth is-narrow">
+                    {{#systeminfo.extensions.items}}
+                    <tr>
+                        <td>{{name}}</td>
+                        <td><span class="tag is-{{statusclass}}">{{statuslabel}}</span></td>
+                    </tr>
+                    {{/systeminfo.extensions.items}}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="columns">
+    {{! Moodle Info }}
+    <div class="column is-half">
+        <div class="box mb-4">
+            <h4 class="title is-6 mb-3">{{systeminfo.moodle.heading}}</h4>
+            <div class="content">
+                <table class="table is-fullwidth is-narrow">
+                    {{#systeminfo.moodle.items}}
+                    <tr><td>{{label}}</td><td><code>{{value}}</code></td></tr>
+                    {{/systeminfo.moodle.items}}
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {{! Plugin Stats }}
+    <div class="column is-half">
+        <div class="box mb-4">
+            <h4 class="title is-6 mb-3">{{systeminfo.plugin.heading}}</h4>
+            <div class="content">
+                {{#systeminfo.plugin.error}}
+                <div class="notification is-danger is-light">{{systeminfo.plugin.errormessage}}</div>
+                {{/systeminfo.plugin.error}}
+                {{^systeminfo.plugin.error}}
+                <table class="table is-fullwidth is-narrow">
+                    {{#systeminfo.plugin.items}}
+                    <tr>
+                        <td>{{label}}</td>
+                        <td>
+                            {{#hastag}}
+                            <span class="tag is-{{tagclass}}">{{value}}</span>
+                            {{/hastag}}
+                            {{^hastag}}
+                            <code>{{value}}</code>
+                            {{/hastag}}
+                        </td>
+                    </tr>
+                    {{/systeminfo.plugin.items}}
+                </table>
+                {{/systeminfo.plugin.error}}
+            </div>
+        </div>
+    </div>
+</div>
+
+{{! System Tools }}
+<div class="box mb-4">
+    <h4 class="title is-6 mb-3">{{systeminfo.tools.heading}}</h4>
+    <div class="content">
+        <table class="table is-fullwidth is-narrow">
+            {{#systeminfo.tools.items}}
+            <tr>
+                <td>{{label}}</td>
+                <td><span class="tag is-{{statusclass}}">{{statuslabel}}</span></td>
+            </tr>
+            {{/systeminfo.tools.items}}
+        </table>
+    </div>
+</div>

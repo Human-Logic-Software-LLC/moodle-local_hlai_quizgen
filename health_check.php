@@ -85,7 +85,7 @@ try {
         'local_hlai_quizgen_topics',
         'local_hlai_quizgen_questions',
         'local_hlai_quizgen_answers',
-        'local_hlai_quizgen_error_log',
+        'local_hlai_quizgen_logs',
         'local_hlai_quizgen_cache',
     ];
 

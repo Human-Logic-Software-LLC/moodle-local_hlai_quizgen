@@ -24,6 +24,8 @@
 
 namespace local_hlai_quizgen;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Implements rate limiting to prevent abuse and control costs.
  */

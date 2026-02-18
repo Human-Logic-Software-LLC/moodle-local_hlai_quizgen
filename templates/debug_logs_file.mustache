@@ -1,0 +1,73 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_hlai_quizgen/debug_logs_file
+
+    File logs tab content.
+
+    Context variables required for this template:
+    * filelogs - Object with file log data
+
+    Example context (json):
+    {
+        "filelogs": {
+            "heading": "Log File",
+            "haslogfile": true,
+            "logfilepath": "/var/log/...",
+            "filesize": "12.5 KB",
+            "hasentries": true,
+            "showingcount": "Showing 100 entries:",
+            "entries": [{"content": "log line"}]
+        }
+    }
+}}
+<div class="box mb-4">
+    <div class="level mb-3">
+        <div class="level-left">
+            <strong>{{filelogs.heading}}</strong>
+        </div>
+        <div class="level-right">
+            <a href="{{filelogs.clearurl}}" class="button is-danger is-small hlai-confirm-action"
+               data-confirm="{{filelogs.clearconfirm}}">{{filelogs.clearbtn}}</a>
+        </div>
+    </div>
+
+    {{#filelogs.haslogfile}}
+        <p><strong>{{filelogs.pathlabel}}:</strong> <code>{{filelogs.logfilepath}}</code></p>
+
+        {{#filelogs.fileexists}}
+            <p><strong>{{filelogs.sizelabel}}:</strong> {{filelogs.filesize}}</p>
+
+            {{^filelogs.hasentries}}
+            <div class="notification is-info is-light">{{filelogs.emptymessage}}</div>
+            {{/filelogs.hasentries}}
+
+            {{#filelogs.hasentries}}
+            <p><strong>{{filelogs.showingcount}}</strong></p>
+            <pre class="hlai-log-file">{{{filelogs.formattedentries}}}</pre>
+            {{/filelogs.hasentries}}
+        {{/filelogs.fileexists}}
+
+        {{^filelogs.fileexists}}
+        <div class="notification is-warning is-light">{{filelogs.notexistmessage}}</div>
+        {{/filelogs.fileexists}}
+    {{/filelogs.haslogfile}}
+
+    {{^filelogs.haslogfile}}
+    <div class="notification is-danger is-light">{{filelogs.notfoundmessage}}</div>
+    {{/filelogs.haslogfile}}
+</div>

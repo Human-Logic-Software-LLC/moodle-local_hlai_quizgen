@@ -1,0 +1,111 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_hlai_quizgen/debug_logs_database
+
+    Database logs tab content with filter form and log table.
+
+    Context variables required for this template:
+    * databaselogs - Object with filter and logs data
+
+    Example context (json):
+    {
+        "databaselogs": {
+            "filters": {"requestid": "", "level": "", "limit": 100},
+            "haslogs": true,
+            "logs": []
+        }
+    }
+}}
+{{! Filter Form }}
+<div class="box mb-4">
+    <h4 class="title is-6 mb-3">{{databaselogs.filters.heading}}</h4>
+    <form method="get">
+        <input type="hidden" name="tab" value="database">
+        <div class="field is-grouped is-grouped-multiline">
+            <div class="control">
+                <label class="label is-small">{{databaselogs.filters.requestidlabel}}</label>
+                <input type="number" name="requestid" class="input is-small hlai-input-md"
+                       value="{{databaselogs.filters.requestid}}" placeholder="{{databaselogs.filters.alllabel}}">
+            </div>
+            <div class="control">
+                <label class="label is-small">{{databaselogs.filters.levellabel}}</label>
+                <div class="select is-small">
+                    <select name="level">
+                        <option value="">{{databaselogs.filters.alllabel}}</option>
+                        {{#databaselogs.filters.leveloptions}}
+                        <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
+                        {{/databaselogs.filters.leveloptions}}
+                    </select>
+                </div>
+            </div>
+            <div class="control">
+                <label class="label is-small">{{databaselogs.filters.limitlabel}}</label>
+                <input type="number" name="limit" class="input is-small hlai-input-sm"
+                       value="{{databaselogs.filters.limit}}">
+            </div>
+            <div class="control">
+                <label class="label is-small">&nbsp;</label>
+                <button type="submit" class="button is-primary is-small">{{databaselogs.filters.filterbtn}}</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+{{! Log Table }}
+{{^databaselogs.haslogs}}
+<div class="notification is-info is-light">{{databaselogs.nologsmessage}}</div>
+{{/databaselogs.haslogs}}
+{{#databaselogs.haslogs}}
+<div class="table-container">
+    <table class="table is-fullwidth is-striped is-hoverable is-narrow">
+        <thead>
+            <tr>
+                <th>{{databaselogs.headers.time}}</th>
+                <th>{{databaselogs.headers.level}}</th>
+                <th>{{databaselogs.headers.request}}</th>
+                <th>{{databaselogs.headers.user}}</th>
+                <th>{{databaselogs.headers.component}}</th>
+                <th>{{databaselogs.headers.message}}</th>
+                <th>{{databaselogs.headers.details}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#databaselogs.logs}}
+            <tr>
+                <td class="hlai-nowrap"><small>{{time}}</small></td>
+                <td><span class="tag is-{{levelclass}}">{{levelupper}}</span></td>
+                <td>{{requestid}}</td>
+                <td>{{userid}}</td>
+                <td><small>{{component}}</small></td>
+                <td>{{message}}</td>
+                <td>
+                    {{#hasdetails}}
+                    <button class="button is-small is-light hlai-toggle-details" data-id="{{id}}">
+                        {{detailsbtn}}
+                    </button>
+                    <div id="details-{{id}}" class="mt-2 hlai-hidden">
+                        <pre class="hlai-log-details">{{detailsformatted}}</pre>
+                    </div>
+                    {{/hasdetails}}
+                </td>
+            </tr>
+            {{/databaselogs.logs}}
+        </tbody>
+    </table>
+</div>
+{{/databaselogs.haslogs}}

@@ -8,7 +8,7 @@
  * @copyright  2025 Human Logic Software LLC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
+define(['jquery', 'core/ajax', 'local_hlai_quizgen/charts'], function($, Ajax, Charts) {
     'use strict';
 
     /**
@@ -16,8 +16,6 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
      */
     var Dashboard = {
         courseid: 0,
-        sesskey: '',
-        ajaxUrl: '',
         refreshInterval: null,
         charts: {},
 
@@ -26,10 +24,9 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
          * @param {number} courseid - The course ID
          * @param {string} sesskey - Session key for AJAX calls
          */
-        init: function(courseid, sesskey) {
-            this.courseid = courseid;
-            this.sesskey = sesskey;
-            this.ajaxUrl = window.hlaiQuizgenDashboard ? window.hlaiQuizgenDashboard.ajaxUrl : M.cfg.wwwroot + '/local/hlai_quizgen/ajax.php';
+        init: function(config) {
+            this.courseid = config.courseid;
+            this.initData = config;
 
             // Wait for ApexCharts to load
             this.waitForApexCharts().then(function() {
@@ -70,7 +67,7 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
          * Initialize all dashboard charts with loading states
          */
         initializeCharts: function() {
-            var stats = window.hlaiQuizgenDashboard ? window.hlaiQuizgenDashboard.stats : {};
+            var stats = this.initData.stats || {};
 
             // FTAR Gauge Chart
             if ($('#ftar-gauge-chart').length && typeof ApexCharts !== 'undefined') {
@@ -113,7 +110,7 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
             }
 
             // Initialize type distribution from PHP data
-            var typeData = window.hlaiQuizgenDashboard ? window.hlaiQuizgenDashboard.typeDistribution : [];
+            var typeData = this.initData.typeDistribution || [];
             if ($('#question-type-chart').length && typeData.length > 0 && typeof ApexCharts !== 'undefined') {
                 var labels = typeData.map(function(item) {
                     return Dashboard.formatQuestionType(item.questiontype);
@@ -162,37 +159,32 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
         },
 
         /**
-         * Fetch data from AJAX endpoint
-         * @param {string} action - The action to perform
-         * @param {object} extraData - Additional data to send
+         * Fetch data from Moodle External Services.
+         * @param {string} action - The action identifier to perform.
          * @returns {Promise}
          */
-        fetchData: function(action, extraData) {
-            var self = this;
-            var data = {
-                action: action,
-                courseid: this.courseid,
-                sesskey: this.sesskey
+        fetchData: function(action) {
+            var methodMap = {
+                'acceptancetrend': {methodname: 'local_hlai_quizgen_get_acceptance_trend', args: {}},
+                'difficultydist': {methodname: 'local_hlai_quizgen_get_difficulty_distribution', args: {}},
+                'bloomsdist': {methodname: 'local_hlai_quizgen_get_blooms_distribution', args: {}},
+                'regenbytype': {methodname: 'local_hlai_quizgen_get_regeneration_by_type', args: {}}
             };
 
-            if (extraData) {
-                $.extend(data, extraData);
+            var call = methodMap[action];
+            if (!call) {
+                return Promise.reject('Unknown action: ' + action);
             }
 
-            return $.ajax({
-                url: this.ajaxUrl,
-                type: 'POST',
-                data: data,
-                dataType: 'json'
-            }).then(function(response) {
-                if (response.success) {
-                    return response.data;
-                } else {
-                    console.error('AJAX error:', response.error);
-                    return null;
+            return Ajax.call([call])[0].then(function(response) {
+                // The regeneration-by-type endpoint returns a JSON string in the 'data' key.
+                if (action === 'regenbytype') {
+                    return JSON.parse(response.data);
                 }
-            }).fail(function(xhr, status, error) {
-                console.error('AJAX request failed:', error);
+                return response;
+            }).catch(function(error) {
+                // eslint-disable-next-line no-console
+                console.error('External service call failed for ' + action + ':', error);
                 return null;
             });
         },
@@ -532,8 +524,8 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
             });
 
             // Delete notification button
-            $(document).on('click', '.hlai-notification .delete', function() {
-                $(this).closest('.hlai-notification').fadeOut(300, function() {
+            $(document).on('click', '.hlai-dismiss-notification, .hlai-notification .delete', function() {
+                $(this).closest('.notification, .hlai-notification').fadeOut(300, function() {
                     $(this).remove();
                 });
             });
@@ -596,12 +588,11 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
     return {
         /**
          * Module initialization entry point
-         * @param {number} courseid - The course ID
-         * @param {string} sesskey - Session key
+         * @param {Object} config - Configuration object with courseid, sesskey, stats, typeDistribution
          */
-        init: function(courseid, sesskey) {
+        init: function(config) {
             $(document).ready(function() {
-                Dashboard.init(courseid, sesskey);
+                Dashboard.init(config);
             });
         }
     };

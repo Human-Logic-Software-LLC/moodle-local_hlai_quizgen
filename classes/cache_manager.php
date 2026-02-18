@@ -24,6 +24,8 @@
 
 namespace local_hlai_quizgen;
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Manages caching of AI responses to reduce API calls and costs.
  */
@@ -64,13 +66,10 @@ class cache_manager {
                 return null;
             }
 
-            // Update hit counter.
-            $DB->execute(
-                "UPDATE {local_hlai_quizgen_cache}
-                 SET hits = hits + 1, lastaccessed = ?
-                 WHERE id = ?",
-                [time(), $cache->id]
-            );
+            // Update hit counter using DML helper.
+            $cache->hits = $cache->hits + 1;
+            $cache->lastaccessed = time();
+            $DB->update_record('local_hlai_quizgen_cache', $cache);
 
             return json_decode($cache->data, true);
         } catch (\Exception $e) {

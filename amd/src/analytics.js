@@ -26,10 +26,11 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
          * @param {string} sesskey - Session key
          * @param {string} timerange - Time range filter
          */
-        init: function(courseid, sesskey, timerange) {
-            this.courseid = courseid;
-            this.sesskey = sesskey;
-            this.timerange = timerange;
+        init: function(config) {
+            this.courseid = config.courseid;
+            this.sesskey = config.sesskey;
+            this.timerange = config.timerange;
+            this.initData = config;
 
             // Wait for ApexCharts to load
             this.waitForApexCharts().then(function() {
@@ -68,7 +69,7 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
          * Render all charts on the analytics page
          */
         renderAllCharts: function() {
-            var data = window.hlaiQuizgenAnalytics || {};
+            var data = this.initData || {};
             var stats = data.stats || {};
 
             this.renderFunnelChart(stats);
@@ -554,13 +555,11 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
     return {
         /**
          * Module initialization entry point
-         * @param {number} courseid - The course ID
-         * @param {string} sesskey - Session key
-         * @param {string} timerange - Time range filter
+         * @param {Object} config - Configuration object with courseid, sesskey, timerange, stats, etc.
          */
-        init: function(courseid, sesskey, timerange) {
+        init: function(config) {
             $(document).ready(function() {
-                Analytics.init(courseid, sesskey, timerange);
+                Analytics.init(config);
             });
         }
     };

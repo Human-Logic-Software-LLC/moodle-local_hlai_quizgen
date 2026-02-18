@@ -210,7 +210,8 @@ class content_extractor {
         }
 
         try {
-            $outputfile = tempnam(sys_get_temp_dir(), 'pdf_');
+            $tempdir = make_temp_directory('local_hlai_quizgen');
+            $outputfile = $tempdir . '/' . uniqid('pdf_');
             $cmd = escapeshellcmd($pdftotext) .
                 ' -layout ' .
                 escapeshellarg($filepath) .
@@ -257,7 +258,8 @@ class content_extractor {
         }
 
         try {
-            $outputfile = tempnam(sys_get_temp_dir(), 'pdf_') . '.txt';
+            $tempdir = make_temp_directory('local_hlai_quizgen');
+            $outputfile = $tempdir . '/' . uniqid('pdf_') . '.txt';
 
             // Use Ghostscript to extract text.
             $cmd = escapeshellcmd($gs) .
@@ -1083,9 +1085,9 @@ class content_extractor {
             // Save package to temp file.
             $packagefile->copy_content_to($zipfile);
 
-            // Extract ZIP.
-            $extractdir = $tempdir . '/extracted';
-            if (!mkdir($extractdir, 0777, true)) {
+            // Extract ZIP using Moodle temp directory.
+            $extractdir = make_temp_directory('local_hlai_quizgen/extracted_' . uniqid());
+            if (!is_dir($extractdir)) {
                 return '';
             }
 

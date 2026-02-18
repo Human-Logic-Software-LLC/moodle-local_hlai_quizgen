@@ -203,334 +203,67 @@ $recenterrors = $DB->count_records_sql(
 // Check AI provider configuration.
 $aiproviderconfigured = \local_hlai_quizgen\gateway_client::is_ready();
 
+// Prepare chart data for AMD module.
+$trenddates = [];
+$trendcounts = [];
+foreach ($usagetrenddata as $data) {
+    $trenddates[] = $data->date;
+    $trendcounts[] = $data->count;
+}
+$bloomslabels = [];
+$bloomsvalues = [];
+foreach ($bloomsstats as $stat) {
+    $bloomslabels[] = $stat->blooms_level;
+    $bloomsvalues[] = (int)$stat->count;
+}
+$typelabels = [];
+$typevalues = [];
+foreach ($questiontypestats as $stat) {
+    $typelabels[] = ucfirst(str_replace('_', ' ', $stat->questiontype ?? ''));
+    $typevalues[] = (int)$stat->count;
+}
+$difficultylabels = [];
+$difficultyvalues = [];
+foreach ($difficultystats as $stat) {
+    $difficultylabels[] = ucfirst($stat->difficulty ?? '');
+    $difficultyvalues[] = (int)$stat->count;
+}
+
+// Add AMD module for admin dashboard charts.
+$PAGE->requires->js_call_amd('local_hlai_quizgen/admindashboard', 'init', [[
+    'trendDates' => $trenddates,
+    'trendCounts' => $trendcounts,
+    'activeTeachers' => (int)$activeteachers,
+    'inactiveTeachers' => max(0, (int)$totaluserswithcapability - (int)$activeteachers),
+    'bloomsLabels' => $bloomslabels,
+    'bloomsValues' => $bloomsvalues,
+    'typeLabels' => $typelabels,
+    'typeValues' => $typevalues,
+    'difficultyLabels' => $difficultylabels,
+    'difficultyValues' => $difficultyvalues,
+]]);
+
 // Output HTML.
 
 echo $OUTPUT->header();
 
 ?>
 
-<style>
-/* Iksha-inspired Clean Design System */
-:root {
-    --admin-primary: #3B82F6;
-    --admin-primary-light: #EFF6FF;
-    --admin-success: #10B981;
-    --admin-success-light: #ECFDF5;
-    --admin-warning: #F59E0B;
-    --admin-warning-light: #FFFBEB;
-    --admin-danger: #EF4444;
-    --admin-danger-light: #FEF2F2;
-    --admin-info: #06B6D4;
-    --admin-info-light: #ECFEFF;
-    --admin-gray-50: #F8FAFC;
-    --admin-gray-100: #F1F5F9;
-    --admin-gray-200: #E2E8F0;
-    --admin-gray-700: #334155;
-    --admin-gray-800: #1E293B;
-}
-
-.admin-stat-card {
-    background: #fff;
-    border: 1px solid var(--admin-gray-200);
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    transition: all 0.2s ease;
-    height: 100%;
-}
-
-.admin-stat-card:hover {
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    border-color: var(--admin-gray-200);
-}
-
-.stat-icon-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 8px;
-    margin-bottom: 0.75rem;
-}
-
-.stat-icon-container.is-primary {
-    background: var(--admin-primary-light);
-    color: var(--admin-primary);
-}
-
-.stat-icon-container.is-success {
-    background: var(--admin-success-light);
-    color: var(--admin-success);
-}
-
-.stat-icon-container.is-warning {
-    background: var(--admin-warning-light);
-    color: var(--admin-warning);
-}
-
-.stat-icon-container.is-info {
-    background: var(--admin-info-light);
-    color: var(--admin-info);
-}
-
-.stat-icon-container.is-danger {
-    background: var(--admin-danger-light);
-    color: var(--admin-danger);
-}
-
-.stat-icon-large {
-    font-size: 1.5rem;
-}
-
-.stat-label {
-    font-size: 0.8125rem;
-    color: var(--admin-gray-700);
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-}
-
-.stat-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--admin-gray-800);
-    line-height: 1.2;
-}
-
-.stat-subtext {
-    font-size: 0.75rem;
-    color: var(--admin-gray-700);
-    margin-top: 0.25rem;
-}
-
-.section-header {
-    border-left: 3px solid var(--admin-primary);
-    padding-left: 1rem;
-    margin: 2.5rem 0 1.5rem 0;
-}
-
-.section-header h2 {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--admin-gray-800);
-    margin: 0;
-}
-
-.chart-container {
-    background: white;
-    border: 1px solid var(--admin-gray-200);
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    margin-bottom: 1.5rem;
-}
-
-.chart-container:hover {
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-}
-
-.chart-title {
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: var(--admin-gray-800);
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.chart-title i {
-    color: var(--admin-primary);
-}
-
-.health-indicator {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 0.8125rem;
-}
-
-.health-indicator.is-healthy {
-    background: var(--admin-success-light);
-    color: var(--admin-success);
-}
-
-.health-indicator.is-error {
-    background: var(--admin-danger-light);
-    color: var(--admin-danger);
-}
-
-.top-performer-row {
-    padding: 0.875rem;
-    border-bottom: 1px solid var(--admin-gray-100);
-    transition: background 0.15s ease;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.top-performer-row:last-child {
-    border-bottom: none;
-}
-
-.top-performer-row:hover {
-    background: var(--admin-gray-50);
-}
-
-.performer-rank {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    background: var(--admin-gray-100);
-    color: var(--admin-gray-700);
-    font-weight: 700;
-    font-size: 0.8125rem;
-}
-
-.performer-name {
-    font-weight: 600;
-    color: var(--admin-gray-800);
-    font-size: 0.875rem;
-}
-
-.performer-details {
-    font-size: 0.75rem;
-    color: var(--admin-gray-700);
-    margin-top: 0.125rem;
-}
-
-.performer-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.375rem 0.75rem;
-    border-radius: 6px;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    background: var(--admin-primary-light);
-    color: var(--admin-primary);
-}
-
-.page-title-section {
-    margin-top: 2rem;
-    margin-bottom: 2.5rem;
-}
-
-.page-title-section h1 {
-    font-size: 1.875rem;
-    font-weight: 700;
-    color: var(--admin-gray-800);
-    margin-bottom: 0.5rem;
-}
-
-.page-subtitle {
-    font-size: 0.9375rem;
-    color: var(--admin-gray-700);
-}
-
-.system-health-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.health-metric {
-    padding: 1rem;
-    background: var(--admin-gray-50);
-    border-radius: 6px;
-}
-
-.health-metric strong {
-    display: block;
-    font-size: 0.8125rem;
-    color: var(--admin-gray-700);
-    margin-bottom: 0.5rem;
-}
-
-.health-value {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.375rem 0.75rem;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 0.875rem;
-}
-
-.health-value.is-warning {
-    background: var(--admin-warning-light);
-    color: var(--admin-warning);
-}
-
-.health-value.is-success {
-    background: var(--admin-success-light);
-    color: var(--admin-success);
-}
-
-.health-value.is-danger {
-    background: var(--admin-danger-light);
-    color: var(--admin-danger);
-}
-
-.health-value.is-dark {
-    background: var(--admin-gray-200);
-    color: var(--admin-gray-700);
-}
-
-.config-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-}
-
-.config-button {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.625rem 1rem;
-    border: 1px solid var(--admin-gray-200);
-    border-radius: 6px;
-    background: white;
-    color: var(--admin-gray-700);
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.8125rem;
-    transition: all 0.15s ease;
-}
-
-.config-button:hover {
-    background: var(--admin-gray-50);
-    border-color: var(--admin-primary);
-    color: var(--admin-primary);
-    text-decoration: none;
-}
-
-.config-button i {
-    font-size: 0.875rem;
-}
-</style>
-
 <div class="container is-fluid">
 
     <!-- Page Title -->
     <div class="page-title-section">
         <h1>
-            <i class="fa fa-line-chart" style="color: var(--admin-primary);"></i> Site-Wide Quiz Generation Analytics
+            <i class="fa fa-line-chart hlai-icon-admin-primary"></i> <?php echo get_string('admin_site_analytics_title', 'local_hlai_quizgen'); ?>
         </h1>
         <p class="page-subtitle">
-            Comprehensive overview of AI quiz generation across your entire Moodle site
+            <?php echo get_string('admin_site_analytics_subtitle', 'local_hlai_quizgen'); ?>
         </p>
     </div>
 
     <!-- Site-Wide Overview Cards -->
     <div class="section-header">
-        <h2><i class="fa fa-bar-chart"></i> Site-Wide Overview</h2>
+        <h2><i class="fa fa-bar-chart"></i> <?php echo get_string('admin_site_overview', 'local_hlai_quizgen'); ?></h2>
     </div>
 
     <div class="columns is-multiline">
@@ -540,7 +273,7 @@ echo $OUTPUT->header();
                 <div class="stat-icon-container is-primary">
                     <i class="fa fa-question-circle stat-icon-large"></i>
                 </div>
-                <div class="stat-label">Total Questions Generated</div>
+                <div class="stat-label"><?php echo get_string('admin_total_questions_generated', 'local_hlai_quizgen'); ?></div>
                 <div class="stat-value"><?php echo number_format($totalquestionsgenerated); ?></div>
             </div>
         </div>
@@ -551,7 +284,7 @@ echo $OUTPUT->header();
                 <div class="stat-icon-container is-info">
                     <i class="fa fa-file-text-o stat-icon-large"></i>
                 </div>
-                <div class="stat-label">Total Quizzes Created</div>
+                <div class="stat-label"><?php echo get_string('admin_total_quizzes_created', 'local_hlai_quizgen'); ?></div>
                 <div class="stat-value"><?php echo number_format($totalquizzescreated); ?></div>
             </div>
         </div>
@@ -562,9 +295,9 @@ echo $OUTPUT->header();
                 <div class="stat-icon-container is-success">
                     <i class="fa fa-users stat-icon-large"></i>
                 </div>
-                <div class="stat-label">Active Teachers</div>
+                <div class="stat-label"><?php echo get_string('admin_active_teachers', 'local_hlai_quizgen'); ?></div>
                 <div class="stat-value"><?php echo number_format($activeteachers); ?></div>
-                <div class="stat-subtext"><?php echo $adoptionrate; ?>% adoption rate</div>
+                <div class="stat-subtext"><?php echo get_string('admin_adoption_rate', 'local_hlai_quizgen', $adoptionrate); ?></div>
             </div>
         </div>
 
@@ -574,9 +307,9 @@ echo $OUTPUT->header();
                 <div class="stat-icon-container is-warning">
                     <i class="fa fa-graduation-cap stat-icon-large"></i>
                 </div>
-                <div class="stat-label">Courses Using Plugin</div>
+                <div class="stat-label"><?php echo get_string('admin_courses_using_plugin', 'local_hlai_quizgen'); ?></div>
                 <div class="stat-value"><?php echo number_format($activecourses); ?></div>
-                <div class="stat-subtext"><?php echo $coursecoverage; ?>% course coverage</div>
+                <div class="stat-subtext"><?php echo get_string('admin_course_coverage', 'local_hlai_quizgen', $coursecoverage); ?></div>
             </div>
         </div>
 
@@ -586,7 +319,7 @@ echo $OUTPUT->header();
                 <div class="stat-icon-container is-warning">
                     <i class="fa fa-star stat-icon-large"></i>
                 </div>
-                <div class="stat-label">Avg Quality Score</div>
+                <div class="stat-label"><?php echo get_string('avg_quality_score', 'local_hlai_quizgen'); ?></div>
                 <div class="stat-value"><?php echo $avgqualityscore; ?></div>
             </div>
         </div>
@@ -597,23 +330,23 @@ echo $OUTPUT->header();
                 <div class="stat-icon-container is-danger">
                     <i class="fa fa-bullseye stat-icon-large"></i>
                 </div>
-                <div class="stat-label">Site-Wide FTAR</div>
+                <div class="stat-label"><?php echo get_string('admin_site_wide_ftar', 'local_hlai_quizgen'); ?></div>
                 <div class="stat-value"><?php echo $siteftar; ?>%</div>
-                <div class="stat-subtext">First-Time Acceptance Rate</div>
+                <div class="stat-subtext"><?php echo get_string('first_time_acceptance_rate', 'local_hlai_quizgen'); ?></div>
             </div>
         </div>
     </div>
 
     <!-- Adoption & Usage Metrics -->
     <div class="section-header">
-        <h2><i class="fa fa-line-chart"></i> Adoption & Usage Metrics</h2>
+        <h2><i class="fa fa-line-chart"></i> <?php echo get_string('admin_adoption_usage', 'local_hlai_quizgen'); ?></h2>
     </div>
 
     <div class="columns">
         <div class="column is-8">
             <div class="chart-container">
                 <h3 class="chart-title">
-                    <i class="fa fa-area-chart"></i> Usage Trend (Last 30 Days)
+                    <i class="fa fa-area-chart"></i> <?php echo get_string('admin_usage_trend', 'local_hlai_quizgen'); ?>
                 </h3>
                 <div id="usageTrendChart"></div>
             </div>
@@ -621,7 +354,7 @@ echo $OUTPUT->header();
         <div class="column is-4">
             <div class="chart-container">
                 <h3 class="chart-title">
-                    <i class="fa fa-pie-chart"></i> Adoption Overview
+                    <i class="fa fa-pie-chart"></i> <?php echo get_string('admin_adoption_overview', 'local_hlai_quizgen'); ?>
                 </h3>
                 <div id="adoptionChart"></div>
             </div>
@@ -630,14 +363,14 @@ echo $OUTPUT->header();
 
     <!-- Quality Overview (Site-Wide) -->
     <div class="section-header">
-        <h2><i class="fa fa-star"></i> Quality Overview</h2>
+        <h2><i class="fa fa-star"></i> <?php echo get_string('admin_quality_overview', 'local_hlai_quizgen'); ?></h2>
     </div>
 
     <div class="columns is-multiline">
         <div class="column is-6">
             <div class="chart-container">
                 <h3 class="chart-title">
-                    <i class="fa fa-th-list"></i> Bloom's Taxonomy Distribution
+                    <i class="fa fa-th-list"></i> <?php echo get_string('blooms_taxonomy', 'local_hlai_quizgen'); ?>
                 </h3>
                 <div id="bloomsDistributionChart"></div>
             </div>
@@ -645,7 +378,7 @@ echo $OUTPUT->header();
         <div class="column is-6">
             <div class="chart-container">
                 <h3 class="chart-title">
-                    <i class="fa fa-tasks"></i> Question Type Popularity
+                    <i class="fa fa-tasks"></i> <?php echo get_string('admin_question_type_popularity', 'local_hlai_quizgen'); ?>
                 </h3>
                 <div id="questionTypeChart"></div>
             </div>
@@ -653,7 +386,7 @@ echo $OUTPUT->header();
         <div class="column is-12">
             <div class="chart-container">
                 <h3 class="chart-title">
-                    <i class="fa fa-signal"></i> Difficulty Distribution
+                    <i class="fa fa-signal"></i> <?php echo get_string('difficulty_distribution', 'local_hlai_quizgen'); ?>
                 </h3>
                 <div id="difficultyChart"></div>
             </div>
@@ -662,29 +395,29 @@ echo $OUTPUT->header();
 
     <!-- Top Performers -->
     <div class="section-header">
-        <h2><i class="fa fa-trophy"></i> Top Performers</h2>
+        <h2><i class="fa fa-trophy"></i> <?php echo get_string('admin_top_performers', 'local_hlai_quizgen'); ?></h2>
     </div>
 
     <div class="columns">
         <div class="column is-6">
             <div class="chart-container">
                 <h3 class="chart-title">
-                    <i class="fa fa-trophy"></i> Top 10 Courses by Questions Generated
+                    <i class="fa fa-trophy"></i> <?php echo get_string('admin_top_courses', 'local_hlai_quizgen'); ?>
                 </h3>
                 <?php if (!empty($topcourses)) : ?>
                     <?php $rank = 1; foreach ($topcourses as $course) : ?>
                         <div class="top-performer-row">
-                            <div class="is-flex is-align-items-center" style="gap: 0.75rem;">
+                            <div class="is-flex is-align-items-center hlai-gap-075">
                                 <span class="performer-rank">#<?php echo $rank++; ?></span>
                                 <strong class="performer-name"><?php echo format_string($course->fullname); ?></strong>
                             </div>
                             <span class="performer-badge">
-                                <?php echo number_format($course->question_count); ?> questions
+                                <?php echo get_string('admin_questions_count', 'local_hlai_quizgen', number_format($course->question_count)); ?>
                             </span>
                         </div>
                     <?php endforeach; ?>
                 <?php else : ?>
-                    <p class="has-text-grey">No course data available yet.</p>
+                    <p class="has-text-grey"><?php echo get_string('admin_no_course_data', 'local_hlai_quizgen'); ?></p>
                 <?php endif; ?>
             </div>
         </div>
@@ -692,17 +425,26 @@ echo $OUTPUT->header();
         <div class="column is-6">
             <div class="chart-container">
                 <h3 class="chart-title">
-                    <i class="fa fa-trophy"></i> Top 10 Teachers by Acceptance Rate
+                    <i class="fa fa-trophy"></i> <?php echo get_string('admin_top_teachers', 'local_hlai_quizgen'); ?>
                 </h3>
                 <?php if (!empty($topteachers)) : ?>
                     <?php $rank = 1; foreach ($topteachers as $teacher) : ?>
                         <div class="top-performer-row">
-                            <div class="is-flex is-align-items-center" style="gap: 0.75rem;">
+                            <div class="is-flex is-align-items-center hlai-gap-075">
                                 <span class="performer-rank">#<?php echo $rank++; ?></span>
                                 <div>
                                     <strong class="performer-name"><?php echo fullname($teacher); ?></strong>
                                     <div class="performer-details">
-                                        <?php echo $teacher->approved_questions . '/' . $teacher->total_questions; ?> approved
+                                        <?php
+                                        echo get_string(
+                                            'admin_approved_fraction',
+                                            'local_hlai_quizgen',
+                                            (object)[
+                                                'approved' => $teacher->approved_questions,
+                                                'total' => $teacher->total_questions,
+                                            ]
+                                        );
+                                        ?>
                                     </div>
                                 </div>
                             </div>
@@ -712,7 +454,7 @@ echo $OUTPUT->header();
                         </div>
                     <?php endforeach; ?>
                 <?php else : ?>
-                    <p class="has-text-grey">No teacher data available yet (minimum 10 questions required).</p>
+                    <p class="has-text-grey"><?php echo get_string('admin_no_teacher_data', 'local_hlai_quizgen'); ?></p>
                 <?php endif; ?>
             </div>
         </div>
@@ -720,7 +462,7 @@ echo $OUTPUT->header();
 
     <!-- System Health -->
     <div class="section-header">
-        <h2><i class="fa fa-wrench"></i> System Health</h2>
+        <h2><i class="fa fa-wrench"></i> <?php echo get_string('admin_system_health', 'local_hlai_quizgen'); ?></h2>
     </div>
 
     <div class="columns">
@@ -728,41 +470,41 @@ echo $OUTPUT->header();
             <div class="chart-container">
                 <div class="system-health-grid">
                     <div class="health-metric">
-                        <strong>AI Provider Status</strong>
+                        <strong><?php echo get_string('admin_ai_provider_status', 'local_hlai_quizgen'); ?></strong>
                         <span class="health-indicator <?php echo $aiproviderconfigured ? 'is-healthy' : 'is-error'; ?>">
                             <i class="fa <?php echo $aiproviderconfigured ? 'fa-check-circle' : 'fa-times-circle'; ?>"></i>
-                            <?php echo $aiproviderconfigured ? 'Connected' : 'Not Configured'; ?>
+                            <?php echo $aiproviderconfigured ? get_string('admin_connected', 'local_hlai_quizgen') : get_string('admin_not_configured', 'local_hlai_quizgen'); ?>
                         </span>
                     </div>
                     <div class="health-metric">
-                        <strong>Pending Generations</strong>
+                        <strong><?php echo get_string('admin_pending_generations', 'local_hlai_quizgen'); ?></strong>
                         <span class="health-value is-warning">
                             <i class="fa fa-clock"></i> <?php echo $pendinggenerations; ?>
                         </span>
                     </div>
                     <div class="health-metric">
-                        <strong>Recent Errors (7 days)</strong>
+                        <strong><?php echo get_string('admin_recent_errors', 'local_hlai_quizgen'); ?></strong>
                         <span class="health-value <?php echo $recenterrors > 0 ? 'is-danger' : 'is-success'; ?>">
                             <i class="fa fa-exclamation-triangle"></i> <?php echo $recenterrors; ?>
                         </span>
                     </div>
                     <div class="health-metric">
-                        <strong>Total Failed</strong>
+                        <strong><?php echo get_string('admin_total_failed', 'local_hlai_quizgen'); ?></strong>
                         <span class="health-value is-dark">
                             <i class="fa fa-ban"></i> <?php echo $failedgenerations; ?>
                         </span>
                     </div>
                 </div>
 
-                <hr style="border-color: var(--admin-gray-200); margin: 1.5rem 0;">
+                <hr class="hlai-admin-hr">
 
                 <h3 class="chart-title">
-                    <i class="fa fa-cog"></i> Quick Configuration Links
+                    <i class="fa fa-cog"></i> <?php echo get_string('admin_quick_config_links', 'local_hlai_quizgen'); ?>
                 </h3>
                 <div class="config-buttons">
                     <a href="<?php echo new moodle_url('/admin/settings.php', ['section' => 'local_hlai_quizgen']); ?>"
                        class="config-button">
-                        <i class="fa fa-wrench"></i> Plugin Settings
+                        <i class="fa fa-wrench"></i> <?php echo get_string('admin_plugin_settings', 'local_hlai_quizgen'); ?>
                     </a>
                     <?php
                     $capurl = new moodle_url(
@@ -772,11 +514,11 @@ echo $OUTPUT->header();
                     ?>
                     <a href="<?php echo $capurl; ?>"
                        class="config-button">
-                        <i class="fa fa-users"></i> User Capabilities
+                        <i class="fa fa-users"></i> <?php echo get_string('admin_user_capabilities', 'local_hlai_quizgen'); ?>
                     </a>
-                    <a href="<?php echo new moodle_url('/local/hlai_quizgen/view_logs.php'); ?>"
+                    <a href="<?php echo new moodle_url('/local/hlai_quizgen/debug_logs.php'); ?>"
                        class="config-button">
-                        <i class="fa fa-file-text-o"></i> View Error Logs
+                        <i class="fa fa-file-text-o"></i> <?php echo get_string('admin_view_error_logs', 'local_hlai_quizgen'); ?>
                     </a>
                 </div>
             </div>
@@ -785,243 +527,7 @@ echo $OUTPUT->header();
 
 </div>
 
-<script>
-// ================= APEXCHARTS VISUALIZATIONS =================.
-
-// 1. Usage Trend Chart (Last 30 Days).
 <?php
-$trenddates = [];
-$trendcounts = [];
-foreach ($usagetrenddata as $data) {
-    $trenddates[] = $data->date;
-    $trendcounts[] = $data->count;
-}
-?>
-var usageTrendOptions = {
-    series: [{
-        name: 'Questions Generated',
-        data: <?php echo json_encode($trendcounts); ?>
-    }],
-    chart: {
-        type: 'area',
-        height: 250,
-        toolbar: { show: false },
-        fontFamily: 'inherit'
-    },
-    colors: ['#3B82F6'],
-    dataLabels: { enabled: false },
-    stroke: {
-        curve: 'smooth',
-        width: 2
-    },
-    fill: {
-        type: 'gradient',
-        gradient: {
-            shadeIntensity: 1,
-            opacityFrom: 0.4,
-            opacityTo: 0.1
-        }
-    },
-    xaxis: {
-        categories: <?php echo json_encode($trenddates); ?>,
-        labels: { show: true }
-    },
-    tooltip: {
-        x: { format: 'dd MMM yyyy' }
-    }
-};
-var usageTrendChart = new ApexCharts(document.querySelector("#usageTrendChart"), usageTrendOptions);
-usageTrendChart.render();
-
-// 2. Adoption Donut Chart.
-var adoptionOptions = {
-    series: [<?php echo $activeteachers; ?>, <?php echo max(0, $totaluserswithcapability - $activeteachers); ?>],
-    chart: {
-        type: 'donut',
-        height: 250,
-        fontFamily: 'inherit'
-    },
-    labels: ['Active Teachers', 'Inactive Teachers'],
-    colors: ['#10B981', '#BFDBFE'],
-    legend: {
-        position: 'bottom',
-        fontSize: '13px'
-    },
-    dataLabels: {
-        enabled: true,
-        style: {
-            fontSize: '14px',
-            fontWeight: 600,
-            colors: ['#1E293B']
-        },
-        dropShadow: {
-            enabled: true,
-            top: 1,
-            left: 1,
-            blur: 2,
-            color: '#fff',
-            opacity: 0.8
-        }
-    },
-    plotOptions: {
-        pie: {
-            donut: {
-                labels: {
-                    show: true,
-                    total: {
-                        show: true,
-                        label: 'Total Users',
-                        fontSize: '14px',
-                        fontWeight: 600,
-                        color: '#334155'
-                    },
-                    value: {
-                        fontSize: '20px',
-                        fontWeight: 700,
-                        color: '#1E293B'
-                    }
-                }
-            }
-        }
-    },
-    states: {
-        hover: {
-            filter: {
-                type: 'lighten',
-                value: 0.05
-            }
-        },
-        active: {
-            filter: {
-                type: 'none'
-            }
-        }
-    },
-    tooltip: {
-        y: {
-            formatter: function(value) {
-                return value + ' teachers'
-            }
-        }
-    }
-};
-var adoptionChart = new ApexCharts(document.querySelector("#adoptionChart"), adoptionOptions);
-adoptionChart.render();
-
-// 3. Bloom's Taxonomy Distribution (Radar Chart).
-<?php
-$bloomslabels = [];
-$bloomsvalues = [];
-foreach ($bloomsstats as $stat) {
-    $bloomslabels[] = $stat->blooms_level;
-    $bloomsvalues[] = (int)$stat->count;
-}
-?>
-var bloomsOptions = {
-    series: [{
-        name: 'Questions',
-        data: <?php echo json_encode($bloomsvalues); ?>
-    }],
-    chart: {
-        type: 'radar',
-        height: 350,
-        fontFamily: 'inherit'
-    },
-    colors: ['#3B82F6'],
-    fill: {
-        opacity: 0.15
-    },
-    markers: {
-        size: 4,
-        colors: ['#3B82F6'],
-        strokeWidth: 2,
-        strokeColors: '#fff'
-    },
-    xaxis: {
-        categories: <?php echo json_encode($bloomslabels); ?>
-    },
-    yaxis: {
-        show: false
-    },
-    grid: {
-        show: false
-    }
-};
-var bloomsChart = new ApexCharts(document.querySelector("#bloomsDistributionChart"), bloomsOptions);
-bloomsChart.render();
-
-// 4. Question Type Bar Chart.
-<?php
-$typelabels = [];
-$typevalues = [];
-foreach ($questiontypestats as $stat) {
-    $typelabels[] = ucfirst(str_replace('_', ' ', $stat->questiontype ?? ''));
-    $typevalues[] = (int)$stat->count;
-}
-?>
-var questionTypeOptions = {
-    series: [{
-        name: 'Questions',
-        data: <?php echo json_encode($typevalues); ?>
-    }],
-    chart: {
-        type: 'bar',
-        height: 350,
-        toolbar: { show: false },
-        fontFamily: 'inherit'
-    },
-    plotOptions: {
-        bar: {
-            horizontal: false,
-            borderRadius: 8,
-            columnWidth: '60%'
-        }
-    },
-    colors: ['#06B6D4'],
-    dataLabels: { enabled: false },
-    xaxis: {
-        categories: <?php echo json_encode($typelabels); ?>
-    }
-};
-var questionTypeChart = new ApexCharts(document.querySelector("#questionTypeChart"), questionTypeOptions);
-questionTypeChart.render();
-
-// 5. Difficulty Distribution Chart.
-<?php
-$difficultylabels = [];
-$difficultyvalues = [];
-foreach ($difficultystats as $stat) {
-    $difficultylabels[] = ucfirst($stat->difficulty ?? '');
-    $difficultyvalues[] = (int)$stat->count;
-}
-?>
-var difficultyOptions = {
-    series: [{
-        name: 'Questions',
-        data: <?php echo json_encode($difficultyvalues); ?>
-    }],
-    chart: {
-        type: 'bar',
-        height: 300,
-        toolbar: { show: false },
-        fontFamily: 'inherit'
-    },
-    plotOptions: {
-        bar: {
-            horizontal: true,
-            borderRadius: 8
-        }
-    },
-    colors: ['#F59E0B'],
-    dataLabels: { enabled: true },
-    xaxis: {
-        categories: <?php echo json_encode($difficultylabels); ?>
-    }
-};
-var difficultyChart = new ApexCharts(document.querySelector("#difficultyChart"), difficultyOptions);
-difficultyChart.render();
-</script>
-
-<?php
+// Charts handled by AMD module local_hlai_quizgen/admindashboard.
 
 echo $OUTPUT->footer();
