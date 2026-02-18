@@ -23,6 +23,8 @@
  * @copyright  2025 Human Logic Software LLC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+/* global ApexCharts */
 define(['jquery', 'core/ajax', 'local_hlai_quizgen/charts'], function($, Ajax, Charts) {
     'use strict';
 
@@ -36,8 +38,7 @@ define(['jquery', 'core/ajax', 'local_hlai_quizgen/charts'], function($, Ajax, C
 
         /**
          * Initialize the dashboard
-         * @param {number} courseid - The course ID
-         * @param {string} sesskey - Session key for AJAX calls
+         * @param {object} config - Configuration object
          */
         init: function(config) {
             this.courseid = config.courseid;
@@ -71,7 +72,7 @@ define(['jquery', 'core/ajax', 'local_hlai_quizgen/charts'], function($, Ajax, C
                         resolve();
                     } else if (attempts >= maxAttempts) {
                         clearInterval(checkInterval);
-                        console.warn('ApexCharts did not load in time');
+                        // ApexCharts did not load in time.
                         resolve();
                     }
                 }, 100);
@@ -198,6 +199,7 @@ define(['jquery', 'core/ajax', 'local_hlai_quizgen/charts'], function($, Ajax, C
                 }
                 return response;
             }).catch(function(error) {
+                // eslint-disable-next-line no-console
                 // eslint-disable-next-line no-console
                 console.error('External service call failed for ' + action + ':', error);
                 return null;

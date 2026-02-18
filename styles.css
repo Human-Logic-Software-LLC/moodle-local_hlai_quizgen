@@ -305,11 +305,11 @@
     .wizard-steps {
         flex-direction: column;
     }
-    
+
     .wizard-step:not(:last-child)::after {
         display: none;
     }
-    
+
     .wizard-step {
         margin-bottom: 20px;
     }

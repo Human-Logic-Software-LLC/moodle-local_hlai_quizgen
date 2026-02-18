@@ -23,6 +23,8 @@
  * @copyright  2025 Human Logic Software LLC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+/* global ApexCharts */
 define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
     'use strict';
 
@@ -37,9 +39,7 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
 
         /**
          * Initialize analytics page
-         * @param {number} courseid - The course ID
-         * @param {string} sesskey - Session key
-         * @param {string} timerange - Time range filter
+         * @param {object} config - Configuration object
          */
         init: function(config) {
             this.courseid = config.courseid;
@@ -73,7 +73,7 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
                         resolve();
                     } else if (attempts >= maxAttempts) {
                         clearInterval(checkInterval);
-                        console.warn('ApexCharts did not load in time');
+                        // ApexCharts did not load in time.
                         resolve();
                     }
                 }, 100);
@@ -88,7 +88,7 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
             var stats = data.stats || {};
 
             this.renderFunnelChart(stats);
-            this.renderQualityDistChart(stats);
+            this.renderQualityDistChart();
             this.renderTypeAcceptanceChart(data.typeStats);
             this.renderDifficultyAnalysisChart(data.difficultyStats);
             this.renderBloomsCoverageChart(data.bloomsStats);
@@ -109,7 +109,6 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
 
             var total = stats.totalQuestions || 0;
             var approved = stats.approved || 0;
-            var rejected = stats.rejected || 0;
             var pending = stats.pending || 0;
 
             var options = {
@@ -162,9 +161,8 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
 
         /**
          * Render quality score distribution chart
-         * @param {object} stats - Statistics data
          */
-        renderQualityDistChart: function(stats) {
+        renderQualityDistChart: function() {
             if (!$('#quality-dist-chart').length || typeof ApexCharts === 'undefined') {
                 return;
             }
@@ -454,7 +452,8 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
          * @param {array} rejectionReasons - Rejection reasons data
          */
         renderRejectionReasonsChart: function(rejectionReasons) {
-            if (!$('#rejection-reasons-chart').length || typeof ApexCharts === 'undefined' || !rejectionReasons || rejectionReasons.length === 0) {
+            if (!$('#rejection-reasons-chart').length || typeof ApexCharts === 'undefined' ||
+                    !rejectionReasons || rejectionReasons.length === 0) {
                 return;
             }
 

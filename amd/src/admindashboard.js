@@ -24,6 +24,8 @@
  * @copyright  2025 Human Logic Software LLC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+/* global ApexCharts */
 define(['jquery'], function($) {
     'use strict';
 
@@ -66,7 +68,7 @@ define(['jquery'], function($) {
                     } else if (attempts >= maxAttempts) {
                         clearInterval(checkInterval);
                         // eslint-disable-next-line no-console
-                        console.warn('ApexCharts did not load in time');
+                        // ApexCharts did not load in time.
                         resolve();
                     }
                 }, 100);

@@ -15,7 +15,7 @@
 
 /**
  * Chart utilities and configurations for HLAI QuizGen
- * 
+ *
  * This module provides reusable chart configurations and helper functions
  * for ApexCharts integration throughout the plugin.
  *
@@ -24,6 +24,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+/* global ApexCharts */
 define(['jquery'], function($) {
     'use strict';
 
@@ -257,7 +258,7 @@ define(['jquery'], function($) {
                 }
             } : undefined
         });
-        
+
         // Explicitly override legend if showLegend is false
         if (options.showLegend === false) {
             chartOptions.legend = { show: false };
@@ -356,12 +357,12 @@ define(['jquery'], function($) {
      */
     function createRadialChart(selector, options) {
         // Support both options.value and options.series[0] for flexibility
-        var value = options.value !== undefined ? options.value : 
+        var value = options.value !== undefined ? options.value :
                     (options.series && options.series.length > 0 ? options.series[0] : 0);
-        
+
         // Use provided color or determine based on thresholds
         var color = options.colors && options.colors.length > 0 ? options.colors[0] : colors.primary;
-        
+
         // Color based on thresholds (if no explicit color and thresholds provided)
         if (!options.colors && options.thresholds) {
             if (value >= options.thresholds.excellent) {
@@ -490,7 +491,7 @@ define(['jquery'], function($) {
                 }
             } : undefined
         });
-        
+
         // Explicitly override legend if showLegend is false
         if (options.showLegend === false) {
             chartOptions.legend = { show: false };
