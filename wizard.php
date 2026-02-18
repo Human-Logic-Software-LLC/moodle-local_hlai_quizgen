@@ -1916,7 +1916,7 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
     $html .= html_writer::end_div(); // Activity-selection-section.
 
     // Navigation buttons.
-    $html .= html_writer::start_div('level mt-6 pt-4 hlai-border-top');
+    $html .= html_writer::start_div('level is-mobile mt-6 pt-4 hlai-border-top');
     $html .= html_writer::start_div('level-left');
     $html .= html_writer::link(
         new moodle_url('/course/view.php', ['id' => $courseid]),
@@ -2272,7 +2272,7 @@ function local_hlai_quizgen_render_step2(int $courseid, int $requestid): string 
         $html .= html_writer::end_div(); // Hlai-topics-section.
 
         // Navigation.
-        $html .= html_writer::start_div('level mt-6 pt-4 hlai-border-top');
+        $html .= html_writer::start_div('level is-mobile mt-6 pt-4 hlai-border-top');
         $html .= html_writer::start_div('level-left');
         $html .= html_writer::link(
             new moodle_url('/local/hlai_quizgen/wizard.php', ['courseid' => $courseid, 'requestid' => $requestid, 'step' => 1]),
@@ -2669,7 +2669,7 @@ function local_hlai_quizgen_render_step3(int $courseid, int $requestid): string 
     // JavaScript handled by AMD module local_hlai_quizgen/wizard.
 
     // Navigation.
-    $html .= html_writer::start_div('level mt-5');
+    $html .= html_writer::start_div('level is-mobile mt-5');
     $html .= html_writer::start_div('level-left');
     $html .= html_writer::link(
         new moodle_url('/local/hlai_quizgen/wizard.php', ['courseid' => $courseid, 'requestid' => $requestid, 'step' => 2]),
@@ -2961,7 +2961,7 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
     $html .= html_writer::start_div('questions-review-wrapper');
 
     // Clean toolbar using Bulma level.
-    $html .= html_writer::start_div('level mb-5 py-2');
+    $html .= html_writer::start_div('level is-mobile mb-5 py-2');
 
     // Left: Select all + Bulk action.
     $html .= html_writer::start_div('level-left');
@@ -3278,7 +3278,7 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
     // JavaScript handled by AMD module local_hlai_quizgen/wizard.
 
     // Navigation.
-    $html .= html_writer::start_div('level mt-5');
+    $html .= html_writer::start_div('level is-mobile mt-5');
     $html .= html_writer::start_div('level-left');
     $html .= html_writer::link(
         new moodle_url('/local/hlai_quizgen/wizard.php', ['courseid' => $courseid, 'requestid' => $requestid, 'step' => 3]),
@@ -3499,7 +3499,7 @@ function local_hlai_quizgen_render_step5(int $courseid, int $requestid): string 
     $html .= html_writer::end_div();
 
     // Navigation.
-    $html .= html_writer::start_div('level mt-5');
+    $html .= html_writer::start_div('level is-mobile mt-5');
     $html .= html_writer::start_div('level-left');
     $html .= html_writer::link(
         new moodle_url('/local/hlai_quizgen/wizard.php', ['courseid' => $courseid, 'requestid' => $requestid, 'step' => 4]),
