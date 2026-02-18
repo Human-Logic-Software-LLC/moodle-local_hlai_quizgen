@@ -254,7 +254,7 @@ if ($step === 'progress') {
     $stepclass .= '1';
 }
 
-echo html_writer::start_div('hlai-quizgen-wizard local-hlai-iksha ' . $stepclass);
+echo html_writer::start_div('hlai-quizgen-wrapper hlai-quizgen-wizard local-hlai-iksha ' . $stepclass);
 
 // Wizard header.
 echo html_writer::start_div('has-text-centered mb-5');
