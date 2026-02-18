@@ -909,11 +909,10 @@ try {
             $context = context_course::instance($courseid);
             require_capability('local/hlai_quizgen:generatequestions', $context);
 
-            if (empty($_FILES['file'])) {
+            $file = local_hlai_quizgen_get_uploaded_file('file');
+            if (empty($file)) {
                 local_hlai_quizgen_send_error(get_string('ajax_no_file_uploaded', 'local_hlai_quizgen'));
             }
-
-            $file = $_FILES['file'];
 
             // Validate file.
             $allowedtypes = ['application/pdf', 'application/msword',

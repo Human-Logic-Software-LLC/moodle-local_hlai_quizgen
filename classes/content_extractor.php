@@ -30,8 +30,6 @@
 
 namespace local_hlai_quizgen;
 
-defined('MOODLE_INTERNAL') || die();
-
 // Only load Moodle module libraries if $CFG is available.
 global $CFG;
 if (isset($CFG)) {

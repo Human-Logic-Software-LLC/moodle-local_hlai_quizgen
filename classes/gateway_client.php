@@ -27,8 +27,6 @@
 
 namespace local_hlai_quizgen;
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Thin gateway client for commercial Human Logic AI routing.
  */

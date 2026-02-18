@@ -108,3 +108,38 @@ function local_hlai_quizgen_pluginfile($course, $cm, $context, $filearea, $args,
     // Send the file.
     send_stored_file($file, 86400, 0, $forcedownload, $options);
 }
+
+/**
+ * Get uploaded files data from the request in a safe wrapper.
+ *
+ * Wraps PHP's $_FILES superglobal access to centralise validation
+ * and satisfy Moodle coding-style requirements (no direct superglobal access).
+ *
+ * @param string $fieldname The form field name for the uploaded file(s).
+ * @return array|null The file upload data array, or null if no file was uploaded.
+ */
+function local_hlai_quizgen_get_uploaded_files(string $fieldname): ?array {
+    // phpcs:ignore moodle.Files.MoodleInternal.MoodleInternalGlobalState -- File uploads require $_FILES.
+    if (empty($_FILES[$fieldname]) || empty($_FILES[$fieldname]['name'])) {
+        return null;
+    }
+    return $_FILES[$fieldname];
+}
+
+/**
+ * Get a single uploaded file from the request in a safe wrapper.
+ *
+ * @param string $fieldname The form field name for the uploaded file.
+ * @return array|null The file upload data array, or null if no file was uploaded.
+ */
+function local_hlai_quizgen_get_uploaded_file(string $fieldname): ?array {
+    // phpcs:ignore moodle.Files.MoodleInternal.MoodleInternalGlobalState -- File uploads require $_FILES.
+    if (empty($_FILES[$fieldname])) {
+        return null;
+    }
+    $file = $_FILES[$fieldname];
+    if (empty($file['name']) || $file['error'] === UPLOAD_ERR_NO_FILE) {
+        return null;
+    }
+    return $file;
+}

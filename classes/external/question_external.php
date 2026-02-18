@@ -27,8 +27,6 @@
 
 namespace local_hlai_quizgen\external;
 
-defined('MOODLE_INTERNAL') || die();
-
 global $CFG;
 require_once("$CFG->libdir/externallib.php");
 

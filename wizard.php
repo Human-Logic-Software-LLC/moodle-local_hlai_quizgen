@@ -366,14 +366,17 @@ function local_hlai_quizgen_handle_content_upload(int $courseid, context $contex
         }
     }
 
+    // Get uploaded files via helper (avoids direct $_FILES access).
+    $uploadedfiledata = local_hlai_quizgen_get_uploaded_files('contentfiles');
+
     // Validate file sizes before processing.
-    if (!empty($_FILES['contentfiles']['name'][0])) {
+    if ($uploadedfiledata && !empty($uploadedfiledata['name'][0])) {
         $maxfilesize = get_config('local_hlai_quizgen', 'max_file_size_mb') ?: 50;
         $maxbytes = $maxfilesize * 1024 * 1024;
 
-        foreach ($_FILES['contentfiles']['size'] as $key => $filesize) {
+        foreach ($uploadedfiledata['size'] as $key => $filesize) {
             if ($filesize > $maxbytes) {
-                $filename = $_FILES['contentfiles']['name'][$key];
+                $filename = $uploadedfiledata['name'][$key];
                 redirect(
                     new moodle_url('/local/hlai_quizgen/wizard.php', ['courseid' => $courseid, 'step' => 1]),
                     get_string(
@@ -391,7 +394,7 @@ function local_hlai_quizgen_handle_content_upload(int $courseid, context $contex
 
     // Validate that at least one content source is provided.
     $hasmanualtext = !empty(trim($manualtext));
-    $hasfiles = !empty($_FILES['contentfiles']['name'][0]);
+    $hasfiles = $uploadedfiledata && !empty($uploadedfiledata['name'][0]);
     $hasactivities = !empty($activityids);
     $hasurls = !empty($urls);
     $hasbulkscan = $bulkscanentire || $bulkscanresources || $bulkscanactivities;
@@ -434,11 +437,11 @@ function local_hlai_quizgen_handle_content_upload(int $courseid, context $contex
     // Add file content (we'll hash filenames and sizes for now, actual content during processing).
     if ($hasfiles) {
         $filedata = [];
-        foreach ($_FILES['contentfiles']['name'] as $key => $filename) {
+        foreach ($uploadedfiledata['name'] as $key => $filename) {
             if (empty($filename)) {
                 continue;
             }
-            $filesize = $_FILES['contentfiles']['size'][$key] ?? 0;
+            $filesize = $uploadedfiledata['size'][$key] ?? 0;
             $filedata[] = $filename . ':' . $filesize;
         }
         sort($filedata);  // Sort for consistent hashing.
@@ -603,12 +606,12 @@ function local_hlai_quizgen_handle_content_upload(int $courseid, context $contex
         $fs = get_file_storage();
         $uploadedfiles = [];
 
-        foreach ($_FILES['contentfiles']['name'] as $key => $filename) {
+        foreach ($uploadedfiledata['name'] as $key => $filename) {
             if (empty($filename)) {
                 continue;
             }
 
-            $fileerror = $_FILES['contentfiles']['error'][$key];
+            $fileerror = $uploadedfiledata['error'][$key];
             if ($fileerror != UPLOAD_ERR_OK) {
                 $errormsg = get_string('wizard_upload_err_unknown', 'local_hlai_quizgen');
                 switch ($fileerror) {
@@ -643,8 +646,8 @@ function local_hlai_quizgen_handle_content_upload(int $courseid, context $contex
                 return;
             }
 
-            $tmpfile = $_FILES['contentfiles']['tmp_name'][$key];
-            $filesize = $_FILES['contentfiles']['size'][$key];
+            $tmpfile = $uploadedfiledata['tmp_name'][$key];
+            $filesize = $uploadedfiledata['size'][$key];
 
             // Validate file size (50MB max).
             $maxsize = 50 * 1024 * 1024;
