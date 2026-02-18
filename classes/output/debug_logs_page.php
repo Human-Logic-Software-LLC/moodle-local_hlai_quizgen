@@ -26,7 +26,6 @@
 
 namespace local_hlai_quizgen\output;
 
-defined('MOODLE_INTERNAL') || die();
 
 use renderable;
 use templatable;
@@ -42,7 +41,6 @@ use local_hlai_quizgen\debug_logger;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class debug_logs_page implements renderable, templatable {
-
     /** @var string Active tab. */
     private $tab;
 

@@ -461,7 +461,11 @@ try {
             foreach ($questions as $q) {
                 $activities[] = [
                     'type' => 'question_generated',
-                    'message' => get_string('ajax_generated_question_on_topic', 'local_hlai_quizgen', (object)['type' => $q->questiontype, 'topic' => $q->topic_title]),
+                    'message' => get_string(
+                        'ajax_generated_question_on_topic',
+                        'local_hlai_quizgen',
+                        (object)['type' => $q->questiontype, 'topic' => $q->topic_title]
+                    ),
                     'difficulty' => $q->difficulty,
                     'blooms' => $q->blooms_level,
                 ];
@@ -1184,14 +1188,22 @@ try {
                             }
                         } catch (Exception $e) {
                             // Column truly doesn't exist, can't fix.
-                            $result['errors'][] = get_string('ajax_question_column_missing', 'local_hlai_quizgen', (object)['id' => $q->questionid, 'error' => $e->getMessage()]);
+                            $result['errors'][] = get_string(
+                                'ajax_question_column_missing',
+                                'local_hlai_quizgen',
+                                (object)['id' => $q->questionid, 'error' => $e->getMessage()]
+                            );
                         }
                     }
                     if ($hascategory) {
                         $result['questions_fixed']++;
                     }
                 } catch (Exception $e) {
-                    $result['errors'][] = get_string('ajax_question_error', 'local_hlai_quizgen', (object)['id' => $q->questionid, 'error' => $e->getMessage()]);
+                    $result['errors'][] = get_string(
+                        'ajax_question_error',
+                        'local_hlai_quizgen',
+                        (object)['id' => $q->questionid, 'error' => $e->getMessage()]
+                    );
                 }
             }
 
@@ -1386,14 +1398,22 @@ try {
                             $DB->set_field('question', 'category', $q->questioncategoryid, ['id' => $q->questionid]);
                             $repaired++;
                         } catch (Exception $e) {
-                            $errors[] = get_string('ajax_question_error', 'local_hlai_quizgen', (object)['id' => $q->questionid, 'error' => $e->getMessage()]);
+                            $errors[] = get_string(
+                                'ajax_question_error',
+                                'local_hlai_quizgen',
+                                (object)['id' => $q->questionid, 'error' => $e->getMessage()]
+                            );
                         }
                     }
                 }
 
                 $result['repaired'] = $repaired;
                 $result['errors'] = $errors;
-                $result['message'] = get_string('ajax_repair_result', 'local_hlai_quizgen', (object)['found' => $result['found'], 'repaired' => $repaired]);
+                $result['message'] = get_string(
+                    'ajax_repair_result',
+                    'local_hlai_quizgen',
+                    (object)['found' => $result['found'], 'repaired' => $repaired]
+                );
             }
 
             local_hlai_quizgen_send_response(true, $result);

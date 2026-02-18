@@ -1129,7 +1129,8 @@ function local_hlai_quizgen_auto_recover_tracking(array $questionids, int $cours
         debugging("DEBUG auto_recover_tracking: Could not get module contexts: " . $e->getMessage(), DEBUG_DEVELOPER);
     }
 
-    debugging("DEBUG auto_recover_tracking: Searching in " . count($contextids) . " contexts for course $courseid", DEBUG_DEVELOPER);
+    debugging("DEBUG auto_recover_tracking: Searching in " .
+        count($contextids) . " contexts for course $courseid", DEBUG_DEVELOPER);
 
     // Build placeholders for IN clause.
     [$insql, $inparams] = $DB->get_in_or_equal($contextids, SQL_PARAMS_QM);
@@ -1178,7 +1179,8 @@ function local_hlai_quizgen_auto_recover_tracking(array $questionids, int $cours
                 $updateobj->timedeployed = time();
                 $DB->update_record('local_hlai_quizgen_questions', $updateobj);
                 $recovered++;
-                debugging("DEBUG auto_recover_tracking: Auto-linked plugin question $qid to Moodle question {$match->id}", DEBUG_DEVELOPER);
+                debugging("DEBUG auto_recover_tracking: Auto-linked plugin question " .
+                    "$qid to Moodle question {$match->id}", DEBUG_DEVELOPER);
                 continue;
             }
         }
@@ -1453,7 +1455,9 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
 
     // GROUP 1: Add Your Own Content.
     $html .= html_writer::start_div('hlai-source-group mb-5');
-    $html .= html_writer::tag('h5', '<i class="fa fa-pencil hlai-icon-warning"></i> ' . get_string('wizard_add_your_own_content', 'local_hlai_quizgen'), [
+    $html .= html_writer::tag('h5',
+        '<i class="fa fa-pencil hlai-icon-warning"></i> ' .
+        get_string('wizard_add_your_own_content', 'local_hlai_quizgen'), [
         'class' => 'hlai-source-group-title',
     ]);
     $html .= html_writer::start_div('columns is-multiline');
@@ -1509,8 +1513,12 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
     ]);
     $html .= html_writer::start_div('hlai-source-content');
     $html .= html_writer::tag('span', '<i class="fa fa-globe hlai-icon-info"></i>', ['class' => 'hlai-source-icon']);
-    $html .= html_writer::tag('strong', get_string('wizard_extract_from_url', 'local_hlai_quizgen'), ['class' => 'hlai-source-title']);
-    $html .= html_writer::tag('p', get_string('wizard_fetch_content_from_web', 'local_hlai_quizgen'), ['class' => 'hlai-source-desc']);
+    $html .= html_writer::tag('strong',
+        get_string('wizard_extract_from_url', 'local_hlai_quizgen'),
+        ['class' => 'hlai-source-title']);
+    $html .= html_writer::tag('p',
+        get_string('wizard_fetch_content_from_web', 'local_hlai_quizgen'),
+        ['class' => 'hlai-source-desc']);
     $html .= html_writer::end_div();
     $html .= html_writer::end_tag('label');
     $html .= html_writer::end_div();
@@ -1520,7 +1528,9 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
 
     // GROUP 2: Use Course Content.
     $html .= html_writer::start_div('hlai-source-group');
-    $html .= html_writer::tag('h5', '<i class="fa fa-book hlai-icon-success"></i> ' . get_string('wizard_use_course_content', 'local_hlai_quizgen'), [
+    $html .= html_writer::tag('h5',
+        '<i class="fa fa-book hlai-icon-success"></i> ' .
+        get_string('wizard_use_course_content', 'local_hlai_quizgen'), [
         'class' => 'hlai-source-group-title',
     ]);
     $html .= html_writer::start_div('columns is-multiline');
@@ -1543,7 +1553,9 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
     $html .= html_writer::start_div('hlai-source-text');
     $html .= html_writer::tag('strong', get_string('source_activities', 'local_hlai_quizgen'), ['class' => 'hlai-source-title']);
     $html .= html_writer::tag('p', get_string('source_activities_desc', 'local_hlai_quizgen'), ['class' => 'hlai-source-desc']);
-    $html .= html_writer::tag('span', '<i class="fa fa-star hlai-icon-warning"></i> ' . get_string('wizard_recommended', 'local_hlai_quizgen'), [
+    $html .= html_writer::tag('span',
+        '<i class="fa fa-star hlai-icon-warning"></i> ' .
+        get_string('wizard_recommended', 'local_hlai_quizgen'), [
         'class' => 'hlai-source-badge',
     ]);
     $html .= html_writer::end_div();
@@ -1566,8 +1578,12 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
     $html .= html_writer::tag('span', '<i class="fa fa-graduation-cap hlai-icon-success"></i>', [
         'class' => 'hlai-source-icon',
     ]);
-    $html .= html_writer::tag('strong', get_string('wizard_scan_entire_course', 'local_hlai_quizgen'), ['class' => 'hlai-source-title']);
-    $html .= html_writer::tag('p', get_string('wizard_scan_entire_course_desc', 'local_hlai_quizgen'), ['class' => 'hlai-source-desc']);
+    $html .= html_writer::tag('strong',
+        get_string('wizard_scan_entire_course', 'local_hlai_quizgen'),
+        ['class' => 'hlai-source-title']);
+    $html .= html_writer::tag('p',
+        get_string('wizard_scan_entire_course_desc', 'local_hlai_quizgen'),
+        ['class' => 'hlai-source-desc']);
     $html .= html_writer::end_div();
     $html .= html_writer::end_tag('label');
     $html .= html_writer::end_div();
@@ -1585,8 +1601,12 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
     ]);
     $html .= html_writer::start_div('hlai-source-content');
     $html .= html_writer::tag('span', '<i class="fa fa-book hlai-icon-purple"></i>', ['class' => 'hlai-source-icon']);
-    $html .= html_writer::tag('strong', get_string('wizard_scan_all_resources', 'local_hlai_quizgen'), ['class' => 'hlai-source-title']);
-    $html .= html_writer::tag('p', get_string('wizard_scan_all_resources_desc', 'local_hlai_quizgen'), ['class' => 'hlai-source-desc']);
+    $html .= html_writer::tag('strong',
+        get_string('wizard_scan_all_resources', 'local_hlai_quizgen'),
+        ['class' => 'hlai-source-title']);
+    $html .= html_writer::tag('p',
+        get_string('wizard_scan_all_resources_desc', 'local_hlai_quizgen'),
+        ['class' => 'hlai-source-desc']);
     $html .= html_writer::end_div();
     $html .= html_writer::end_tag('label');
     $html .= html_writer::end_div();
@@ -1604,8 +1624,12 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
     ]);
     $html .= html_writer::start_div('hlai-source-content');
     $html .= html_writer::tag('span', '<i class="fa fa-edit hlai-icon-danger"></i>', ['class' => 'hlai-source-icon']);
-    $html .= html_writer::tag('strong', get_string('wizard_scan_all_activities', 'local_hlai_quizgen'), ['class' => 'hlai-source-title']);
-    $html .= html_writer::tag('p', get_string('wizard_scan_all_activities_desc', 'local_hlai_quizgen'), ['class' => 'hlai-source-desc']);
+    $html .= html_writer::tag('strong',
+        get_string('wizard_scan_all_activities', 'local_hlai_quizgen'),
+        ['class' => 'hlai-source-title']);
+    $html .= html_writer::tag('p',
+        get_string('wizard_scan_all_activities_desc', 'local_hlai_quizgen'),
+        ['class' => 'hlai-source-desc']);
     $html .= html_writer::end_div();
     $html .= html_writer::end_tag('label');
     $html .= html_writer::end_div();
@@ -1699,7 +1723,9 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
 
     // URL extraction section (initially hidden).
     $html .= html_writer::start_div('field mb-5 hlai-hidden', ['id' => 'section-url']);
-    $html .= html_writer::tag('label', '<i class="fa fa-globe hlai-icon-info"></i> ' . get_string('wizard_extract_from_url', 'local_hlai_quizgen'), [
+    $html .= html_writer::tag('label',
+        '<i class="fa fa-globe hlai-icon-info"></i> ' .
+        get_string('wizard_extract_from_url', 'local_hlai_quizgen'), [
         'class' => 'label',
     ]);
     $html .= html_writer::tag('p', get_string('wizard_enter_urls_help', 'local_hlai_quizgen'), ['class' => 'help mb-3']);
@@ -1759,7 +1785,9 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
             'id' => 'select-all-activities',
             'class' => 'hlai-action-btn hlai-action-select',
         ]);
-        $html .= html_writer::tag('button', '<i class="fa fa-times"></i> ' . get_string('deselect_all_topics', 'local_hlai_quizgen'), [
+        $html .= html_writer::tag('button',
+            '<i class="fa fa-times"></i> ' .
+            get_string('deselect_all_topics', 'local_hlai_quizgen'), [
             'type' => 'button',
             'id' => 'deselect-all-activities',
             'class' => 'hlai-action-btn hlai-action-deselect',
@@ -2134,12 +2162,16 @@ function local_hlai_quizgen_render_step2(int $courseid, int $requestid): string 
         // Action bar with buttons and count.
         $html .= html_writer::start_div('hlai-topics-actions');
         $html .= html_writer::start_div('hlai-topics-buttons');
-        $html .= html_writer::tag('button', '<i class="fa fa-check"></i> ' . get_string('select_all_topics', 'local_hlai_quizgen'), [
+        $html .= html_writer::tag('button',
+            '<i class="fa fa-check"></i> ' .
+            get_string('select_all_topics', 'local_hlai_quizgen'), [
             'type' => 'button',
             'id' => 'select-all-topics',
             'class' => 'hlai-action-btn hlai-action-select',
         ]);
-        $html .= html_writer::tag('button', '<i class="fa fa-times"></i> ' . get_string('deselect_all_topics', 'local_hlai_quizgen'), [
+        $html .= html_writer::tag('button',
+            '<i class="fa fa-times"></i> ' .
+            get_string('deselect_all_topics', 'local_hlai_quizgen'), [
             'type' => 'button',
             'id' => 'deselect-all-topics',
             'class' => 'hlai-action-btn hlai-action-deselect',
@@ -2180,7 +2212,9 @@ function local_hlai_quizgen_render_step2(int $courseid, int $requestid): string 
         // Selected count indicator.
         $html .= html_writer::start_div('hlai-topics-selected-bar');
         $html .= html_writer::tag('span', '<i class="fa fa-check-circle"></i>', ['class' => 'hlai-selected-icon']);
-        $html .= html_writer::tag('span', get_string('wizard_n_topics_selected', 'local_hlai_quizgen', 0), ['id' => 'selected-topics-count', 'class' => 'hlai-selected-text']);
+        $html .= html_writer::tag('span',
+            get_string('wizard_n_topics_selected', 'local_hlai_quizgen', 0),
+            ['id' => 'selected-topics-count', 'class' => 'hlai-selected-text']);
         $html .= html_writer::end_div();
 
         $html .= html_writer::end_div(); // Hlai-topics-section.
@@ -2373,7 +2407,9 @@ function local_hlai_quizgen_render_step3(int $courseid, int $requestid): string 
 
     // TOTAL QUESTIONS - Compact card.
     $html .= html_writer::start_div('hlai-config-card');
-    $html .= html_writer::tag('label', get_string('total_questions', 'local_hlai_quizgen'), ['class' => 'hlai-config-label', 'for' => 'total-questions']);
+    $html .= html_writer::tag('label',
+        get_string('total_questions', 'local_hlai_quizgen'),
+        ['class' => 'hlai-config-label', 'for' => 'total-questions']);
     $html .= html_writer::empty_tag('input', [
         'type' => 'number',
         'name' => 'total_questions',
@@ -2424,11 +2460,26 @@ function local_hlai_quizgen_render_step3(int $courseid, int $requestid): string 
     $html .= html_writer::end_div();
 
     $questiontypes = [
-        'multichoice' => ['label' => get_string('qtype_multichoice', 'local_hlai_quizgen'), 'icon' => '<i class="fa fa-dot-circle-o"></i>', 'color' => '#3B82F6'],
-        'truefalse' => ['label' => get_string('qtype_truefalse', 'local_hlai_quizgen'), 'icon' => '<i class="fa fa-check"></i>', 'color' => '#10B981'],
-        'shortanswer' => ['label' => get_string('qtype_shortanswer', 'local_hlai_quizgen'), 'icon' => '<i class="fa fa-pencil"></i>', 'color' => '#F59E0B'],
-        'essay' => ['label' => get_string('qtype_essay', 'local_hlai_quizgen'), 'icon' => '<i class="fa fa-file-text-o"></i>', 'color' => '#64748B'],
-        'scenario' => ['label' => get_string('wizard_qtype_scenario', 'local_hlai_quizgen'), 'icon' => '<i class="fa fa-bullseye"></i>', 'color' => '#EF4444'],
+        'multichoice' => [
+            'label' => get_string('qtype_multichoice', 'local_hlai_quizgen'),
+            'icon' => '<i class="fa fa-dot-circle-o"></i>', 'color' => '#3B82F6',
+        ],
+        'truefalse' => [
+            'label' => get_string('qtype_truefalse', 'local_hlai_quizgen'),
+            'icon' => '<i class="fa fa-check"></i>', 'color' => '#10B981',
+        ],
+        'shortanswer' => [
+            'label' => get_string('qtype_shortanswer', 'local_hlai_quizgen'),
+            'icon' => '<i class="fa fa-pencil"></i>', 'color' => '#F59E0B',
+        ],
+        'essay' => [
+            'label' => get_string('qtype_essay', 'local_hlai_quizgen'),
+            'icon' => '<i class="fa fa-file-text-o"></i>', 'color' => '#64748B',
+        ],
+        'scenario' => [
+            'label' => get_string('wizard_qtype_scenario', 'local_hlai_quizgen'),
+            'icon' => '<i class="fa fa-bullseye"></i>', 'color' => '#EF4444',
+        ],
     ];
 
     $html .= html_writer::start_div('hlai-qtype-list');
@@ -2436,7 +2487,8 @@ function local_hlai_quizgen_render_step3(int $courseid, int $requestid): string 
         $html .= html_writer::start_div('hlai-qtype-row', ['data-type' => $type]);
         $html .= html_writer::start_div('hlai-qtype-left hlai-flex-center');
         $iconstyle = 'background: ' . $info['color'] . '15; color: ' . $info['color'] . ';';
-        $html .= html_writer::tag('span', $info['icon'], ['class' => 'hlai-qtype-icon hlai-flex-center-all', 'style' => $iconstyle]);
+        $html .= html_writer::tag('span', $info['icon'],
+            ['class' => 'hlai-qtype-icon hlai-flex-center-all', 'style' => $iconstyle]);
         $html .= html_writer::tag(
             'span',
             $info['label'],
@@ -2586,7 +2638,9 @@ function local_hlai_quizgen_render_step3(int $courseid, int $requestid): string 
     ]);
     $html .= html_writer::start_div('hlai-generating-modal');
     $html .= html_writer::div('', 'loader');
-    $html .= html_writer::tag('h3', '<i class="fa fa-lightbulb-o hlai-icon-primary"></i> ' . get_string('wizard_generating_questions_ellipsis', 'local_hlai_quizgen'), [
+    $html .= html_writer::tag('h3',
+        '<i class="fa fa-lightbulb-o hlai-icon-primary"></i> ' .
+        get_string('wizard_generating_questions_ellipsis', 'local_hlai_quizgen'), [
         'class' => 'generating-title',
     ]);
     $html .= html_writer::tag('p', get_string('wizard_generating_please_wait', 'local_hlai_quizgen'), [
@@ -2626,7 +2680,8 @@ function local_hlai_quizgen_render_step3_5(int $courseid, int $requestid): strin
     if ($request->status === 'failed') {
         $html = html_writer::tag('h3', get_string('generating_questions', 'local_hlai_quizgen'));
         $html .= html_writer::div(
-            get_string('generation_failed', 'local_hlai_quizgen') . ': ' . s($request->error_message ?? get_string('error:unknown', 'local_hlai_quizgen')),
+            get_string('generation_failed', 'local_hlai_quizgen') . ': ' .
+            s($request->error_message ?? get_string('error:unknown', 'local_hlai_quizgen')),
             'notification is-danger is-light mt-4'
         );
         $html .= html_writer::link(
@@ -2722,7 +2777,9 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
         // Spinner styled by CSS class .hlai-generating-modal .loader.
         $html .= html_writer::div('', 'loader');
 
-        $html .= html_writer::tag('h3', '<i class="fa fa-lightbulb-o hlai-icon-primary"></i> ' . get_string('wizard_generating_questions_ellipsis', 'local_hlai_quizgen'), [
+        $html .= html_writer::tag('h3',
+            '<i class="fa fa-lightbulb-o hlai-icon-primary"></i> ' .
+            get_string('wizard_generating_questions_ellipsis', 'local_hlai_quizgen'), [
             'class' => 'title is-5 mb-2',
         ]);
         $html .= html_writer::tag('p', get_string('wizard_generating_please_wait', 'local_hlai_quizgen'), [
@@ -2795,7 +2852,10 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
     $html .= html_writer::start_div('column is-3-desktop is-6-mobile');
     $html .= html_writer::start_div('box has-text-centered');
     $html .= html_writer::span($questions ? count($questions) : 0, 'title is-3 is-block mb-1 has-text-grey-dark');
-    $html .= html_writer::span(get_string('wizard_total_upper', 'local_hlai_quizgen'), 'heading has-text-grey-light is-size-7 has-text-weight-bold');
+    $html .= html_writer::span(
+        get_string('wizard_total_upper', 'local_hlai_quizgen'),
+        'heading has-text-grey-light is-size-7 has-text-weight-bold'
+    );
     $html .= html_writer::end_div();
     $html .= html_writer::end_div();
 
@@ -2803,7 +2863,10 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
     $html .= html_writer::start_div('column is-3-desktop is-6-mobile');
     $html .= html_writer::start_div('box has-text-centered is-success-light');
     $html .= html_writer::span($approvedcount, 'title is-3 is-block mb-1 has-text-success');
-    $html .= html_writer::span(get_string('approved', 'local_hlai_quizgen'), 'heading has-text-success-dark is-size-7 has-text-weight-bold');
+    $html .= html_writer::span(
+        get_string('approved', 'local_hlai_quizgen'),
+        'heading has-text-success-dark is-size-7 has-text-weight-bold'
+    );
     $html .= html_writer::end_div();
     $html .= html_writer::end_div();
 
@@ -2811,7 +2874,10 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
     $html .= html_writer::start_div('column is-3-desktop is-6-mobile');
     $html .= html_writer::start_div('box has-text-centered is-warning-light');
     $html .= html_writer::span($pendingcount, 'title is-3 is-block mb-1 has-text-warning-dark');
-    $html .= html_writer::span(get_string('pending', 'local_hlai_quizgen'), 'heading has-text-warning-dark is-size-7 has-text-weight-bold');
+    $html .= html_writer::span(
+        get_string('pending', 'local_hlai_quizgen'),
+        'heading has-text-warning-dark is-size-7 has-text-weight-bold'
+    );
     $html .= html_writer::end_div();
     $html .= html_writer::end_div();
 
@@ -2819,7 +2885,10 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
     $html .= html_writer::start_div('column is-3-desktop is-6-mobile');
     $html .= html_writer::start_div('box has-text-centered is-danger-light');
     $html .= html_writer::span($rejectedcount, 'title is-3 is-block mb-1 has-text-danger');
-    $html .= html_writer::span(get_string('rejected', 'local_hlai_quizgen'), 'heading has-text-danger-dark is-size-7 has-text-weight-bold');
+    $html .= html_writer::span(
+        get_string('rejected', 'local_hlai_quizgen'),
+        'heading has-text-danger-dark is-size-7 has-text-weight-bold'
+    );
     $html .= html_writer::end_div();
     $html .= html_writer::end_div();
 
@@ -3014,7 +3083,9 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
                 $html .= html_writer::start_div('mt-3');
                 $html .= html_writer::tag(
                     'p',
-                    html_writer::tag('strong', '<i class="fa fa-lightbulb-o mr-2"></i>' . get_string('wizard_model_answer_criteria', 'local_hlai_quizgen')),
+                    html_writer::tag('strong',
+                        '<i class="fa fa-lightbulb-o mr-2"></i>' .
+                        get_string('wizard_model_answer_criteria', 'local_hlai_quizgen')),
                     ['class' => 'has-text-grey-dark mb-2']
                 );
                 $html .= html_writer::div(format_text($modelanswer, FORMAT_HTML), 'model-answer hlai-model-answer');
@@ -3090,7 +3161,9 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
                 'sesskey' => sesskey(),
                 'step' => 4,
             ]);
-            $html .= html_writer::link($rejecturl, get_string('wizard_reject', 'local_hlai_quizgen'), ['class' => 'card-footer-item has-text-danger']);
+            $html .= html_writer::link($rejecturl,
+                get_string('wizard_reject', 'local_hlai_quizgen'),
+                ['class' => 'card-footer-item has-text-danger']);
         }
 
         $maxregens = get_config('local_hlai_quizgen', 'max_regenerations') ?: 5;
@@ -3104,7 +3177,9 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
                 'sesskey' => sesskey(),
                 'step' => 4,
             ]);
-            $html .= html_writer::link($regenurl, get_string('regenerate_question', 'local_hlai_quizgen') . ' (' . $remainingregens . ')', [
+            $html .= html_writer::link($regenurl,
+                get_string('regenerate_question', 'local_hlai_quizgen') .
+                ' (' . $remainingregens . ')', [
                 'class' => 'card-footer-item has-text-info',
             ]);
         }
@@ -3222,7 +3297,9 @@ function local_hlai_quizgen_render_step5(int $courseid, int $requestid): string 
     $readyinfo->approved = $approvedcount;
     $readyinfo->total = $totalcount;
     $html .= html_writer::div(
-        html_writer::tag('strong', "<i class='fa fa-check-circle'></i> " . get_string('wizard_approved_ready_deploy', 'local_hlai_quizgen', $readyinfo)),
+        html_writer::tag('strong',
+            "<i class='fa fa-check-circle'></i> " .
+            get_string('wizard_approved_ready_deploy', 'local_hlai_quizgen', $readyinfo)),
         'notification is-success'
     );
 
@@ -3318,7 +3395,9 @@ function local_hlai_quizgen_render_step5(int $courseid, int $requestid): string 
     ]);
     $html .= html_writer::start_div('control');
     // Use request's category_name if available, otherwise default to 'AI Generated Questions'.
-    $defaultcategoryname = !empty($request->category_name) ? $request->category_name : get_string('wizard_ai_generated_questions', 'local_hlai_quizgen');
+    $defaultcategoryname = !empty($request->category_name)
+        ? $request->category_name
+        : get_string('wizard_ai_generated_questions', 'local_hlai_quizgen');
     $html .= html_writer::empty_tag('input', [
         'type' => 'text',
         'name' => 'category_name',

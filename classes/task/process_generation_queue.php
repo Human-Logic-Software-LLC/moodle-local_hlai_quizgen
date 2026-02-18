@@ -26,7 +26,6 @@
 
 namespace local_hlai_quizgen\task;
 
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * Process generation queue task.

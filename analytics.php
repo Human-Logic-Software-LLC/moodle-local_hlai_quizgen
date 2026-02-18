@@ -227,8 +227,10 @@ echo $OUTPUT->header();
     <div class="level mb-5">
         <div class="level-left">
             <div>
-                <h1 class="title is-4 mb-1"><i class="fa fa-bar-chart hlai-icon-primary"></i> <?php echo get_string('analytics_dashboard', 'local_hlai_quizgen'); ?></h1>
-                <p class="subtitle is-6 has-text-grey"><?php echo get_string('analytics_dashboard_subtitle', 'local_hlai_quizgen'); ?></p>
+                <h1 class="title is-4 mb-1"><i class="fa fa-bar-chart hlai-icon-primary"></i>
+                    <?php echo get_string('analytics_dashboard', 'local_hlai_quizgen'); ?></h1>
+                <p class="subtitle is-6 has-text-grey">
+                    <?php echo get_string('analytics_dashboard_subtitle', 'local_hlai_quizgen'); ?></p>
             </div>
         </div>
         <div class="level-right">
@@ -245,7 +247,8 @@ echo $OUTPUT->header();
     <!-- Time Range Filter -->
     <div class="box mb-4">
         <div class="is-flex is-align-items-center">
-            <span class="has-text-weight-semibold mr-3"><i class="fa fa-calendar hlai-icon-info"></i> <?php echo get_string('analytics_time_range', 'local_hlai_quizgen'); ?></span>
+            <span class="has-text-weight-semibold mr-3"><i class="fa fa-calendar hlai-icon-info"></i>
+                <?php echo get_string('analytics_time_range', 'local_hlai_quizgen'); ?></span>
             <div class="buttons has-addons">
                 <a href="?courseid=<?php echo $courseid; ?>&timerange=7"
                    class="button is-small <?php echo $timerange === '7' ? 'is-primary' : 'is-light'; ?>">
@@ -290,7 +293,8 @@ echo $OUTPUT->header();
                 <p class="is-size-3"><i class="fa fa-check-circle hlai-icon-success"></i></p>
                 <p class="title is-4 mb-1"><?php echo $approvedquestions; ?></p>
                 <p class="heading"><?php echo get_string('approved', 'local_hlai_quizgen'); ?></p>
-                <p class="help has-text-grey"><?php echo get_string('analytics_pct_acceptance', 'local_hlai_quizgen', $acceptancerate); ?></p>
+                <p class="help has-text-grey">
+                    <?php echo get_string('analytics_pct_acceptance', 'local_hlai_quizgen', $acceptancerate); ?></p>
             </div>
         </div>
         <div class="column">
@@ -323,16 +327,20 @@ echo $OUTPUT->header();
     <div class="columns">
         <div class="column is-half">
             <div class="box">
-                <p class="title is-6"><i class="fa fa-filter hlai-icon-info"></i> <?php echo get_string('analytics_review_funnel', 'local_hlai_quizgen'); ?></p>
-                <p class="has-text-grey is-size-7"><?php echo get_string('analytics_review_funnel_desc', 'local_hlai_quizgen'); ?></p>
+                <p class="title is-6"><i class="fa fa-filter hlai-icon-info"></i>
+                    <?php echo get_string('analytics_review_funnel', 'local_hlai_quizgen'); ?></p>
+                <p class="has-text-grey is-size-7">
+                    <?php echo get_string('analytics_review_funnel_desc', 'local_hlai_quizgen'); ?></p>
                 <div id="funnel-chart" class="hlai-chart-h350"></div>
             </div>
         </div>
 
         <div class="column is-half">
             <div class="box">
-                <p class="title is-6"><i class="fa fa-star hlai-icon-warning"></i> <?php echo get_string('analytics_quality_score_dist', 'local_hlai_quizgen'); ?></p>
-                <p class="has-text-grey is-size-7"><?php echo get_string('analytics_quality_score_dist_desc', 'local_hlai_quizgen'); ?></p>
+                <p class="title is-6"><i class="fa fa-star hlai-icon-warning"></i>
+                    <?php echo get_string('analytics_quality_score_dist', 'local_hlai_quizgen'); ?></p>
+                <p class="has-text-grey is-size-7">
+                    <?php echo get_string('analytics_quality_score_dist_desc', 'local_hlai_quizgen'); ?></p>
                 <div id="quality-dist-chart" class="hlai-chart-h350"></div>
             </div>
         </div>
@@ -340,7 +348,8 @@ echo $OUTPUT->header();
 
     <!-- Question Type Analysis -->
     <div class="box mt-4">
-        <p class="title is-6"><i class="fa fa-clipboard hlai-icon-secondary"></i> <?php echo get_string('analytics_type_performance', 'local_hlai_quizgen'); ?></p>
+        <p class="title is-6"><i class="fa fa-clipboard hlai-icon-secondary"></i>
+            <?php echo get_string('analytics_type_performance', 'local_hlai_quizgen'); ?></p>
         <p class="has-text-grey is-size-7"><?php echo get_string('analytics_type_performance_desc', 'local_hlai_quizgen'); ?></p>
         <div class="columns">
             <div class="column is-half">
@@ -355,7 +364,8 @@ echo $OUTPUT->header();
                                 <th class="has-text-right"><?php echo get_string('analytics_total', 'local_hlai_quizgen'); ?></th>
                                 <th class="has-text-right"><?php echo get_string('approved', 'local_hlai_quizgen'); ?></th>
                                 <th class="has-text-right"><?php echo get_string('analytics_rate', 'local_hlai_quizgen'); ?></th>
-                                <th class="has-text-right"><?php echo get_string('analytics_avg_regen', 'local_hlai_quizgen'); ?></th>
+                                <th class="has-text-right">
+                                    <?php echo get_string('analytics_avg_regen', 'local_hlai_quizgen'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -393,15 +403,19 @@ echo $OUTPUT->header();
     <div class="columns mt-4">
         <div class="column is-half">
             <div class="box">
-                <p class="title is-6"><i class="fa fa-signal hlai-icon-info"></i> <?php echo get_string('analytics_difficulty_analysis', 'local_hlai_quizgen'); ?></p>
-                <p class="has-text-grey is-size-7"><?php echo get_string('analytics_difficulty_analysis_desc', 'local_hlai_quizgen'); ?></p>
+                <p class="title is-6"><i class="fa fa-signal hlai-icon-info"></i>
+                    <?php echo get_string('analytics_difficulty_analysis', 'local_hlai_quizgen'); ?></p>
+                <p class="has-text-grey is-size-7">
+                    <?php echo get_string('analytics_difficulty_analysis_desc', 'local_hlai_quizgen'); ?></p>
                 <div id="difficulty-analysis-chart" class="hlai-chart-h350"></div>
             </div>
         </div>
         <div class="column is-half">
             <div class="box">
-                <p class="title is-6"><i class="fa fa-lightbulb-o hlai-icon-primary"></i> <?php echo get_string('blooms_coverage', 'local_hlai_quizgen'); ?></p>
-                <p class="has-text-grey is-size-7"><?php echo get_string('analytics_cognitive_level_dist', 'local_hlai_quizgen'); ?></p>
+                <p class="title is-6"><i class="fa fa-lightbulb-o hlai-icon-primary"></i>
+                    <?php echo get_string('blooms_coverage', 'local_hlai_quizgen'); ?></p>
+                <p class="has-text-grey is-size-7">
+                    <?php echo get_string('analytics_cognitive_level_dist', 'local_hlai_quizgen'); ?></p>
                 <div id="blooms-coverage-chart" class="hlai-chart-h350"></div>
             </div>
         </div>
@@ -409,15 +423,18 @@ echo $OUTPUT->header();
 
     <!-- Regeneration Analysis -->
     <div class="box mt-4">
-        <p class="title is-6"><i class="fa fa-refresh hlai-icon-warning"></i> <?php echo get_string('analytics_regen_analysis', 'local_hlai_quizgen'); ?></p>
+        <p class="title is-6"><i class="fa fa-refresh hlai-icon-warning"></i>
+            <?php echo get_string('analytics_regen_analysis', 'local_hlai_quizgen'); ?></p>
         <p class="has-text-grey is-size-7"><?php echo get_string('analytics_regen_analysis_desc', 'local_hlai_quizgen'); ?></p>
         <div class="columns">
             <div class="column is-half">
-                <p class="has-text-weight-semibold mb-3"><?php echo get_string('analytics_regen_distribution', 'local_hlai_quizgen'); ?></p>
+                <p class="has-text-weight-semibold mb-3">
+                    <?php echo get_string('analytics_regen_distribution', 'local_hlai_quizgen'); ?></p>
                 <div id="regen-dist-chart" class="hlai-chart-h280"></div>
             </div>
             <div class="column is-half">
-                <p class="has-text-weight-semibold mb-3"><?php echo get_string('analytics_regen_by_difficulty', 'local_hlai_quizgen'); ?></p>
+                <p class="has-text-weight-semibold mb-3">
+                    <?php echo get_string('analytics_regen_by_difficulty', 'local_hlai_quizgen'); ?></p>
                 <div id="regen-by-difficulty-chart" class="hlai-chart-h280"></div>
             </div>
         </div>
@@ -426,7 +443,8 @@ echo $OUTPUT->header();
     <!-- Rejection Analysis -->
     <?php if (!empty($rejectionreasons)) : ?>
     <div class="box mt-4">
-        <p class="title is-6"><i class="fa fa-times-circle hlai-icon-danger"></i> <?php echo get_string('analytics_rejection_analysis', 'local_hlai_quizgen'); ?></p>
+        <p class="title is-6"><i class="fa fa-times-circle hlai-icon-danger"></i>
+            <?php echo get_string('analytics_rejection_analysis', 'local_hlai_quizgen'); ?></p>
         <p class="has-text-grey is-size-7"><?php echo get_string('analytics_rejection_analysis_desc', 'local_hlai_quizgen'); ?></p>
         <div class="columns">
             <div class="column is-half">
@@ -434,7 +452,8 @@ echo $OUTPUT->header();
             </div>
             <div class="column is-half">
                 <div class="box">
-                    <p class="title is-6 mb-3"><?php echo get_string('analytics_top_rejection_reasons', 'local_hlai_quizgen'); ?></p>
+                    <p class="title is-6 mb-3">
+                        <?php echo get_string('analytics_top_rejection_reasons', 'local_hlai_quizgen'); ?></p>
                     <ul class="hlai-simple-list">
                         <?php foreach ($rejectionreasons as $reason) : ?>
                         <li class="is-flex is-justify-content-space-between is-align-items-center">
@@ -451,14 +470,16 @@ echo $OUTPUT->header();
 
     <!-- Trends Over Time -->
     <div class="box mt-4">
-        <p class="title is-6"><i class="fa fa-line-chart hlai-icon-primary"></i> <?php echo get_string('analytics_trends_over_time', 'local_hlai_quizgen'); ?></p>
+        <p class="title is-6"><i class="fa fa-line-chart hlai-icon-primary"></i>
+            <?php echo get_string('analytics_trends_over_time', 'local_hlai_quizgen'); ?></p>
         <p class="has-text-grey is-size-7"><?php echo get_string('analytics_trends_over_time_desc', 'local_hlai_quizgen'); ?></p>
         <div id="trends-chart" class="hlai-chart-h350"></div>
     </div>
 
     <!-- Insights & Recommendations -->
     <div class="box mt-4">
-        <p class="title is-6"><i class="fa fa-lightbulb-o hlai-icon-warning"></i> <?php echo get_string('analytics_insights_recommendations', 'local_hlai_quizgen'); ?></p>
+        <p class="title is-6"><i class="fa fa-lightbulb-o hlai-icon-warning"></i>
+            <?php echo get_string('analytics_insights_recommendations', 'local_hlai_quizgen'); ?></p>
         <div class="columns">
             <?php
             // Generate insights based on data.

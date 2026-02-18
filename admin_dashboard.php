@@ -254,7 +254,8 @@ echo $OUTPUT->header();
     <!-- Page Title -->
     <div class="page-title-section">
         <h1>
-            <i class="fa fa-line-chart hlai-icon-admin-primary"></i> <?php echo get_string('admin_site_analytics_title', 'local_hlai_quizgen'); ?>
+            <i class="fa fa-line-chart hlai-icon-admin-primary"></i>
+            <?php echo get_string('admin_site_analytics_title', 'local_hlai_quizgen'); ?>
         </h1>
         <p class="page-subtitle">
             <?php echo get_string('admin_site_analytics_subtitle', 'local_hlai_quizgen'); ?>
@@ -297,7 +298,9 @@ echo $OUTPUT->header();
                 </div>
                 <div class="stat-label"><?php echo get_string('admin_active_teachers', 'local_hlai_quizgen'); ?></div>
                 <div class="stat-value"><?php echo number_format($activeteachers); ?></div>
-                <div class="stat-subtext"><?php echo get_string('admin_adoption_rate', 'local_hlai_quizgen', $adoptionrate); ?></div>
+                <div class="stat-subtext">
+                    <?php echo get_string('admin_adoption_rate', 'local_hlai_quizgen', $adoptionrate); ?>
+                </div>
             </div>
         </div>
 
@@ -309,7 +312,9 @@ echo $OUTPUT->header();
                 </div>
                 <div class="stat-label"><?php echo get_string('admin_courses_using_plugin', 'local_hlai_quizgen'); ?></div>
                 <div class="stat-value"><?php echo number_format($activecourses); ?></div>
-                <div class="stat-subtext"><?php echo get_string('admin_course_coverage', 'local_hlai_quizgen', $coursecoverage); ?></div>
+                <div class="stat-subtext">
+                    <?php echo get_string('admin_course_coverage', 'local_hlai_quizgen', $coursecoverage); ?>
+                </div>
             </div>
         </div>
 
@@ -412,7 +417,13 @@ echo $OUTPUT->header();
                                 <strong class="performer-name"><?php echo format_string($course->fullname); ?></strong>
                             </div>
                             <span class="performer-badge">
-                                <?php echo get_string('admin_questions_count', 'local_hlai_quizgen', number_format($course->question_count)); ?>
+                                <?php
+                                echo get_string(
+                                    'admin_questions_count',
+                                    'local_hlai_quizgen',
+                                    number_format($course->question_count)
+                                );
+                                ?>
                             </span>
                         </div>
                     <?php endforeach; ?>
@@ -473,7 +484,11 @@ echo $OUTPUT->header();
                         <strong><?php echo get_string('admin_ai_provider_status', 'local_hlai_quizgen'); ?></strong>
                         <span class="health-indicator <?php echo $aiproviderconfigured ? 'is-healthy' : 'is-error'; ?>">
                             <i class="fa <?php echo $aiproviderconfigured ? 'fa-check-circle' : 'fa-times-circle'; ?>"></i>
-                            <?php echo $aiproviderconfigured ? get_string('admin_connected', 'local_hlai_quizgen') : get_string('admin_not_configured', 'local_hlai_quizgen'); ?>
+                            <?php
+                            echo $aiproviderconfigured
+                                ? get_string('admin_connected', 'local_hlai_quizgen')
+                                : get_string('admin_not_configured', 'local_hlai_quizgen');
+                            ?>
                         </span>
                     </div>
                     <div class="health-metric">

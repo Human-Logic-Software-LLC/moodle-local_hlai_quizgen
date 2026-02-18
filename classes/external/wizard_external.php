@@ -172,7 +172,10 @@ class wizard_external extends \external_api {
      */
     public static function get_progress_returns(): \external_single_structure {
         return new \external_single_structure([
-            'status' => new \external_value(PARAM_TEXT, 'Request status (pending, analyzing, topics_ready, processing, completed, failed)'),
+            'status' => new \external_value(
+                PARAM_TEXT,
+                'Request status (pending, analyzing, topics_ready, processing, completed, failed)'
+            ),
             'progress' => new \external_value(PARAM_FLOAT, 'Progress percentage 0-100'),
             'message' => new \external_value(PARAM_TEXT, 'Current progress message', VALUE_OPTIONAL),
             'questions_generated' => new \external_value(PARAM_INT, 'Number of questions generated so far'),

@@ -497,7 +497,9 @@ class diagnostic_external extends \external_api {
     public static function diagnose_parameters() {
         return new \external_function_parameters([
             'requestid' => new \external_value(PARAM_INT, 'Request ID to diagnose (0 if not used)', VALUE_DEFAULT, 0),
-            'courseid' => new \external_value(PARAM_INT, 'Course ID to diagnose all requests for (0 if not used)', VALUE_DEFAULT, 0),
+            'courseid' => new \external_value(
+                PARAM_INT, 'Course ID to diagnose all requests for (0 if not used)', VALUE_DEFAULT, 0
+            ),
         ]);
     }
 

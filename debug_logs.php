@@ -102,4 +102,3 @@ $page = new \local_hlai_quizgen\output\debug_logs_page($tab, $requestid, $level,
 echo $OUTPUT->render_from_template('local_hlai_quizgen/debug_logs', $page->export_for_template($OUTPUT));
 
 echo $OUTPUT->footer();
-
