@@ -1175,17 +1175,26 @@ body.path-local-hlai_quizgen {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
 }
 
 .hlai-quizgen-wrapper .level-left,
 .hlai-quizgen-wrapper .level-right {
     display: flex !important;
     align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
 }
 
 .hlai-quizgen-wrapper .level-item {
     display: flex !important;
     align-items: center !important;
+    margin-right: 0.75rem !important;
+}
+
+.hlai-quizgen-wrapper .level-item:last-child {
+    margin-right: 0 !important;
 }
 
 /* ==========================================================================

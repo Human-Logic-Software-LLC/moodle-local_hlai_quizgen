@@ -1294,7 +1294,20 @@ function local_hlai_quizgen_handle_deploy_questions(int $requestid, int $coursei
 
             // Save category name to request record for future reference.
             if (!empty($categoryname)) {
-                $DB->set_field('local_hlai_quizgen_requests', 'category_name', $categoryname, ['id' => $requestid]);
+                try {
+                    $DB->set_field(
+                        'local_hlai_quizgen_requests',
+                        'category_name',
+                        $categoryname,
+                        ['id' => $requestid]
+                    );
+                } catch (\Exception $e) {
+                    debugging(
+                        'handle_deploy_questions: Could not save category_name: '
+                        . $e->getMessage(),
+                        DEBUG_DEVELOPER
+                    );
+                }
             }
 
             // Post-deployment verification with auto-recovery.
@@ -3311,8 +3324,8 @@ function local_hlai_quizgen_render_step5(int $courseid, int $requestid): string 
         return '';
     }
 
-    // Get request record for category_name.
-    $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid], 'category_name');
+    // Get request record for category_name (fetch full record for compatibility).
+    $request = $DB->get_record('local_hlai_quizgen_requests', ['id' => $requestid]);
 
     $html = html_writer::start_div('hlai-step-content');
 
@@ -3468,7 +3481,7 @@ function local_hlai_quizgen_render_step5(int $courseid, int $requestid): string 
     ]);
     $html .= html_writer::start_div('control');
     // Use request's category_name if available, otherwise default to 'AI Generated Questions'.
-    $defaultcategoryname = !empty($request->category_name)
+    $defaultcategoryname = (!empty($request) && !empty($request->category_name))
         ? $request->category_name
         : get_string('wizard_ai_generated_questions', 'local_hlai_quizgen');
     $html .= html_writer::empty_tag('input', [
