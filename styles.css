@@ -1,0 +1,316 @@
+/**
+ * Styles for AI Quiz Generator plugin.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 Human Logic Software LLC
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+/* Wizard container */
+.hlai-quizgen-wizard {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Step indicator */
+.wizard-steps {
+    display: flex;
+    justify-content: space-between;
+    margin: 30px 0;
+    padding: 0;
+    list-style: none;
+}
+
+.wizard-step {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    padding: 10px;
+}
+
+.wizard-step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 30px;
+    right: -50%;
+    width: 100%;
+    height: 2px;
+    background: #ddd;
+    z-index: -1;
+}
+
+.wizard-step.completed:not(:last-child)::after {
+    background: #28a745;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 50%;
+    background: #ddd;
+    color: #666;
+    margin: 0 auto 10px;
+    font-weight: bold;
+}
+
+.wizard-step.active .step-number {
+    background: #007bff;
+    color: #fff;
+}
+
+.wizard-step.completed .step-number {
+    background: #28a745;
+    color: #fff;
+}
+
+.step-title {
+    font-size: 0.9em;
+    color: #666;
+}
+
+.wizard-step.active .step-title {
+    color: #007bff;
+    font-weight: bold;
+}
+
+/* Step content */
+.wizard-step-content {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 30px;
+    min-height: 400px;
+}
+
+/* Content upload section */
+.content-upload-section,
+.activity-selection-section {
+    margin: 20px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 5px;
+}
+
+#content-files {
+    margin: 10px 0;
+}
+
+/* Topics display */
+.topics-container {
+    margin: 20px 0;
+}
+
+.topic-item {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 10px 0;
+}
+
+.topic-item.selected {
+    border-color: #007bff;
+    background: #f0f8ff;
+}
+
+.topic-item h5 {
+    margin: 0 0 10px 0;
+    color: #333;
+}
+
+.topic-item p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.subtopic-item {
+    margin-left: 30px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-left: 3px solid #007bff;
+    margin-top: 5px;
+}
+
+/* Question review */
+.question-card {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 15px 0;
+}
+
+.question-card.approved {
+    border-color: #28a745;
+    background: #f0fff4;
+}
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.question-type-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 0.85em;
+    font-weight: bold;
+}
+
+.question-type-badge.multichoice {
+    background: #007bff;
+    color: #fff;
+}
+
+.question-type-badge.truefalse {
+    background: #6c757d;
+    color: #fff;
+}
+
+.question-type-badge.shortanswer {
+    background: #17a2b8;
+    color: #fff;
+}
+
+.question-type-badge.essay {
+    background: #ffc107;
+    color: #000;
+}
+
+.difficulty-badge {
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 0.85em;
+}
+
+.difficulty-badge.easy {
+    background: #d4edda;
+    color: #155724;
+}
+
+.difficulty-badge.medium {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.difficulty-badge.hard {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.question-actions {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #ddd;
+}
+
+.question-actions button {
+    margin-right: 5px;
+}
+
+/* Answer options */
+.answer-option {
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 3px;
+}
+
+.answer-option.correct {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+}
+
+.answer-option.incorrect {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
+
+/* Navigation */
+.wizard-navigation {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #ddd;
+}
+
+/* Loading spinner */
+.loading-spinner {
+    text-align: center;
+    padding: 40px;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Alerts */
+.alert {
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 5px;
+}
+
+.alert-info {
+    background: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
+}
+
+.alert-success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.alert-warning {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+}
+
+.alert-danger {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+/* Statistics */
+.stats-card {
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 10px 0;
+    text-align: center;
+}
+
+.stats-number {
+    font-size: 2em;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.stats-label {
+    color: #666;
+    font-size: 0.9em;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .wizard-steps {
+        flex-direction: column;
+    }
+    
+    .wizard-step:not(:last-child)::after {
+        display: none;
+    }
+    
+    .wizard-step {
+        margin-bottom: 20px;
+    }
+}
