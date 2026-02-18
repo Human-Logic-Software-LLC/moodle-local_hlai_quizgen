@@ -1126,10 +1126,10 @@ function local_hlai_quizgen_auto_recover_tracking(array $questionids, int $cours
             $contextids[] = $mctx->id;
         }
     } catch (\Exception $e) {
-        debugging("DEBUG auto_recover_tracking: Could not get module contexts: " . $e->getMessage(), DEBUG_DEVELOPER);
+        debugging("auto_recover_tracking: Could not get module contexts: " . $e->getMessage(), DEBUG_DEVELOPER);
     }
 
-    debugging("DEBUG auto_recover_tracking: Searching in " .
+    debugging("auto_recover_tracking: Searching in " .
         count($contextids) . " contexts for course $courseid", DEBUG_DEVELOPER);
 
     // Build placeholders for IN clause.
@@ -1179,7 +1179,7 @@ function local_hlai_quizgen_auto_recover_tracking(array $questionids, int $cours
                 $updateobj->timedeployed = time();
                 $DB->update_record('local_hlai_quizgen_questions', $updateobj);
                 $recovered++;
-                debugging("DEBUG auto_recover_tracking: Auto-linked plugin question " .
+                debugging("auto_recover_tracking: Auto-linked plugin question " .
                     "$qid to Moodle question {$match->id}", DEBUG_DEVELOPER);
                 continue;
             }
@@ -1217,13 +1217,13 @@ function local_hlai_quizgen_auto_recover_tracking(array $questionids, int $cours
 function local_hlai_quizgen_handle_deploy_questions(int $requestid, int $courseid) {
     global $DB;
 
-    debugging("DEBUG handle_deploy_questions: Starting deployment for request $requestid, course $courseid", DEBUG_DEVELOPER);
+    debugging("handle_deploy_questions: Starting deployment for request $requestid, course $courseid", DEBUG_DEVELOPER);
 
     $deploytype = required_param('deploy_type', PARAM_TEXT);
     $quizname = optional_param('quiz_name', '', PARAM_TEXT);
     $categoryname = optional_param('category_name', '', PARAM_TEXT);
 
-    debugging("DEBUG handle_deploy_questions: deploy_type=$deploytype, quiz_name=$quizname", DEBUG_DEVELOPER);
+    debugging("handle_deploy_questions: deploy_type=$deploytype, quiz_name=$quizname", DEBUG_DEVELOPER);
 
     // Get only approved questions for this request.
     $questions = $DB->get_records('local_hlai_quizgen_questions', [
@@ -1232,7 +1232,7 @@ function local_hlai_quizgen_handle_deploy_questions(int $requestid, int $coursei
     ], '', 'id, questiontype');
     $questionids = array_keys($questions);
 
-    debugging("DEBUG handle_deploy_questions: Found " . count($questionids) . " approved questions", DEBUG_DEVELOPER);
+    debugging("handle_deploy_questions: Found " . count($questionids) . " approved questions", DEBUG_DEVELOPER);
 
     if (empty($questionids)) {
         // Check if there are ANY questions for this request.
@@ -1259,13 +1259,13 @@ function local_hlai_quizgen_handle_deploy_questions(int $requestid, int $coursei
     foreach ($questions as $q) {
         $qtypes[] = $q->questiontype ?? 'unknown';
     }
-    debugging("DEBUG handle_deploy_questions: Question types to deploy: " . implode(', ', $qtypes), DEBUG_DEVELOPER);
+    debugging("handle_deploy_questions: Question types to deploy: " . implode(', ', $qtypes), DEBUG_DEVELOPER);
 
     try {
         $deployer = new \local_hlai_quizgen\quiz_deployer();
 
         if ($deploytype === 'new_quiz') {
-            debugging("DEBUG handle_deploy_questions: Creating new quiz...", DEBUG_DEVELOPER);
+            debugging("handle_deploy_questions: Creating new quiz...", DEBUG_DEVELOPER);
             $cmid = $deployer->create_quiz($questionids, $courseid, $quizname);
 
             // Post-deployment verification with auto-recovery.
@@ -1289,7 +1289,7 @@ function local_hlai_quizgen_handle_deploy_questions(int $requestid, int $coursei
                 );
             }
         } else {
-            debugging("DEBUG handle_deploy_questions: Deploying to question bank...", DEBUG_DEVELOPER);
+            debugging("handle_deploy_questions: Deploying to question bank...", DEBUG_DEVELOPER);
             $moodlequestionids = $deployer->deploy_to_question_bank($questionids, $courseid, $categoryname);
 
             // Save category name to request record for future reference.
@@ -1327,8 +1327,8 @@ function local_hlai_quizgen_handle_deploy_questions(int $requestid, int $coursei
         $fullerror = get_class($e) . ': ' . $e->getMessage();
         $debuginfo = " [File: " . $e->getFile() . ":" . $e->getLine() . "]";
 
-        debugging("DEBUG handle_deploy_questions: DEPLOYMENT FAILED - $fullerror $debuginfo", DEBUG_DEVELOPER);
-        debugging("DEBUG handle_deploy_questions: Stack trace: " . $e->getTraceAsString(), DEBUG_DEVELOPER);
+        debugging("handle_deploy_questions: DEPLOYMENT FAILED - $fullerror $debuginfo", DEBUG_DEVELOPER);
+        debugging("handle_deploy_questions: Stack trace: " . $e->getTraceAsString(), DEBUG_DEVELOPER);
 
         // Try to log the error.
         try {
@@ -1339,7 +1339,7 @@ function local_hlai_quizgen_handle_deploy_questions(int $requestid, int $coursei
                 \local_hlai_quizgen\error_handler::SEVERITY_ERROR
             );
         } catch (\Throwable $logerror) {
-            debugging("DEBUG handle_deploy_questions: Failed to log error: " . $logerror->getMessage(), DEBUG_DEVELOPER);
+            debugging("handle_deploy_questions: Failed to log error: " . $logerror->getMessage(), DEBUG_DEVELOPER);
         }
 
         // Show the full error message to the user for debugging.

@@ -59,7 +59,7 @@ class quiz_deployer {
         global $DB, $USER;
 
         debugging(
-            "DEBUG deploy_to_question_bank: Starting with " . count($questionids) .
+            "deploy_to_question_bank: Starting with " . count($questionids) .
             " questions, courseid=$courseid, modulecontext=" . ($modulecontext ? $modulecontext->id : 'null'),
             DEBUG_DEVELOPER
         );
@@ -76,7 +76,7 @@ class quiz_deployer {
         try {
             $category = self::get_or_create_category($courseid, $categoryname, $modulecontext);
             debugging(
-                "DEBUG deploy_to_question_bank: Got/created category ID: " .
+                "deploy_to_question_bank: Got/created category ID: " .
                 $category->id . " contextid: " . $category->contextid,
                 DEBUG_DEVELOPER
             );
@@ -95,12 +95,12 @@ class quiz_deployer {
 
         foreach ($questionids as $questionid) {
             try {
-                debugging("DEBUG deploy_to_question_bank: Processing question ID: $questionid", DEBUG_DEVELOPER);
+                debugging("deploy_to_question_bank: Processing question ID: $questionid", DEBUG_DEVELOPER);
 
                 // Get question from our table.
                 $genquestion = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
                 debugging(
-                    "DEBUG deploy_to_question_bank: Loaded genquestion, type=" .
+                    "deploy_to_question_bank: Loaded genquestion, type=" .
                     ($genquestion->questiontype ?? 'null'),
                     DEBUG_DEVELOPER
                 );
@@ -110,7 +110,7 @@ class quiz_deployer {
                 if (!empty($genquestion->moodle_questionid)) {
                     $existingmq = $DB->get_record('question', ['id' => $genquestion->moodle_questionid]);
                     if ($existingmq) {
-                        debugging("DEBUG deploy_to_question_bank: Question $questionid already linked to Moodle question "
+                        debugging("deploy_to_question_bank: Question $questionid already linked to Moodle question "
                             . "{$genquestion->moodle_questionid} - skipping", DEBUG_DEVELOPER);
                         $deployedids[] = (int)$genquestion->moodle_questionid;
                         $DB->set_field('local_hlai_quizgen_questions', 'status', 'deployed', ['id' => $questionid]);
@@ -118,7 +118,7 @@ class quiz_deployer {
                         continue;
                     }
                     // Moodle question was deleted - clear stale reference and re-create.
-                    debugging("DEBUG deploy_to_question_bank: Stale moodle_questionid "
+                    debugging("deploy_to_question_bank: Stale moodle_questionid "
                         . "{$genquestion->moodle_questionid} for question $questionid - will re-create", DEBUG_DEVELOPER);
                 }
 
@@ -132,7 +132,7 @@ class quiz_deployer {
                 );
                 if ($existingmoodleid) {
                     debugging(
-                        "DEBUG deploy_to_question_bank: Found existing Moodle " .
+                        "deploy_to_question_bank: Found existing Moodle " .
                         "question $existingmoodleid for plugin question $questionid - linking",
                         DEBUG_DEVELOPER
                     );
@@ -161,7 +161,7 @@ class quiz_deployer {
                     );
                     $questionnumber++;
 
-                    debugging("DEBUG deploy_to_question_bank: Created Moodle question ID: $moodlequestionid", DEBUG_DEVELOPER);
+                    debugging("deploy_to_question_bank: Created Moodle question ID: $moodlequestionid", DEBUG_DEVELOPER);
 
                     // Save tracking in the SAME transaction - atomic with question creation.
                     $updateobj = new \stdClass();
@@ -192,7 +192,7 @@ class quiz_deployer {
                     // COMMIT: Both question creation and tracking succeeded.
                     $transaction->allow_commit();
                     debugging(
-                        "DEBUG deploy_to_question_bank: COMMITTED transaction - " .
+                        "deploy_to_question_bank: COMMITTED transaction - " .
                         "moodle_questionid=$moodlequestionid saved for plugin question $questionid",
                         DEBUG_DEVELOPER
                     );
@@ -203,10 +203,10 @@ class quiz_deployer {
                         $transaction->rollback($txex);
                     } catch (\Exception $rbex) {
                         // Rollback itself can throw - just log it.
-                        debugging("DEBUG deploy_to_question_bank: Rollback exception: " . $rbex->getMessage(), DEBUG_DEVELOPER);
+                        debugging("deploy_to_question_bank: Rollback exception: " . $rbex->getMessage(), DEBUG_DEVELOPER);
                     }
                     debugging(
-                        "DEBUG deploy_to_question_bank: ROLLED BACK transaction " .
+                        "deploy_to_question_bank: ROLLED BACK transaction " .
                         "for question $questionid: " . $txex->getMessage(),
                         DEBUG_DEVELOPER
                     );
@@ -224,20 +224,20 @@ class quiz_deployer {
                     ]);
                 } catch (\Exception $logex) {
                     debugging(
-                        "DEBUG deploy_to_question_bank: Warning - log_action failed: " .
+                        "deploy_to_question_bank: Warning - log_action failed: " .
                         $logex->getMessage(),
                         DEBUG_DEVELOPER
                     );
                 }
             } catch (\Exception $e) {
                 $errormsg = "Question $questionid: " . $e->getMessage();
-                debugging("DEBUG deploy_to_question_bank: ERROR - $errormsg", DEBUG_DEVELOPER);
+                debugging("deploy_to_question_bank: ERROR - $errormsg", DEBUG_DEVELOPER);
                 $errors[] = $errormsg;
             }
         }
 
         debugging(
-            "DEBUG deploy_to_question_bank: Completed. Deployed: " . count($deployedids) .
+            "deploy_to_question_bank: Completed. Deployed: " . count($deployedids) .
             ", Errors: " . count($errors),
             DEBUG_DEVELOPER
         );
@@ -299,7 +299,7 @@ class quiz_deployer {
 
         if ($existing) {
             debugging(
-                "DEBUG find_existing_moodle_question: Found match - Moodle question " .
+                "find_existing_moodle_question: Found match - Moodle question " .
                 "{$existing->id} for plugin question {$genquestion->id}",
                 DEBUG_DEVELOPER
             );
@@ -376,7 +376,7 @@ class quiz_deployer {
         $quizid = $DB->insert_record('quiz', $quiz);
         $quiz->id = $quizid;
 
-        debugging("DEBUG create_quiz: Created quiz ID: $quizid", DEBUG_DEVELOPER);
+        debugging("create_quiz: Created quiz ID: $quizid", DEBUG_DEVELOPER);
 
         // Create course module.
         $moduleinfo = new \stdClass();
@@ -405,9 +405,9 @@ class quiz_deployer {
             $quizsection->shufflequestions = 0;
 
             $DB->insert_record('quiz_sections', $quizsection);
-            debugging("DEBUG create_quiz: Created quiz_sections entry for quiz $quizid", DEBUG_DEVELOPER);
+            debugging("create_quiz: Created quiz_sections entry for quiz $quizid", DEBUG_DEVELOPER);
         } catch (\Exception $e) {
-            debugging("DEBUG create_quiz: Warning - Could not create quiz_sections entry: " . $e->getMessage(), DEBUG_DEVELOPER);
+            debugging("create_quiz: Warning - Could not create quiz_sections entry: " . $e->getMessage(), DEBUG_DEVELOPER);
         }
 
         // Determine correct context for question bank categories based on Moodle version:
@@ -417,13 +417,13 @@ class quiz_deployer {
         if (self::is_moodle_5_or_later()) {
             $quizmodulecontext = \context_module::instance($cmid);
             debugging(
-                "DEBUG create_quiz: Moodle 5.x detected — using module context ID=" .
+                "create_quiz: Moodle 5.x detected — using module context ID=" .
                 $quizmodulecontext->id,
                 DEBUG_DEVELOPER
             );
             $moodlequestionids = self::deploy_to_question_bank($questionids, $courseid, $categoryname, $quizmodulecontext);
         } else {
-            debugging("DEBUG create_quiz: Moodle 4.x detected — using course context", DEBUG_DEVELOPER);
+            debugging("create_quiz: Moodle 4.x detected — using course context", DEBUG_DEVELOPER);
             $moodlequestionids = self::deploy_to_question_bank($questionids, $courseid, $categoryname);
         }
 
@@ -494,14 +494,14 @@ class quiz_deployer {
         if ($modulecontext) {
             $context = $modulecontext;
             debugging(
-                "DEBUG get_or_create_category: Using MODULE context ID: " .
+                "get_or_create_category: Using MODULE context ID: " .
                 $context->id . " for course $courseid",
                 DEBUG_DEVELOPER
             );
         } else {
             $context = \context_course::instance($courseid);
             debugging(
-                "DEBUG get_or_create_category: Using COURSE context ID: " .
+                "get_or_create_category: Using COURSE context ID: " .
                 $context->id . " for course $courseid",
                 DEBUG_DEVELOPER
             );
@@ -528,7 +528,7 @@ class quiz_deployer {
         ]);
 
         if ($category) {
-            debugging("DEBUG get_or_create_category: Found existing category ID: " . $category->id, DEBUG_DEVELOPER);
+            debugging("get_or_create_category: Found existing category ID: " . $category->id, DEBUG_DEVELOPER);
             return $category;
         }
 
@@ -543,7 +543,7 @@ class quiz_deployer {
                 $defaultcategory = question_get_default_category($context->id);
                 if ($defaultcategory) {
                     debugging(
-                        "DEBUG get_or_create_category: Got default category " .
+                        "get_or_create_category: Got default category " .
                         "via question_get_default_category(): ID " .
                         $defaultcategory->id,
                         DEBUG_DEVELOPER
@@ -551,7 +551,7 @@ class quiz_deployer {
                 }
             } catch (\Exception $e) {
                 debugging(
-                    "DEBUG get_or_create_category: " .
+                    "get_or_create_category: " .
                     "question_get_default_category() failed: " . $e->getMessage(),
                     DEBUG_DEVELOPER
                 );
@@ -578,7 +578,7 @@ class quiz_deployer {
 
                 try {
                     $topcategory->id = $DB->insert_record('question_categories', $topcategory);
-                    debugging("DEBUG get_or_create_category: Created top category ID: " . $topcategory->id, DEBUG_DEVELOPER);
+                    debugging("get_or_create_category: Created top category ID: " . $topcategory->id, DEBUG_DEVELOPER);
                 } catch (\Exception $e) {
                     throw new \moodle_exception(
                         'error:deployment',
@@ -588,7 +588,7 @@ class quiz_deployer {
                     );
                 }
             } else {
-                debugging("DEBUG get_or_create_category: Found existing top category ID: " . $topcategory->id, DEBUG_DEVELOPER);
+                debugging("get_or_create_category: Found existing top category ID: " . $topcategory->id, DEBUG_DEVELOPER);
             }
 
             // Find existing default category under this context's top.
@@ -636,7 +636,7 @@ class quiz_deployer {
                 try {
                     $defaultcategory->id = $DB->insert_record('question_categories', $defaultcategory);
                     debugging(
-                        "DEBUG get_or_create_category: Created default " .
+                        "get_or_create_category: Created default " .
                         "category ID: " . $defaultcategory->id,
                         DEBUG_DEVELOPER
                     );
@@ -650,7 +650,7 @@ class quiz_deployer {
                 }
             } else {
                 debugging(
-                    "DEBUG get_or_create_category: Found existing default " .
+                    "get_or_create_category: Found existing default " .
                     "category ID: " . $defaultcategory->id,
                     DEBUG_DEVELOPER
                 );
@@ -670,7 +670,7 @@ class quiz_deployer {
 
         try {
             $category->id = $DB->insert_record('question_categories', $category);
-            debugging("DEBUG get_or_create_category: Created new category ID: " . $category->id, DEBUG_DEVELOPER);
+            debugging("get_or_create_category: Created new category ID: " . $category->id, DEBUG_DEVELOPER);
         } catch (\Exception $e) {
             throw new \moodle_exception(
                 'error:deployment',
@@ -682,7 +682,7 @@ class quiz_deployer {
 
         // Log important info for debugging.
         $contexttype = $modulecontext ? 'MODULE' : 'COURSE';
-        debugging("DEBUG get_or_create_category: Category hierarchy created:", DEBUG_DEVELOPER);
+        debugging("get_or_create_category: Category hierarchy created:", DEBUG_DEVELOPER);
         debugging("  - Default Category ID: " . $defaultcategory->id, DEBUG_DEVELOPER);
         debugging("  - New Category ID: " . $category->id . " - Name: " . $category->name, DEBUG_DEVELOPER);
         debugging("  - Context ID: " . $category->contextid . " ({$contexttype} context for course $courseid)", DEBUG_DEVELOPER);
@@ -708,9 +708,9 @@ class quiz_deployer {
     ): int {
         global $DB, $USER, $CFG;
 
-        // DEBUG: Log the start of question conversion.
+        // Log the start of question conversion.
         debugging(
-            "DEBUG: Starting convert_to_moodle_question for genquestion ID: " .
+            "deploy: Starting convert_to_moodle_question for genquestion ID: " .
             ($genquestion->id ?? 'unknown') . ", type: " . ($genquestion->questiontype ?? 'unknown'),
             DEBUG_DEVELOPER
         );
@@ -772,12 +772,12 @@ class quiz_deployer {
         $question->createdby = $USER->id;
         $question->modifiedby = $USER->id;
 
-        // DEBUG: Log question object before insert.
-        debugging("DEBUG: Inserting into 'question' table. Fields: " . json_encode(array_keys((array)$question)), DEBUG_DEVELOPER);
+        // Log question object before insert.
+        debugging("deploy: Inserting into 'question' table. Fields: " . json_encode(array_keys((array)$question)), DEBUG_DEVELOPER);
 
         try {
             $questionid = $DB->insert_record('question', $question);
-            debugging("DEBUG: Successfully inserted question, ID: $questionid", DEBUG_DEVELOPER);
+            debugging("deploy: Successfully inserted question, ID: $questionid", DEBUG_DEVELOPER);
         } catch (\Exception $e) {
             throw new \moodle_exception(
                 'error:deployment',
@@ -798,7 +798,7 @@ class quiz_deployer {
 
         try {
             $entryid = $DB->insert_record('question_bank_entries', $qbentry);
-            debugging("DEBUG: Successfully inserted question_bank_entries, ID: $entryid", DEBUG_DEVELOPER);
+            debugging("deploy: Successfully inserted question_bank_entries, ID: $entryid", DEBUG_DEVELOPER);
         } catch (\Exception $e) {
             throw new \moodle_exception(
                 'error:deployment',
@@ -817,7 +817,7 @@ class quiz_deployer {
 
         try {
             $DB->insert_record('question_versions', $qversion);
-            debugging("DEBUG: Successfully inserted question_versions", DEBUG_DEVELOPER);
+            debugging("deploy: Successfully inserted question_versions", DEBUG_DEVELOPER);
         } catch (\Exception $e) {
             throw new \moodle_exception(
                 'error:deployment',
@@ -830,7 +830,7 @@ class quiz_deployer {
 
         // Type-specific data.
         try {
-            debugging("DEBUG: Adding type-specific data for type: " . $genquestion->questiontype, DEBUG_DEVELOPER);
+            debugging("deploy: Adding type-specific data for type: " . $genquestion->questiontype, DEBUG_DEVELOPER);
             switch ($genquestion->questiontype) {
                 case 'multichoice':
                     self::add_multichoice_data($questionid, $genquestion);
@@ -850,9 +850,9 @@ class quiz_deployer {
                     self::add_essay_data($questionid, $genquestion);
                     break;
                 default:
-                    debugging("DEBUG: Unknown question type: " . $genquestion->questiontype, DEBUG_DEVELOPER);
+                    debugging("deploy: Unknown question type: " . $genquestion->questiontype, DEBUG_DEVELOPER);
             }
-            debugging("DEBUG: Successfully added type-specific data", DEBUG_DEVELOPER);
+            debugging("deploy: Successfully added type-specific data", DEBUG_DEVELOPER);
         } catch (\Exception $e) {
             throw new \moodle_exception(
                 'error:deployment',
@@ -865,10 +865,10 @@ class quiz_deployer {
         // Add question tags for better organization and filtering.
         try {
             self::tag_question($questionid, $genquestion, $category);
-            debugging("DEBUG: Successfully added tags", DEBUG_DEVELOPER);
+            debugging("deploy: Successfully added tags", DEBUG_DEVELOPER);
         } catch (\Exception $e) {
             // Tags are optional, log but don't fail.
-            debugging("DEBUG: Warning - Failed to add tags: " . $e->getMessage(), DEBUG_DEVELOPER);
+            debugging("deploy: Warning - Failed to add tags: " . $e->getMessage(), DEBUG_DEVELOPER);
         }
 
         // VERIFICATION: Confirm question was properly created and linked.
@@ -881,7 +881,7 @@ class quiz_deployer {
         );
 
         debugging(
-            "DEBUG: Question $questionid created — category=$categoryid, " .
+            "deploy: Question $questionid created — category=$categoryid, " .
             "bank_entry_cat=" . ($verifyqbe->questioncategoryid ?? 'NULL') .
             ", version_status=" . ($verifyqbe->version_status ?? 'NULL'),
             DEBUG_DEVELOPER
@@ -903,7 +903,7 @@ class quiz_deployer {
 
         // Validate category has a valid contextid.
         if (empty($category->contextid) || $category->contextid <= 0) {
-            debugging("DEBUG tag_question: Invalid contextid in category", DEBUG_DEVELOPER);
+            debugging("tag_question: Invalid contextid in category", DEBUG_DEVELOPER);
             return;
         }
 
@@ -911,11 +911,11 @@ class quiz_deployer {
         try {
             $context = \context::instance_by_id($category->contextid, IGNORE_MISSING);
             if (!$context) {
-                debugging("DEBUG tag_question: Context not found for ID: " . $category->contextid, DEBUG_DEVELOPER);
+                debugging("tag_question: Context not found for ID: " . $category->contextid, DEBUG_DEVELOPER);
                 return;
             }
         } catch (\Exception $e) {
-            debugging("DEBUG tag_question: Failed to get context: " . $e->getMessage(), DEBUG_DEVELOPER);
+            debugging("tag_question: Failed to get context: " . $e->getMessage(), DEBUG_DEVELOPER);
             return;
         }
 
@@ -1270,9 +1270,9 @@ class quiz_deployer {
 
             try {
                 $slotid = $DB->insert_record('quiz_slots', $slotrecord);
-                debugging("DEBUG: Created quiz_slot ID: $slotid for question: $questionid", DEBUG_DEVELOPER);
+                debugging("deploy: Created quiz_slot ID: $slotid for question: $questionid", DEBUG_DEVELOPER);
             } catch (\Exception $e) {
-                debugging("DEBUG: ERROR creating quiz_slot: " . $e->getMessage(), DEBUG_DEVELOPER);
+                debugging("deploy: ERROR creating quiz_slot: " . $e->getMessage(), DEBUG_DEVELOPER);
                 throw new \moodle_exception(
                     'error:deployment',
                     'local_hlai_quizgen',
@@ -1292,9 +1292,9 @@ class quiz_deployer {
 
             try {
                 $DB->insert_record('question_references', $reference);
-                debugging("DEBUG: Created question_reference for slot: $slotid", DEBUG_DEVELOPER);
+                debugging("deploy: Created question_reference for slot: $slotid", DEBUG_DEVELOPER);
             } catch (\Exception $e) {
-                debugging("DEBUG: ERROR creating question_reference: " . $e->getMessage(), DEBUG_DEVELOPER);
+                debugging("deploy: ERROR creating question_reference: " . $e->getMessage(), DEBUG_DEVELOPER);
                 throw new \moodle_exception(
                     'error:deployment',
                     'local_hlai_quizgen',
@@ -1359,7 +1359,7 @@ class quiz_deployer {
         // The mod_qbank module was introduced in Moodle 5.0 as a reliable detection method.
         $ismoodle5 = $DB->record_exists('modules', ['name' => 'qbank']);
 
-        debugging("DEBUG is_moodle_5_or_later: " . ($ismoodle5 ? 'YES (mod_qbank found)' : 'NO (Moodle 4.x)'), DEBUG_DEVELOPER);
+        debugging("is_moodle_5_or_later: " . ($ismoodle5 ? 'YES (mod_qbank found)' : 'NO (Moodle 4.x)'), DEBUG_DEVELOPER);
 
         return $ismoodle5;
     }

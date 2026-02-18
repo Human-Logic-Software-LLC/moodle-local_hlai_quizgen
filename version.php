@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_hlai_quizgen';
-$plugin->version   = 2026020435;        // YYYYMMDDXX format - Replace all emoji with Font Awesome icons.
+$plugin->version   = 2026020435;        // YYYYMMDDXX format.
 $plugin->requires  = 2022112809;        // Moodle 4.1.9+.
 $plugin->supported = [401, 500];        // Moodle 4.1.9+ to 5.0.x.
 $plugin->maturity  = MATURITY_STABLE;

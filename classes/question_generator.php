@@ -128,7 +128,7 @@ class question_generator {
         $cachekey = "request_{$requestid}_content";
         if (!isset(self::$contentcache[$cachekey])) {
             self::$contentcache[$cachekey] = self::get_full_content_for_request($request);
-            // DEBUG: Log content length.
+            // Log content length for diagnostics.
             \local_hlai_quizgen\debug_logger::debug('Content extracted for request', [
                 'request_id' => $requestid,
                 'content_length' => strlen(self::$contentcache[$cachekey]),
@@ -315,7 +315,7 @@ class question_generator {
         // Determine quality mode from config.
         $quality = $config['processing_mode'] ?? 'balanced';
 
-        // DEBUG: Simple error_log.
+        // Log gateway call parameters.
         \local_hlai_quizgen\debug_logger::debug('About to call gateway for question generation', [
             'topic_title' => $topic->title,
             'payload_content_length' => strlen($payload['topic_content']),
@@ -742,7 +742,7 @@ class question_generator {
                     }
                 } else if (strpos($source, 'bulk_scan:') === 0) {
                     // For bulk scans, get content from all topics' descriptions.
-                    // DEBUG: Log that we're handling bulk scan.
+                    // Log bulk scan handling.
                     \local_hlai_quizgen\debug_logger::debug('Handling bulk_scan content source', [
                         'request_id' => $request->id,
                         'source' => $source,
@@ -763,7 +763,7 @@ class question_generator {
                         }
                     }
 
-                    // DEBUG: Log bulk scan content length.
+                    // Log extracted content length.
                     \local_hlai_quizgen\debug_logger::debug('Bulk scan content extracted', [
                         'content_length' => strlen($fullcontent),
                     ], $request->id);

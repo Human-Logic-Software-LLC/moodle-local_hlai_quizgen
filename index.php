@@ -113,12 +113,6 @@ $firsttimeapproved = $DB->count_records_sql(
 );
 $ftar = $totalreviewed > 0 ? round(($firsttimeapproved / $totalreviewed) * 100, 1) : 0;
 
-// DEBUG: Temporarily log FTAR calculation.
-debugging(
-    "FTAR Debug - User: $userid, Total Reviewed: $totalreviewed, "
-    . "First-time Approved: $firsttimeapproved, Approved: $approvedquestions, FTAR: $ftar%"
-);
-
 // Recent requests.
 $recentrequests = $DB->get_records_sql(
     "SELECT r.id, r.courseid, r.status, r.total_questions, r.questions_generated,
