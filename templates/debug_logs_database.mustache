@@ -46,7 +46,7 @@
                 <label class="label is-small">{{databaselogs.filters.levellabel}}</label>
                 <div class="select is-small">
                     <select name="level">
-                        <option value="" label="{{databaselogs.filters.alllabel}}">{{databaselogs.filters.alllabel}}</option>
+                        <option value="">{{databaselogs.filters.alllabel}}</option>
                         {{#databaselogs.filters.leveloptions}}
                         <option value="{{value}}" {{#selected}}selected{{/selected}}>{{label}}</option>
                         {{/databaselogs.filters.leveloptions}}

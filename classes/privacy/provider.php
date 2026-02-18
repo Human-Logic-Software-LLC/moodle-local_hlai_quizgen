@@ -298,8 +298,9 @@ class provider implements
                 foreach ($reviews as $review) {
                     $data[] = [
                         'status' => $review->status,
-                        'comments' => $review->comments,
-                        'rating' => $review->rating,
+                        'decision' => $review->decision,
+                        'decision_comments' => $review->decision_comments,
+                        'review_type' => $review->review_type,
                         'timecreated' => transform::datetime($review->timecreated),
                     ];
                 }
@@ -320,8 +321,8 @@ class provider implements
                 foreach ($refinements as $refinement) {
                     $data[] = [
                         'refinement_type' => $refinement->refinement_type,
-                        'original_text' => $refinement->original_text,
-                        'refined_text' => $refinement->refined_text,
+                        'changes' => $refinement->changes,
+                        'improvements_applied' => $refinement->improvements_applied,
                         'timecreated' => transform::datetime($refinement->timecreated),
                     ];
                 }

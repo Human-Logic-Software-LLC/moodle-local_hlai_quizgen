@@ -125,7 +125,10 @@ class quiz_deployer {
                 // DUPLICATE DETECTION: Search for an existing Moodle question in this category
                 // that matches this plugin question (prevents duplicates from failed re-deploys).
                 $existingmoodleid = self::find_existing_moodle_question(
-                    $genquestion, $category->id, $category->name, $questionnumber
+                    $genquestion,
+                    $category->id,
+                    $category->name,
+                    $questionnumber
                 );
                 if ($existingmoodleid) {
                     debugging(
@@ -151,7 +154,10 @@ class quiz_deployer {
                 try {
                     // Create the Moodle question.
                     $moodlequestionid = self::convert_to_moodle_question(
-                        $genquestion, $category->id, $category->name, $questionnumber
+                        $genquestion,
+                        $category->id,
+                        $category->name,
+                        $questionnumber
                     );
                     $questionnumber++;
 

@@ -58,7 +58,7 @@ body.path-local-hlai_quizgen.hlai-step-2 #page-footer {
    CSS CUSTOM PROPERTIES (Iksha Design Tokens)
    ========================================================================== */
 
-:root {
+body.path-local-hlai_quizgen {
     /* Brand Colors - Standardized Iksha Blue */
     --hlai-primary: #3B82F6;
     --hlai-primary-light: #EFF6FF;
@@ -9030,12 +9030,12 @@ body.path-local-hlai_quizgen.hlai-step-2 #page-footer {
 .title i.fa,
 .title i.fas,
 .title i.far,
-h1 i.fa, h1 i.fas, h1 i.far,
-h2 i.fa, h2 i.fas, h2 i.far,
-h3 i.fa, h3 i.fas, h3 i.far,
-h4 i.fa, h4 i.fas, h4 i.far,
-h5 i.fa, h5 i.fas, h5 i.far,
-h6 i.fa, h6 i.fas, h6 i.far,
+.hlai-quizgen-wrapper h1 i.fa, .hlai-quizgen-wrapper h1 i.fas, .hlai-quizgen-wrapper h1 i.far,
+.hlai-quizgen-wrapper h2 i.fa, .hlai-quizgen-wrapper h2 i.fas, .hlai-quizgen-wrapper h2 i.far,
+.hlai-quizgen-wrapper h3 i.fa, .hlai-quizgen-wrapper h3 i.fas, .hlai-quizgen-wrapper h3 i.far,
+.hlai-quizgen-wrapper h4 i.fa, .hlai-quizgen-wrapper h4 i.fas, .hlai-quizgen-wrapper h4 i.far,
+.hlai-quizgen-wrapper h5 i.fa, .hlai-quizgen-wrapper h5 i.fas, .hlai-quizgen-wrapper h5 i.far,
+.hlai-quizgen-wrapper h6 i.fa, .hlai-quizgen-wrapper h6 i.fas, .hlai-quizgen-wrapper h6 i.far,
 .panel-heading i.fa,
 .panel-heading i.fas,
 .panel-heading i.far {
@@ -9047,15 +9047,15 @@ h6 i.fa, h6 i.fas, h6 i.far,
 }
 
 /* Fix for icons in paragraphs and divs */
-p i.fa,
-p i.fas,
-p i.far,
-div i.fa,
-div i.fas,
-div i.far,
-span i.fa,
-span i.fas,
-span i.far {
+.hlai-quizgen-wrapper p i.fa,
+.hlai-quizgen-wrapper p i.fas,
+.hlai-quizgen-wrapper p i.far,
+.hlai-quizgen-wrapper div i.fa,
+.hlai-quizgen-wrapper div i.fas,
+.hlai-quizgen-wrapper div i.far,
+.hlai-quizgen-wrapper span i.fa,
+.hlai-quizgen-wrapper span i.fas,
+.hlai-quizgen-wrapper span i.far {
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -9063,21 +9063,21 @@ span i.far {
 }
 
 /* Fix for icons in lists */
-li i.fa,
-li i.fas,
-li i.far {
+.hlai-quizgen-wrapper li i.fa,
+.hlai-quizgen-wrapper li i.fas,
+.hlai-quizgen-wrapper li i.far {
     display: inline-flex !important;
     align-items: center !important;
     vertical-align: middle !important;
 }
 
 /* Fix for icons in buttons and links */
-button i.fa,
-button i.fas,
-button i.far,
-a i.fa,
-a i.fas,
-a i.far,
+.hlai-quizgen-wrapper button i.fa,
+.hlai-quizgen-wrapper button i.fas,
+.hlai-quizgen-wrapper button i.far,
+.hlai-quizgen-wrapper a i.fa,
+.hlai-quizgen-wrapper a i.fas,
+.hlai-quizgen-wrapper a i.far,
 .button i.fa,
 .button i.fas,
 .button i.far {
@@ -9548,7 +9548,7 @@ body.path-local-hlai_quizgen #page-footer .purgecaches {
    ========================================================================== */
 
 /* Iksha-inspired Clean Design System */
-:root {
+body.path-local-hlai_quizgen {
     --admin-primary: #3B82F6;
     --admin-primary-light: #EFF6FF;
     --admin-success: #10B981;

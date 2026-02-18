@@ -1455,11 +1455,14 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
 
     // GROUP 1: Add Your Own Content.
     $html .= html_writer::start_div('hlai-source-group mb-5');
-    $html .= html_writer::tag('h5',
+    $html .= html_writer::tag(
+        'h5',
         '<i class="fa fa-pencil hlai-icon-warning"></i> ' .
-        get_string('wizard_add_your_own_content', 'local_hlai_quizgen'), [
+        get_string('wizard_add_your_own_content', 'local_hlai_quizgen'),
+        [
         'class' => 'hlai-source-group-title',
-    ]);
+        ]
+    );
     $html .= html_writer::start_div('columns is-multiline');
 
     // Option 1: Manual Text Entry.
@@ -1513,12 +1516,16 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
     ]);
     $html .= html_writer::start_div('hlai-source-content');
     $html .= html_writer::tag('span', '<i class="fa fa-globe hlai-icon-info"></i>', ['class' => 'hlai-source-icon']);
-    $html .= html_writer::tag('strong',
+    $html .= html_writer::tag(
+        'strong',
         get_string('wizard_extract_from_url', 'local_hlai_quizgen'),
-        ['class' => 'hlai-source-title']);
-    $html .= html_writer::tag('p',
+        ['class' => 'hlai-source-title']
+    );
+    $html .= html_writer::tag(
+        'p',
         get_string('wizard_fetch_content_from_web', 'local_hlai_quizgen'),
-        ['class' => 'hlai-source-desc']);
+        ['class' => 'hlai-source-desc']
+    );
     $html .= html_writer::end_div();
     $html .= html_writer::end_tag('label');
     $html .= html_writer::end_div();
@@ -1528,11 +1535,14 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
 
     // GROUP 2: Use Course Content.
     $html .= html_writer::start_div('hlai-source-group');
-    $html .= html_writer::tag('h5',
+    $html .= html_writer::tag(
+        'h5',
         '<i class="fa fa-book hlai-icon-success"></i> ' .
-        get_string('wizard_use_course_content', 'local_hlai_quizgen'), [
+        get_string('wizard_use_course_content', 'local_hlai_quizgen'),
+        [
         'class' => 'hlai-source-group-title',
-    ]);
+        ]
+    );
     $html .= html_writer::start_div('columns is-multiline');
 
     // Option 4: Course Activities (Browse & Select).
@@ -1553,11 +1563,14 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
     $html .= html_writer::start_div('hlai-source-text');
     $html .= html_writer::tag('strong', get_string('source_activities', 'local_hlai_quizgen'), ['class' => 'hlai-source-title']);
     $html .= html_writer::tag('p', get_string('source_activities_desc', 'local_hlai_quizgen'), ['class' => 'hlai-source-desc']);
-    $html .= html_writer::tag('span',
+    $html .= html_writer::tag(
+        'span',
         '<i class="fa fa-star hlai-icon-warning"></i> ' .
-        get_string('wizard_recommended', 'local_hlai_quizgen'), [
+        get_string('wizard_recommended', 'local_hlai_quizgen'),
+        [
         'class' => 'hlai-source-badge',
-    ]);
+        ]
+    );
     $html .= html_writer::end_div();
     $html .= html_writer::end_div();
     $html .= html_writer::end_tag('label');
@@ -1578,12 +1591,16 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
     $html .= html_writer::tag('span', '<i class="fa fa-graduation-cap hlai-icon-success"></i>', [
         'class' => 'hlai-source-icon',
     ]);
-    $html .= html_writer::tag('strong',
+    $html .= html_writer::tag(
+        'strong',
         get_string('wizard_scan_entire_course', 'local_hlai_quizgen'),
-        ['class' => 'hlai-source-title']);
-    $html .= html_writer::tag('p',
+        ['class' => 'hlai-source-title']
+    );
+    $html .= html_writer::tag(
+        'p',
         get_string('wizard_scan_entire_course_desc', 'local_hlai_quizgen'),
-        ['class' => 'hlai-source-desc']);
+        ['class' => 'hlai-source-desc']
+    );
     $html .= html_writer::end_div();
     $html .= html_writer::end_tag('label');
     $html .= html_writer::end_div();
@@ -1601,12 +1618,16 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
     ]);
     $html .= html_writer::start_div('hlai-source-content');
     $html .= html_writer::tag('span', '<i class="fa fa-book hlai-icon-purple"></i>', ['class' => 'hlai-source-icon']);
-    $html .= html_writer::tag('strong',
+    $html .= html_writer::tag(
+        'strong',
         get_string('wizard_scan_all_resources', 'local_hlai_quizgen'),
-        ['class' => 'hlai-source-title']);
-    $html .= html_writer::tag('p',
+        ['class' => 'hlai-source-title']
+    );
+    $html .= html_writer::tag(
+        'p',
         get_string('wizard_scan_all_resources_desc', 'local_hlai_quizgen'),
-        ['class' => 'hlai-source-desc']);
+        ['class' => 'hlai-source-desc']
+    );
     $html .= html_writer::end_div();
     $html .= html_writer::end_tag('label');
     $html .= html_writer::end_div();
@@ -1624,12 +1645,16 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
     ]);
     $html .= html_writer::start_div('hlai-source-content');
     $html .= html_writer::tag('span', '<i class="fa fa-edit hlai-icon-danger"></i>', ['class' => 'hlai-source-icon']);
-    $html .= html_writer::tag('strong',
+    $html .= html_writer::tag(
+        'strong',
         get_string('wizard_scan_all_activities', 'local_hlai_quizgen'),
-        ['class' => 'hlai-source-title']);
-    $html .= html_writer::tag('p',
+        ['class' => 'hlai-source-title']
+    );
+    $html .= html_writer::tag(
+        'p',
         get_string('wizard_scan_all_activities_desc', 'local_hlai_quizgen'),
-        ['class' => 'hlai-source-desc']);
+        ['class' => 'hlai-source-desc']
+    );
     $html .= html_writer::end_div();
     $html .= html_writer::end_tag('label');
     $html .= html_writer::end_div();
@@ -1723,11 +1748,14 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
 
     // URL extraction section (initially hidden).
     $html .= html_writer::start_div('field mb-5 hlai-hidden', ['id' => 'section-url']);
-    $html .= html_writer::tag('label',
+    $html .= html_writer::tag(
+        'label',
         '<i class="fa fa-globe hlai-icon-info"></i> ' .
-        get_string('wizard_extract_from_url', 'local_hlai_quizgen'), [
+        get_string('wizard_extract_from_url', 'local_hlai_quizgen'),
+        [
         'class' => 'label',
-    ]);
+        ]
+    );
     $html .= html_writer::tag('p', get_string('wizard_enter_urls_help', 'local_hlai_quizgen'), ['class' => 'help mb-3']);
 
     $html .= html_writer::start_div('control');
@@ -1785,13 +1813,16 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
             'id' => 'select-all-activities',
             'class' => 'hlai-action-btn hlai-action-select',
         ]);
-        $html .= html_writer::tag('button',
+        $html .= html_writer::tag(
+            'button',
             '<i class="fa fa-times"></i> ' .
-            get_string('deselect_all_topics', 'local_hlai_quizgen'), [
+            get_string('deselect_all_topics', 'local_hlai_quizgen'),
+            [
             'type' => 'button',
             'id' => 'deselect-all-activities',
             'class' => 'hlai-action-btn hlai-action-deselect',
-        ]);
+            ]
+        );
         $html .= html_writer::end_div();
         $html .= html_writer::tag('span', get_string('wizard_activities_available', 'local_hlai_quizgen', count($activities)), [
             'class' => 'hlai-activities-count',
@@ -2162,20 +2193,26 @@ function local_hlai_quizgen_render_step2(int $courseid, int $requestid): string 
         // Action bar with buttons and count.
         $html .= html_writer::start_div('hlai-topics-actions');
         $html .= html_writer::start_div('hlai-topics-buttons');
-        $html .= html_writer::tag('button',
+        $html .= html_writer::tag(
+            'button',
             '<i class="fa fa-check"></i> ' .
-            get_string('select_all_topics', 'local_hlai_quizgen'), [
+            get_string('select_all_topics', 'local_hlai_quizgen'),
+            [
             'type' => 'button',
             'id' => 'select-all-topics',
             'class' => 'hlai-action-btn hlai-action-select',
-        ]);
-        $html .= html_writer::tag('button',
+            ]
+        );
+        $html .= html_writer::tag(
+            'button',
             '<i class="fa fa-times"></i> ' .
-            get_string('deselect_all_topics', 'local_hlai_quizgen'), [
+            get_string('deselect_all_topics', 'local_hlai_quizgen'),
+            [
             'type' => 'button',
             'id' => 'deselect-all-topics',
             'class' => 'hlai-action-btn hlai-action-deselect',
-        ]);
+            ]
+        );
         $html .= html_writer::end_div();
         $html .= html_writer::tag('span', get_string('wizard_topics_discovered', 'local_hlai_quizgen', count($topics)), [
             'class' => 'hlai-topics-count',
@@ -2212,9 +2249,11 @@ function local_hlai_quizgen_render_step2(int $courseid, int $requestid): string 
         // Selected count indicator.
         $html .= html_writer::start_div('hlai-topics-selected-bar');
         $html .= html_writer::tag('span', '<i class="fa fa-check-circle"></i>', ['class' => 'hlai-selected-icon']);
-        $html .= html_writer::tag('span',
+        $html .= html_writer::tag(
+            'span',
             get_string('wizard_n_topics_selected', 'local_hlai_quizgen', 0),
-            ['id' => 'selected-topics-count', 'class' => 'hlai-selected-text']);
+            ['id' => 'selected-topics-count', 'class' => 'hlai-selected-text']
+        );
         $html .= html_writer::end_div();
 
         $html .= html_writer::end_div(); // Hlai-topics-section.
@@ -2407,9 +2446,11 @@ function local_hlai_quizgen_render_step3(int $courseid, int $requestid): string 
 
     // TOTAL QUESTIONS - Compact card.
     $html .= html_writer::start_div('hlai-config-card');
-    $html .= html_writer::tag('label',
+    $html .= html_writer::tag(
+        'label',
         get_string('total_questions', 'local_hlai_quizgen'),
-        ['class' => 'hlai-config-label', 'for' => 'total-questions']);
+        ['class' => 'hlai-config-label', 'for' => 'total-questions']
+    );
     $html .= html_writer::empty_tag('input', [
         'type' => 'number',
         'name' => 'total_questions',
@@ -2487,8 +2528,11 @@ function local_hlai_quizgen_render_step3(int $courseid, int $requestid): string 
         $html .= html_writer::start_div('hlai-qtype-row', ['data-type' => $type]);
         $html .= html_writer::start_div('hlai-qtype-left hlai-flex-center');
         $iconstyle = 'background: ' . $info['color'] . '15; color: ' . $info['color'] . ';';
-        $html .= html_writer::tag('span', $info['icon'],
-            ['class' => 'hlai-qtype-icon hlai-flex-center-all', 'style' => $iconstyle]);
+        $html .= html_writer::tag(
+            'span',
+            $info['icon'],
+            ['class' => 'hlai-qtype-icon hlai-flex-center-all', 'style' => $iconstyle]
+        );
         $html .= html_writer::tag(
             'span',
             $info['label'],
@@ -2638,11 +2682,14 @@ function local_hlai_quizgen_render_step3(int $courseid, int $requestid): string 
     ]);
     $html .= html_writer::start_div('hlai-generating-modal');
     $html .= html_writer::div('', 'loader');
-    $html .= html_writer::tag('h3',
+    $html .= html_writer::tag(
+        'h3',
         '<i class="fa fa-lightbulb-o hlai-icon-primary"></i> ' .
-        get_string('wizard_generating_questions_ellipsis', 'local_hlai_quizgen'), [
+        get_string('wizard_generating_questions_ellipsis', 'local_hlai_quizgen'),
+        [
         'class' => 'generating-title',
-    ]);
+        ]
+    );
     $html .= html_writer::tag('p', get_string('wizard_generating_please_wait', 'local_hlai_quizgen'), [
         'class' => 'generating-subtitle',
     ]);
@@ -2777,11 +2824,14 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
         // Spinner styled by CSS class .hlai-generating-modal .loader.
         $html .= html_writer::div('', 'loader');
 
-        $html .= html_writer::tag('h3',
+        $html .= html_writer::tag(
+            'h3',
             '<i class="fa fa-lightbulb-o hlai-icon-primary"></i> ' .
-            get_string('wizard_generating_questions_ellipsis', 'local_hlai_quizgen'), [
+            get_string('wizard_generating_questions_ellipsis', 'local_hlai_quizgen'),
+            [
             'class' => 'title is-5 mb-2',
-        ]);
+            ]
+        );
         $html .= html_writer::tag('p', get_string('wizard_generating_please_wait', 'local_hlai_quizgen'), [
             'class' => 'has-text-grey is-size-6 mb-4',
         ]);
@@ -2998,6 +3048,20 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
     $html .= html_writer::end_div();
     $html .= html_writer::end_div(); // Level toolbar.
 
+    // Pre-load all answers for these questions to avoid N+1 queries.
+    $questionids = array_keys($questions);
+    $allanswers = [];
+    if (!empty($questionids)) {
+        [$insql, $inparams] = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED);
+        $answersql = "SELECT * FROM {local_hlai_quizgen_answers}
+                       WHERE questionid $insql
+                    ORDER BY questionid, sortorder ASC";
+        $answersraw = $DB->get_records_sql($answersql, $inparams);
+        foreach ($answersraw as $ans) {
+            $allanswers[$ans->questionid][] = $ans;
+        }
+    }
+
     $questionnumber = 0;
     foreach ($questions as $question) {
         $questionnumber++;
@@ -3083,9 +3147,11 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
                 $html .= html_writer::start_div('mt-3');
                 $html .= html_writer::tag(
                     'p',
-                    html_writer::tag('strong',
+                    html_writer::tag(
+                        'strong',
                         '<i class="fa fa-lightbulb-o mr-2"></i>' .
-                        get_string('wizard_model_answer_criteria', 'local_hlai_quizgen')),
+                        get_string('wizard_model_answer_criteria', 'local_hlai_quizgen')
+                    ),
                     ['class' => 'has-text-grey-dark mb-2']
                 );
                 $html .= html_writer::div(format_text($modelanswer, FORMAT_HTML), 'model-answer hlai-model-answer');
@@ -3101,7 +3167,7 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
             }
         } else {
             // For MCQ, TF, Short Answer, Matching - show answer options.
-            $answers = $DB->get_records('local_hlai_quizgen_answers', ['questionid' => $question->id], 'sortorder ASC');
+            $answers = $allanswers[$question->id] ?? [];
             if (!empty($answers)) {
                 $html .= html_writer::start_div('mt-3');
                 $letterlabel = 'A';
@@ -3161,9 +3227,11 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
                 'sesskey' => sesskey(),
                 'step' => 4,
             ]);
-            $html .= html_writer::link($rejecturl,
+            $html .= html_writer::link(
+                $rejecturl,
                 get_string('wizard_reject', 'local_hlai_quizgen'),
-                ['class' => 'card-footer-item has-text-danger']);
+                ['class' => 'card-footer-item has-text-danger']
+            );
         }
 
         $maxregens = get_config('local_hlai_quizgen', 'max_regenerations') ?: 5;
@@ -3177,11 +3245,14 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
                 'sesskey' => sesskey(),
                 'step' => 4,
             ]);
-            $html .= html_writer::link($regenurl,
+            $html .= html_writer::link(
+                $regenurl,
                 get_string('regenerate_question', 'local_hlai_quizgen') .
-                ' (' . $remainingregens . ')', [
+                ' (' . $remainingregens . ')',
+                [
                 'class' => 'card-footer-item has-text-info',
-            ]);
+                ]
+            );
         }
 
         $html .= html_writer::end_div(); // Card-footer.
@@ -3297,9 +3368,11 @@ function local_hlai_quizgen_render_step5(int $courseid, int $requestid): string 
     $readyinfo->approved = $approvedcount;
     $readyinfo->total = $totalcount;
     $html .= html_writer::div(
-        html_writer::tag('strong',
+        html_writer::tag(
+            'strong',
             "<i class='fa fa-check-circle'></i> " .
-            get_string('wizard_approved_ready_deploy', 'local_hlai_quizgen', $readyinfo)),
+            get_string('wizard_approved_ready_deploy', 'local_hlai_quizgen', $readyinfo)
+        ),
         'notification is-success'
     );
 

@@ -738,24 +738,8 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
     }
 
     if ($oldversion < 2025111610) {
-        // Add ratelimit_log table for tracking rate limiting.
-        $table = new xmldb_table('local_hlai_quizgen_ratelimit_log');
-
-        if (!$dbman->table_exists($table)) {
-            $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
-            $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-            $table->add_field('action', XMLDB_TYPE_CHAR, '100', null, XMLDB_NOTNULL, null, null);
-            $table->add_field('ip_address', XMLDB_TYPE_CHAR, '45', null, null, null, null);
-            $table->add_field('timecreated', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
-
-            $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
-            $table->add_key('userid', XMLDB_KEY_FOREIGN, ['userid'], 'user', ['id']);
-
-            $table->add_index('userid_action_time', XMLDB_INDEX_NOTUNIQUE, ['userid', 'action', 'timecreated']);
-            $table->add_index('timecreated', XMLDB_INDEX_NOTUNIQUE, ['timecreated']);
-
-            $dbman->create_table($table);
-        }
+        // Note: ratelimit_log table already created in version 2025111602.
+        // Schema matches install.xml (userid, limittype, details, timecreated).
 
         // Add courseid and userid fields to questions table if missing.
         $table = new xmldb_table('local_hlai_quizgen_questions');

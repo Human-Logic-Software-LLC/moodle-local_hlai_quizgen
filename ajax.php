@@ -1258,6 +1258,30 @@ try {
                 'repaired_status' => 0,
             ];
 
+            // Pre-load type-specific data existence to avoid N+1 queries.
+            $questionids = array_keys($questions);
+            $typedatasets = [];
+            if (!empty($questionids)) {
+                [$insql, $inparams] = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED);
+                // Batch-check each question type table.
+                $typetables = [
+                    'multichoice' => ['qtype_multichoice_options', 'questionid'],
+                    'truefalse' => ['question_truefalse', 'question'],
+                    'shortanswer' => ['qtype_shortanswer_options', 'questionid'],
+                    'essay' => ['qtype_essay_options', 'questionid'],
+                    'match' => ['qtype_match_options', 'questionid'],
+                    'matching' => ['qtype_match_options', 'questionid'],
+                ];
+                foreach ($typetables as $qtype => $tableinfo) {
+                    [$tbl, $col] = $tableinfo;
+                    $sql = "SELECT $col FROM {{$tbl}} WHERE $col $insql";
+                    $found = $DB->get_fieldset_sql($sql, $inparams);
+                    foreach ($found as $qid) {
+                        $typedatasets[$qid] = true;
+                    }
+                }
+            }
+
             foreach ($questions as $q) {
                 // Count by type.
                 if (!isset($result['by_type'][$q->qtype])) {
@@ -1274,28 +1298,12 @@ try {
                     ];
                 }
 
-                // Check if question type-specific data exists.
-                $hastypedata = false;
-                switch ($q->qtype) {
-                    case 'multichoice':
-                        $hastypedata = $DB->record_exists('qtype_multichoice_options', ['questionid' => $q->id]);
-                        break;
-                    case 'truefalse':
-                        $hastypedata = $DB->record_exists('question_truefalse', ['question' => $q->id]);
-                        break;
-                    case 'shortanswer':
-                        $hastypedata = $DB->record_exists('qtype_shortanswer_options', ['questionid' => $q->id]);
-                        break;
-                    case 'essay':
-                        $hastypedata = $DB->record_exists('qtype_essay_options', ['questionid' => $q->id]);
-                        break;
-                    case 'match':
-                    case 'matching':
-                        $hastypedata = $DB->record_exists('qtype_match_options', ['questionid' => $q->id]);
-                        break;
-                    default:
-                        $hastypedata = true; // Unknown types, assume ok.
-                }
+                // Check type-specific data from pre-loaded sets.
+                $knowntype = in_array($q->qtype, [
+                    'multichoice', 'truefalse', 'shortanswer',
+                    'essay', 'match', 'matching',
+                ]);
+                $hastypedata = !$knowntype || !empty($typedatasets[$q->id]);
 
                 if (!$hastypedata) {
                     $result['missing_type_data'][] = [
