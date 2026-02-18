@@ -25,8 +25,29 @@
     Example context (json):
     {
         "databaselogs": {
-            "filters": {"requestid": "", "level": "", "limit": 100},
-            "haslogs": true,
+            "filters": {
+                "heading": "Filters",
+                "requestid": "",
+                "requestidlabel": "Request ID",
+                "level": "",
+                "levellabel": "Level",
+                "leveloptions": [{"value": "info", "label": "Info", "selected": false}],
+                "alllabel": "All",
+                "limit": 100,
+                "limitlabel": "Limit",
+                "filterbtn": "Filter"
+            },
+            "haslogs": false,
+            "nologsmessage": "No logs found.",
+            "headers": {
+                "time": "Time",
+                "level": "Level",
+                "request": "Request",
+                "user": "User",
+                "component": "Component",
+                "message": "Message",
+                "details": "Details"
+            },
             "logs": []
         }
     }

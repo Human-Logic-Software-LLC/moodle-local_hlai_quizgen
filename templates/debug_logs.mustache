@@ -31,9 +31,30 @@
 
     Example context (json):
     {
-        "provider": {"ready": true, "statusclass": "success", "statuslabel": "Yes", "gatewayurl": "https://..."},
+        "provider": {
+            "heading": "AI Provider Status",
+            "available": true,
+            "activelabel": "Active",
+            "statusclass": "success",
+            "statuslabel": "Yes",
+            "gatewaylabel": "Gateway URL",
+            "gatewayurl": "https://example.com/gateway",
+            "showwarning": false,
+            "error": false
+        },
         "tabs": [{"key": "database", "label": "Database", "active": true, "url": "#"}],
-        "actions": {"systeminfourl": "#", "testlogurl": "#", "refreshurl": "#"}
+        "actions": {
+            "systeminfourl": "#",
+            "systeminfolabel": "System Info",
+            "testlogurl": "#",
+            "testloglabel": "Test Log",
+            "refreshurl": "#",
+            "refreshlabel": "Refresh"
+        },
+        "show_database": false,
+        "show_file": false,
+        "show_requests": false,
+        "show_system": false
     }
 }}
 <div class="hlai-quizgen-wrapper local-hlai-iksha">
