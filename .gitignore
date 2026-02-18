@@ -33,9 +33,6 @@ node_modules/
 *.log
 *.log.*
 
-# Build files (source maps only - .min.js files must be tracked for Moodle)
-amd/build/*.min.js.map
-
 # OS files
 Thumbs.db
 .DS_Store
