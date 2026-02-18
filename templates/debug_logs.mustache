@@ -61,7 +61,7 @@
 
     {{! AI Provider Status }}
     <div class="box mb-4">
-        <h3 class="title is-6 mb-3">{{provider.heading}}</h3>
+        <h3 class="title is-6 mb-3">{{#provider.heading}}{{provider.heading}}{{/provider.heading}}{{^provider.heading}}AI Provider{{/provider.heading}}</h3>
         {{#provider.available}}
         <div class="columns is-multiline is-mobile">
             <div class="column is-half">
