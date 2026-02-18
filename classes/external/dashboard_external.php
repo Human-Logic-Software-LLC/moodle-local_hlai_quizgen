@@ -24,9 +24,6 @@
 
 namespace local_hlai_quizgen\external;
 
-global $CFG;
-require_once("$CFG->libdir/externallib.php");
-
 /**
  * Dashboard external functions for the local_hlai_quizgen plugin.
  *

@@ -30,14 +30,6 @@
 
 namespace local_hlai_quizgen;
 
-// Only load Moodle module libraries if $CFG is available.
-global $CFG;
-if (isset($CFG)) {
-    require_once($CFG->dirroot . '/mod/page/lib.php');
-    require_once($CFG->dirroot . '/mod/book/lib.php');
-    require_once($CFG->dirroot . '/mod/lesson/lib.php');
-}
-
 // NOTE: No Composer/vendor dependencies - all extraction uses native PHP or system commands.
 
 /**

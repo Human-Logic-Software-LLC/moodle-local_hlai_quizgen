@@ -29,11 +29,6 @@
 
 namespace local_hlai_quizgen;
 
-global $CFG;
-require_once($CFG->dirroot . '/question/engine/bank.php');
-require_once($CFG->dirroot . '/mod/quiz/lib.php');
-require_once($CFG->dirroot . '/mod/quiz/locallib.php');
-
 /**
  * Quiz deployer class.
  */
@@ -54,7 +49,11 @@ class quiz_deployer {
         ?string $categoryname = null,
         ?\context $modulecontext = null
     ): array {
-        global $DB, $USER;
+        global $DB, $USER, $CFG;
+
+        require_once($CFG->dirroot . '/question/engine/bank.php');
+        require_once($CFG->dirroot . '/mod/quiz/lib.php');
+        require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 
         debugging(
             "deploy_to_question_bank: Starting with " . count($questionids) .
