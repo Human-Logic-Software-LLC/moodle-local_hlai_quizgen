@@ -1,0 +1,280 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template    local_hlai_quizgen/analytics
+    @copyright   2025 Human Logic Software LLC
+    @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Analytics page template.
+}}
+<div class="hlai-quizgen-wrapper local-hlai-quizgen hlai-mt-2rem">
+    {{! Page Header }}
+    <div class="level mb-5">
+        <div class="level-left">
+            <div>
+                <h1 class="title is-4 mb-1"><i class="fa fa-bar-chart hlai-icon-primary"></i>
+                    {{{analytics_dashboard}}}</h1>
+                <p class="subtitle is-6 has-text-grey">
+                    {{{analytics_dashboard_subtitle}}}</p>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="buttons">
+                <a href="{{{dashboardurl}}}" class="button is-light">
+                    <span><i class="fa fa-arrow-left hlai-icon-secondary"></i></span>
+                    <span>{{{analytics_back_to_dashboard}}}</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {{! Time Range Filter }}
+    <div class="box mb-4">
+        <div class="is-flex is-align-items-center">
+            <span class="has-text-weight-semibold mr-3"><i class="fa fa-calendar hlai-icon-info"></i>
+                {{{analytics_time_range}}}</span>
+            <div class="buttons has-addons">
+                {{#timeranges}}
+                <a href="{{{url}}}"
+                   class="button is-small {{#active}}is-primary{{/active}}{{^active}}is-light{{/active}}">
+                    {{{label}}}
+                </a>
+                {{/timeranges}}
+            </div>
+        </div>
+    </div>
+
+    {{! Summary Stats Row }}
+    <div class="columns is-multiline mb-5">
+        <div class="column">
+            <div class="box has-text-centered">
+                <p class="is-size-3"><i class="fa fa-file-text-o hlai-icon-primary"></i></p>
+                <p class="title is-4 mb-1">{{totalrequests}}</p>
+                <p class="heading">{{{analytics_quiz_generations}}}</p>
+                <p class="help has-text-grey">&nbsp;</p>
+            </div>
+        </div>
+        <div class="column">
+            <div class="box has-text-centered">
+                <p class="is-size-3"><i class="fa fa-question-circle hlai-icon-info"></i></p>
+                <p class="title is-4 mb-1">{{totalquestions}}</p>
+                <p class="heading">{{{analytics_questions_created}}}</p>
+                <p class="help has-text-grey">&nbsp;</p>
+            </div>
+        </div>
+        <div class="column">
+            <div class="box has-text-centered">
+                <p class="is-size-3"><i class="fa fa-check-circle hlai-icon-success"></i></p>
+                <p class="title is-4 mb-1">{{approvedquestions}}</p>
+                <p class="heading">{{{approved_label}}}</p>
+                <p class="help has-text-grey">
+                    {{{analytics_pct_acceptance}}}</p>
+            </div>
+        </div>
+        <div class="column">
+            <div class="box has-text-centered">
+                <p class="is-size-3"><i class="fa fa-times-circle hlai-icon-danger"></i></p>
+                <p class="title is-4 mb-1">{{rejectedquestions}}</p>
+                <p class="heading">{{{rejected_label}}}</p>
+                <p class="help has-text-grey">&nbsp;</p>
+            </div>
+        </div>
+        <div class="column">
+            <div class="box has-text-centered">
+                <p class="is-size-3"><i class="fa fa-star hlai-icon-warning"></i></p>
+                <p class="title is-4 mb-1">{{avgquality}}</p>
+                <p class="heading">{{{analytics_avg_quality}}}</p>
+                <p class="help has-text-grey">&nbsp;</p>
+            </div>
+        </div>
+        <div class="column">
+            <div class="box has-text-centered">
+                <p class="is-size-3"><i class="fa fa-bullseye hlai-icon-success"></i></p>
+                <p class="title is-4 mb-1">{{ftar}}%</p>
+                <p class="heading">{{{analytics_ftar}}}</p>
+                <p class="help has-text-grey">&nbsp;</p>
+            </div>
+        </div>
+    </div>
+
+    {{! Main Charts Row }}
+    <div class="columns">
+        <div class="column is-half">
+            <div class="box">
+                <p class="title is-6"><i class="fa fa-filter hlai-icon-info"></i>
+                    {{{analytics_review_funnel}}}</p>
+                <p class="has-text-grey is-size-7">
+                    {{{analytics_review_funnel_desc}}}</p>
+                <div id="funnel-chart" class="hlai-chart-h350"></div>
+            </div>
+        </div>
+
+        <div class="column is-half">
+            <div class="box">
+                <p class="title is-6"><i class="fa fa-star hlai-icon-warning"></i>
+                    {{{analytics_quality_score_dist}}}</p>
+                <p class="has-text-grey is-size-7">
+                    {{{analytics_quality_score_dist_desc}}}</p>
+                <div id="quality-dist-chart" class="hlai-chart-h350"></div>
+            </div>
+        </div>
+    </div>
+
+    {{! Question Type Analysis }}
+    <div class="box mt-4">
+        <p class="title is-6"><i class="fa fa-clipboard hlai-icon-secondary"></i>
+            {{{analytics_type_performance}}}</p>
+        <p class="has-text-grey is-size-7">{{{analytics_type_performance_desc}}}</p>
+        <div class="columns">
+            <div class="column is-half">
+                <div id="type-acceptance-chart" class="hlai-chart-h350"></div>
+            </div>
+            <div class="column is-half">
+                <div class="table-container">
+                    <table class="table is-fullwidth is-striped is-hoverable">
+                        <thead>
+                            <tr>
+                                <th>{{{question_type}}}</th>
+                                <th class="has-text-right">{{{analytics_total}}}</th>
+                                <th class="has-text-right">{{{approved_label}}}</th>
+                                <th class="has-text-right">{{{analytics_rate}}}</th>
+                                <th class="has-text-right">
+                                    {{{analytics_avg_regen}}}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#typerows}}
+                            <tr>
+                                <td>
+                                    <span class="tag is-info is-light">{{{typename}}}</span>
+                                </td>
+                                <td class="has-text-right">{{count}}</td>
+                                <td class="has-text-right">{{approved}}</td>
+                                <td class="has-text-right">
+                                    <span class="tag {{rateclass}} is-light">
+                                        {{rate}}%
+                                    </span>
+                                </td>
+                                <td class="has-text-right">{{avgregen}}</td>
+                            </tr>
+                            {{/typerows}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{! Difficulty & Bloom's Analysis }}
+    <div class="columns mt-4">
+        <div class="column is-half">
+            <div class="box">
+                <p class="title is-6"><i class="fa fa-signal hlai-icon-info"></i>
+                    {{{analytics_difficulty_analysis}}}</p>
+                <p class="has-text-grey is-size-7">
+                    {{{analytics_difficulty_analysis_desc}}}</p>
+                <div id="difficulty-analysis-chart" class="hlai-chart-h350"></div>
+            </div>
+        </div>
+        <div class="column is-half">
+            <div class="box">
+                <p class="title is-6"><i class="fa fa-lightbulb-o hlai-icon-primary"></i>
+                    {{{blooms_coverage}}}</p>
+                <p class="has-text-grey is-size-7">
+                    {{{analytics_cognitive_level_dist}}}</p>
+                <div id="blooms-coverage-chart" class="hlai-chart-h350"></div>
+            </div>
+        </div>
+    </div>
+
+    {{! Regeneration Analysis }}
+    <div class="box mt-4">
+        <p class="title is-6"><i class="fa fa-refresh hlai-icon-warning"></i>
+            {{{analytics_regen_analysis}}}</p>
+        <p class="has-text-grey is-size-7">{{{analytics_regen_analysis_desc}}}</p>
+        <div class="columns">
+            <div class="column is-half">
+                <p class="has-text-weight-semibold mb-3">
+                    {{{analytics_regen_distribution}}}</p>
+                <div id="regen-dist-chart" class="hlai-chart-h280"></div>
+            </div>
+            <div class="column is-half">
+                <p class="has-text-weight-semibold mb-3">
+                    {{{analytics_regen_by_difficulty}}}</p>
+                <div id="regen-by-difficulty-chart" class="hlai-chart-h280"></div>
+            </div>
+        </div>
+    </div>
+
+    {{! Rejection Analysis }}
+    {{#hasrejectionreasons}}
+    <div class="box mt-4">
+        <p class="title is-6"><i class="fa fa-times-circle hlai-icon-danger"></i>
+            {{{analytics_rejection_analysis}}}</p>
+        <p class="has-text-grey is-size-7">{{{analytics_rejection_analysis_desc}}}</p>
+        <div class="columns">
+            <div class="column is-half">
+                <div id="rejection-reasons-chart" class="hlai-chart-h300"></div>
+            </div>
+            <div class="column is-half">
+                <div class="box">
+                    <p class="title is-6 mb-3">
+                        {{{analytics_top_rejection_reasons}}}</p>
+                    <ul class="hlai-simple-list">
+                        {{#rejectionreasons}}
+                        <li class="is-flex is-justify-content-space-between is-align-items-center">
+                            <span>{{{reason}}}</span>
+                            <span class="tag is-danger is-light">{{count}}</span>
+                        </li>
+                        {{/rejectionreasons}}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/hasrejectionreasons}}
+
+    {{! Trends Over Time }}
+    <div class="box mt-4">
+        <p class="title is-6"><i class="fa fa-line-chart hlai-icon-primary"></i>
+            {{{analytics_trends_over_time}}}</p>
+        <p class="has-text-grey is-size-7">{{{analytics_trends_over_time_desc}}}</p>
+        <div id="trends-chart" class="hlai-chart-h350"></div>
+    </div>
+
+    {{! Insights & Recommendations }}
+    <div class="box mt-4">
+        <p class="title is-6"><i class="fa fa-lightbulb-o hlai-icon-warning"></i>
+            {{{analytics_insights_recommendations}}}</p>
+        <div class="columns">
+            {{#insights}}
+            <div class="column is-one-third">
+                <div class="notification is-{{type}} is-light">
+                    <div class="is-flex is-align-items-start">
+                        <span class="mr-3 hlai-font-lg"><i class="fa {{iconclass}}"></i></span>
+                        <div>
+                            <strong>{{{title}}}</strong>
+                            <p class="mt-2">{{{message}}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{/insights}}
+        </div>
+    </div>
+</div>
+<div class="hlai-spacer-60"></div>

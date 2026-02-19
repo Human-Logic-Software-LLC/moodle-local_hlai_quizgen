@@ -1,0 +1,57 @@
+{{!
+    @template local_hlai_quizgen/wizard
+
+    AI Quiz Generator 5-step wizard page template.
+
+    Context variables required for this template:
+    * stepclass - CSS class for current step (e.g. hlai-step-1, hlai-step-progress)
+    * wizard_title - Wizard heading text
+    * wizard_subtitle - Wizard subtitle text
+    * steps - Array of step indicator items, each with:
+        * number - Step number (1-5)
+        * title - Step title string
+        * is_active - Whether this is the current step
+        * is_completed - Whether this step is completed
+    * stephtml - Pre-rendered HTML for the current step content
+
+    Example context (json):
+    {
+        "stepclass": "hlai-step-1",
+        "wizard_title": "AI Quiz Generator",
+        "wizard_subtitle": "Generate questions from your course content",
+        "steps": [
+            {"number": 1, "title": "Content", "is_active": true, "is_completed": false},
+            {"number": 2, "title": "Configure", "is_active": false, "is_completed": false}
+        ],
+        "stephtml": "<div>Step content here</div>"
+    }
+}}
+<div class="hlai-quizgen-wrapper hlai-quizgen-wizard local-hlai-quizgen {{stepclass}}">
+
+    {{! Wizard header }}
+    <div class="has-text-centered mb-5">
+        <h2 class="has-text-weight-bold hlai-wizard-heading">{{{wizard_title}}}</h2>
+        <p class="has-text-grey">{{{wizard_subtitle}}}</p>
+    </div>
+
+    {{! Step indicator }}
+    <div class="hlai-steps mb-5">
+        {{#steps}}
+        <div class="hlai-step-item{{#is_active}} is-active{{/is_active}}{{#is_completed}} is-completed{{/is_completed}}">
+            <div class="hlai-step-marker">{{number}}</div>
+            <div class="hlai-step-details">
+                <div class="hlai-step-title">{{title}}</div>
+            </div>
+        </div>
+        {{/steps}}
+    </div>
+
+    {{! Step content }}
+    <div class="wizard-step-content" id="wizard-step-content">
+        {{{stephtml}}}
+    </div>
+
+</div>
+
+{{! Footer spacer }}
+<div class="hlai-spacer-60"></div>

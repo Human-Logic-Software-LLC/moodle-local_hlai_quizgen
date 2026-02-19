@@ -44,6 +44,7 @@ class template_external extends \external_api {
     public static function save_template_parameters() {
         return new \external_function_parameters([
             'name' => new \external_value(PARAM_TEXT, 'The name of the template'),
+            // PARAM_RAW required for JSON object input; validated via json_decode() in method body.
             'config' => new \external_value(PARAM_RAW, 'The template configuration as a JSON string'),
             'courseid' => new \external_value(PARAM_INT, 'The course ID (0 for user-level)', VALUE_DEFAULT, 0),
         ]);

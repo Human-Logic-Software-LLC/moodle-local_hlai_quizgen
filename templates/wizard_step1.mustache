@@ -1,0 +1,274 @@
+{{!
+    @template local_hlai_quizgen/wizard_step1
+
+    Wizard step 1: Content source selection.
+
+    Context variables required for this template:
+    * step1_title - Step heading text
+    * step1_description - Step subtitle text
+    * form_url - Form action URL
+    * sesskey - Session key
+    * courseid - Course ID
+    * select_content_sources - Label text
+    * select_content_sources_help - Help text
+    * group1_title - "Add Your Own Content" heading (HTML)
+    * group2_title - "Use Course Content" heading (HTML)
+    * source_manual / source_manual_desc - Manual entry labels
+    * source_upload / source_upload_desc - File upload labels
+    * source_url / source_url_desc - URL extraction labels
+    * source_activities / source_activities_desc - Activities labels
+    * wizard_recommended - Recommended badge text
+    * source_scan_course / source_scan_course_desc - Scan course labels
+    * source_scan_resources / source_scan_resources_desc - Scan resources labels
+    * source_scan_activities / source_scan_activities_desc - Scan activities labels
+    * selected_sources - "Selected sources" label
+    * manual_text_entry / manual_text_entry_help / manual_text_placeholder - Manual textarea
+    * upload_files / upload_files_help / choose_files / no_files_selected - File upload section
+    * supported_formats - Supported formats text
+    * php_limits - PHP upload limits text (HTML)
+    * url_label / url_help / url_placeholder / url_per_line_help - URL section
+    * select_activities / select_activities_help - Activity selector heading
+    * has_activities - Whether activities exist
+    * activities_count_text - "N activities available" text
+    * select_all - Select all button text
+    * deselect_all - Deselect all button text
+    * activities - Array of activity objects with: id, name, type, emoji_html
+    * n_activities_selected - "0 activities selected" text
+    * noactivities - No activities message
+    * cancel_url - Cancel button URL
+    * cancel - Cancel button text
+    * next - Next button text
+
+    Example context (json):
+    {
+        "has_activities": true,
+        "activities": [{"id": 1, "name": "Lesson 1", "type": "Page", "emoji_html": "<i class=\"fa fa-file\"></i>"}]
+    }
+}}
+<div class="hlai-step-content">
+    <h2 class="title is-4 mb-0">{{{step1_title}}}</h2>
+    <p class="subtitle is-6 has-text-grey mt-1 mb-4">{{{step1_description}}}</p>
+    <hr class="mt-0 mb-5">
+
+    <form method="post" action="{{form_url}}" id="content-upload-form" enctype="multipart/form-data">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+        <input type="hidden" name="action" value="upload_content">
+        <input type="hidden" name="courseid" value="{{courseid}}">
+
+        {{! Content source selection }}
+        <div class="field mb-5">
+            <label class="label is-medium">{{{select_content_sources}}}</label>
+            <p class="help mb-4">{{{select_content_sources_help}}}</p>
+
+            {{! GROUP 1: Add Your Own Content }}
+            <div class="hlai-source-group mb-5">
+                <h5 class="hlai-source-group-title"><i class="fa fa-pencil hlai-icon-warning"></i> {{{group1_title}}}</h5>
+                <div class="columns is-multiline">
+                    {{! Option 1: Manual Text Entry }}
+                    <div class="column is-4">
+                        <label class="hlai-source-card" for="source_manual">
+                            <input type="checkbox" name="content_sources[]" value="manual" id="source_manual" class="content-source-checkbox hlai-source-check" data-source="manual">
+                            <div class="hlai-source-content">
+                                <span class="hlai-source-icon"><i class="fa fa-pencil hlai-icon-warning"></i></span>
+                                <strong class="hlai-source-title">{{{source_manual}}}</strong>
+                                <p class="hlai-source-desc">{{{source_manual_desc}}}</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    {{! Option 2: File Upload }}
+                    <div class="column is-4">
+                        <label class="hlai-source-card" for="source_upload">
+                            <input type="checkbox" name="content_sources[]" value="upload" id="source_upload" class="content-source-checkbox hlai-source-check" data-source="upload">
+                            <div class="hlai-source-content">
+                                <span class="hlai-source-icon"><i class="fa fa-folder-open hlai-icon-purple"></i></span>
+                                <strong class="hlai-source-title">{{{source_upload}}}</strong>
+                                <p class="hlai-source-desc">{{{source_upload_desc}}}</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    {{! Option 3: URL Extraction }}
+                    <div class="column is-4">
+                        <label class="hlai-source-card" for="source_url">
+                            <input type="checkbox" name="content_sources[]" value="url" id="source_url" class="content-source-checkbox hlai-source-check" data-source="url">
+                            <div class="hlai-source-content">
+                                <span class="hlai-source-icon"><i class="fa fa-globe hlai-icon-info"></i></span>
+                                <strong class="hlai-source-title">{{{source_url_title}}}</strong>
+                                <p class="hlai-source-desc">{{{source_url_desc}}}</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            {{! GROUP 2: Use Course Content }}
+            <div class="hlai-source-group">
+                <h5 class="hlai-source-group-title"><i class="fa fa-book hlai-icon-success"></i> {{{group2_title}}}</h5>
+                <div class="columns is-multiline">
+                    {{! Option 4: Course Activities }}
+                    <div class="column is-6">
+                        <label class="hlai-source-card hlai-source-featured" for="source_activities">
+                            <input type="checkbox" name="content_sources[]" value="activities" id="source_activities" class="content-source-checkbox hlai-source-check" data-source="activities">
+                            <div class="hlai-source-content">
+                                <span class="hlai-source-icon hlai-icon-lg"><i class="fa fa-book hlai-icon-primary"></i></span>
+                                <div class="hlai-source-text">
+                                    <strong class="hlai-source-title">{{{source_activities}}}</strong>
+                                    <p class="hlai-source-desc">{{{source_activities_desc}}}</p>
+                                    <span class="hlai-source-badge"><i class="fa fa-star hlai-icon-warning"></i> {{{wizard_recommended}}}</span>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    {{! Option 5: Scan Entire Course }}
+                    <div class="column is-6">
+                        <label class="hlai-source-card" for="source_scan_course">
+                            <input type="checkbox" name="content_sources[]" value="scan_course" id="source_scan_course" class="content-source-checkbox hlai-source-check" data-source="scan_course">
+                            <div class="hlai-source-content">
+                                <span class="hlai-source-icon"><i class="fa fa-graduation-cap hlai-icon-success"></i></span>
+                                <strong class="hlai-source-title">{{{source_scan_course}}}</strong>
+                                <p class="hlai-source-desc">{{{source_scan_course_desc}}}</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    {{! Option 6: Scan All Resources }}
+                    <div class="column is-6">
+                        <label class="hlai-source-card" for="source_scan_resources">
+                            <input type="checkbox" name="content_sources[]" value="scan_resources" id="source_scan_resources" class="content-source-checkbox hlai-source-check" data-source="scan_resources">
+                            <div class="hlai-source-content">
+                                <span class="hlai-source-icon"><i class="fa fa-book hlai-icon-purple"></i></span>
+                                <strong class="hlai-source-title">{{{source_scan_resources}}}</strong>
+                                <p class="hlai-source-desc">{{{source_scan_resources_desc}}}</p>
+                            </div>
+                        </label>
+                    </div>
+
+                    {{! Option 7: Scan All Activities }}
+                    <div class="column is-6">
+                        <label class="hlai-source-card" for="source_scan_activities">
+                            <input type="checkbox" name="content_sources[]" value="scan_activities" id="source_scan_activities" class="content-source-checkbox hlai-source-check" data-source="scan_activities">
+                            <div class="hlai-source-content">
+                                <span class="hlai-source-icon"><i class="fa fa-edit hlai-icon-danger"></i></span>
+                                <strong class="hlai-source-title">{{{source_scan_activities}}}</strong>
+                                <p class="hlai-source-desc">{{{source_scan_activities_desc}}}</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            {{! Selected sources display }}
+            <div class="notification is-info is-light mt-4 hlai-hidden" id="selected-sources-display">
+                <strong>{{{selected_sources}}}: </strong>
+                <span id="selected-sources-list" class="tag is-primary is-medium ml-2"></span>
+            </div>
+        </div>
+
+        {{! Bulk scan hidden sections }}
+        <div class="hlai-hidden" id="section-scan_course"></div>
+        <div class="hlai-hidden" id="section-scan_resources"></div>
+        <div class="hlai-hidden" id="section-scan_activities"></div>
+
+        {{! Manual text entry section }}
+        <div class="field mb-5 hlai-hidden" id="section-manual">
+            <label class="label"><i class="fa fa-pencil hlai-icon-warning"></i> {{{manual_text_entry}}}</label>
+            <p class="help mb-3">{{{manual_text_entry_help}}}</p>
+            <div class="control">
+                <textarea name="manual_text" id="manual_text" rows="8" class="textarea" placeholder="{{manual_text_placeholder}}"></textarea>
+            </div>
+        </div>
+
+        {{! File upload section }}
+        <div class="field mb-5 hlai-hidden" id="section-upload">
+            <label class="label"><i class="fa fa-folder-open hlai-icon-purple"></i> {{{upload_files}}}</label>
+            <p class="help mb-3">{{{upload_files_help}}}</p>
+            <div class="file has-name is-boxed is-fullwidth">
+                <label class="file-label">
+                    <input type="file" name="contentfiles[]" id="content-files" class="file-input" multiple="multiple" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt">
+                    <span class="file-cta">
+                        <span class="file-icon is-size-4">&#x1F4C2;</span>
+                        <span class="file-label">{{{choose_files}}}</span>
+                    </span>
+                    <span class="file-name">{{{no_files_selected}}}</span>
+                </label>
+            </div>
+            <p class="help mt-2">{{{supported_formats}}}</p>
+            <div class="mt-2"><small class="has-text-grey is-size-7">{{{php_limits}}}</small></div>
+            <div class="mt-2" id="uploaded-files-list"></div>
+        </div>
+
+        {{! URL extraction section }}
+        <div class="field mb-5 hlai-hidden" id="section-url">
+            <label class="label"><i class="fa fa-globe hlai-icon-info"></i> {{{url_label}}}</label>
+            <p class="help mb-3">{{{url_help}}}</p>
+            <div class="control">
+                <textarea name="url_list" id="url_list" rows="4" class="textarea" placeholder="{{url_placeholder}}"></textarea>
+            </div>
+            <p class="help mt-2">{{{url_per_line_help}}}</p>
+        </div>
+
+        {{! Activity selection section }}
+        <div class="hlai-activities-section hlai-hidden" id="section-activities">
+            <div class="hlai-activities-header">
+                <span class="hlai-activities-icon"><i class="fa fa-book hlai-icon-info"></i></span>
+                <div class="hlai-activities-header-text">
+                    <h3 class="hlai-activities-title">{{{select_activities}}}</h3>
+                    <p class="hlai-activities-subtitle">{{{select_activities_help}}}</p>
+                </div>
+            </div>
+
+            {{#has_activities}}
+            <div class="hlai-activities-actions">
+                <div class="hlai-activities-buttons">
+                    <button type="button" id="select-all-activities" class="hlai-action-btn hlai-action-select">
+                        <i class="fa fa-check"></i> {{{select_all}}}
+                    </button>
+                    <button type="button" id="deselect-all-activities" class="hlai-action-btn hlai-action-deselect">
+                        <i class="fa fa-times"></i> {{{deselect_all}}}
+                    </button>
+                </div>
+                <span class="hlai-activities-count">{{{activities_count_text}}}</span>
+            </div>
+
+            <div class="hlai-activities-list">
+                {{#activities}}
+                <label class="hlai-activity-card">
+                    <input type="checkbox" name="activityids[]" value="{{id}}" class="hlai-activity-checkbox">
+                    <span class="hlai-activity-checkmark"></span>
+                    <div class="hlai-activity-content">
+                        <span class="hlai-activity-emoji">{{{emoji_html}}}</span>
+                        <div class="hlai-activity-text">
+                            <span class="hlai-activity-name">{{{name}}}</span>
+                            <span class="hlai-activity-type">{{{type}}}</span>
+                        </div>
+                    </div>
+                </label>
+                {{/activities}}
+            </div>
+
+            <div class="hlai-activities-selected-bar">
+                <span class="hlai-selected-icon"><i class="fa fa-check-circle"></i></span>
+                <span id="selected-activities-count" class="hlai-selected-text">{{{n_activities_selected}}}</span>
+            </div>
+            {{/has_activities}}
+
+            {{^has_activities}}
+            <div class="notification is-info is-light">{{{noactivities}}}</div>
+            {{/has_activities}}
+        </div>
+
+        {{! Navigation buttons }}
+        <div class="level is-mobile mt-6 pt-4 hlai-border-top">
+            <div class="level-left">
+                <a href="{{cancel_url}}" class="button is-light">{{{cancel}}}</a>
+            </div>
+            <div class="level-right">
+                <button type="submit" class="button is-primary" id="step1-next">
+                    {{{next}}} <i class="fa fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

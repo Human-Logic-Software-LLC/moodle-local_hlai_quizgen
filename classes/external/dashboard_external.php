@@ -667,16 +667,34 @@ class dashboard_external extends \external_api {
             '91-100' => [91, 100],
         ];
 
+        // Single query with CASE WHEN instead of 10 separate COUNT queries.
+        $sql = "SELECT
+                    SUM(CASE WHEN validation_score >= 0 AND validation_score <= 10 THEN 1 ELSE 0 END) AS r0_10,
+                    SUM(CASE WHEN validation_score >= 11 AND validation_score <= 20 THEN 1 ELSE 0 END) AS r11_20,
+                    SUM(CASE WHEN validation_score >= 21 AND validation_score <= 30 THEN 1 ELSE 0 END) AS r21_30,
+                    SUM(CASE WHEN validation_score >= 31 AND validation_score <= 40 THEN 1 ELSE 0 END) AS r31_40,
+                    SUM(CASE WHEN validation_score >= 41 AND validation_score <= 50 THEN 1 ELSE 0 END) AS r41_50,
+                    SUM(CASE WHEN validation_score >= 51 AND validation_score <= 60 THEN 1 ELSE 0 END) AS r51_60,
+                    SUM(CASE WHEN validation_score >= 61 AND validation_score <= 70 THEN 1 ELSE 0 END) AS r61_70,
+                    SUM(CASE WHEN validation_score >= 71 AND validation_score <= 80 THEN 1 ELSE 0 END) AS r71_80,
+                    SUM(CASE WHEN validation_score >= 81 AND validation_score <= 90 THEN 1 ELSE 0 END) AS r81_90,
+                    SUM(CASE WHEN validation_score >= 91 AND validation_score <= 100 THEN 1 ELSE 0 END) AS r91_100
+                FROM {local_hlai_quizgen_questions}
+                WHERE userid = ?";
+        $row = $DB->get_record_sql($sql, [$userid]);
+
         $labels = [];
         $values = [];
+        $fieldmap = [
+            '0-10' => 'r0_10', '11-20' => 'r11_20', '21-30' => 'r21_30',
+            '31-40' => 'r31_40', '41-50' => 'r41_50', '51-60' => 'r51_60',
+            '61-70' => 'r61_70', '71-80' => 'r71_80', '81-90' => 'r81_90',
+            '91-100' => 'r91_100',
+        ];
         foreach ($ranges as $label => $range) {
-            $count = $DB->count_records_sql(
-                "SELECT COUNT(*) FROM {local_hlai_quizgen_questions}
-                 WHERE userid = ? AND validation_score >= ? AND validation_score <= ?",
-                [$userid, $range[0], $range[1]]
-            );
             $labels[] = $label;
-            $values[] = (int) $count;
+            $field = $fieldmap[$label];
+            $values[] = (int) ($row->$field ?? 0);
         }
 
         return [

@@ -30,8 +30,8 @@ $doreset   = optional_param('doreset', 0, PARAM_BOOL);
 require_login();
 $context = context_system::instance();
 // Allow quizgen report viewers or site admins.
-if (!has_capability('local_hlai_quizgen:viewreports', $context) && !has_capability('moodle/site:config', $context)) {
-    require_capability('local_hlai_quizgen:viewreports', $context);
+if (!has_capability('local/hlai_quizgen:viewreports', $context) && !has_capability('moodle/site:config', $context)) {
+    require_capability('local/hlai_quizgen:viewreports', $context);
 }
 
 $PAGE->set_url('/local/hlai_quizgen/reset_request.php', ['requestid' => $requestid]);
@@ -45,7 +45,7 @@ global $DB, $OUTPUT;
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('reset_request_title', 'local_hlai_quizgen'), 2);
-echo html_writer::start_div('hlai-quizgen-wrapper local-hlai-iksha');
+echo html_writer::start_div('hlai-quizgen-wrapper local-hlai-quizgen');
 
 echo html_writer::div(
     get_string('reset_request_info', 'local_hlai_quizgen'),

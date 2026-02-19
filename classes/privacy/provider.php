@@ -904,15 +904,34 @@ class provider implements
     private static function delete_request_data(int $requestid): void {
         global $DB;
 
-        // Get questions.
+        // Get questions to cascade-delete child records.
         $questions = $DB->get_records('local_hlai_quizgen_questions', ['requestid' => $requestid]);
 
         foreach ($questions as $question) {
+            // Delete all child records linked to this question.
             $DB->delete_records('local_hlai_quizgen_answers', ['questionid' => $question->id]);
+            $DB->delete_records('local_hlai_quizgen_outcome_map', ['questionid' => $question->id]);
+            $DB->delete_records('local_hlai_quizgen_calibration', ['questionid' => $question->id]);
+            $DB->delete_records('local_hlai_quizgen_alternatives', ['original_questionid' => $question->id]);
+            $DB->delete_records('local_hlai_quizgen_refinements', ['questionid' => $question->id]);
+            $DB->delete_records('local_hlai_quizgen_refine_suggest', ['questionid' => $question->id]);
+
+            // Delete review records and their children.
+            $reviews = $DB->get_records('local_hlai_quizgen_reviews', ['questionid' => $question->id]);
+            foreach ($reviews as $review) {
+                $DB->delete_records('local_hlai_quizgen_review_comments', ['reviewid' => $review->id]);
+                $DB->delete_records('local_hlai_quizgen_review_ratings', ['reviewid' => $review->id]);
+                $DB->delete_records('local_hlai_quizgen_revision_issues', ['reviewid' => $review->id]);
+                $DB->delete_records('local_hlai_quizgen_revisions', ['reviewid' => $review->id]);
+                $DB->delete_records('local_hlai_quizgen_review_log', ['reviewid' => $review->id]);
+            }
+            $DB->delete_records('local_hlai_quizgen_reviews', ['questionid' => $question->id]);
         }
 
+        // Delete request-level child records.
         $DB->delete_records('local_hlai_quizgen_questions', ['requestid' => $requestid]);
         $DB->delete_records('local_hlai_quizgen_topics', ['requestid' => $requestid]);
+        $DB->delete_records('local_hlai_quizgen_url_content', ['requestid' => $requestid]);
         $DB->delete_records('local_hlai_quizgen_logs', ['requestid' => $requestid]);
         $DB->delete_records('local_hlai_quizgen_requests', ['id' => $requestid]);
     }

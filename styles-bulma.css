@@ -55,11 +55,11 @@ body.path-local-hlai_quizgen.hlai-step-2 #page-footer {
 }
 
 /* ==========================================================================
-   CSS CUSTOM PROPERTIES (Iksha Design Tokens)
+   CSS CUSTOM PROPERTIES (QuizGen Design Tokens)
    ========================================================================== */
 
 body.path-local-hlai_quizgen {
-    /* Brand Colors - Standardized Iksha Blue */
+    /* Brand Colors - Standardized QuizGen Blue */
     --hlai-primary: #3B82F6;
     --hlai-primary-light: #EFF6FF;
     --hlai-primary-dark: #1D4ED8;
@@ -98,7 +98,7 @@ body.path-local-hlai_quizgen {
     --hlai-space-5: 1.25rem;
     --hlai-space-6: 1.5rem;
     
-    /* Border Radius - Professional (Iksha) */
+    /* Border Radius - Professional (QuizGen) */
     --hlai-radius-sm: 4px;
     --hlai-radius-md: 6px;
     --hlai-radius-lg: 8px;
@@ -5227,7 +5227,7 @@ body.path-local-hlai_quizgen {
     }
 }
 /* ==========================================================================
-   CARD COMPONENT (Standard Bulma Implementation with Iksha Style)
+   CARD COMPONENT (Standard Bulma Implementation with QuizGen Style)
    ========================================================================== */
 
 .hlai-quizgen-wrapper .card {
@@ -8875,191 +8875,191 @@ body.path-local-hlai_quizgen {
 }
 
 /* ==========================================================================
-   IK SHA THEME ALIGNMENT (QuizGen)
+   QUIZGEN THEME ALIGNMENT
    ========================================================================== */
 
-.hlai-quizgen-wrapper.local-hlai-iksha,
-.hlai-quizgen-wizard.local-hlai-iksha {
-    --iksha-primary: var(--hlai-primary);
-    --iksha-primary-light: var(--hlai-primary-light);
-    --iksha-primary-dark: var(--hlai-primary-dark);
+.hlai-quizgen-wrapper.local-hlai-quizgen,
+.hlai-quizgen-wizard.local-hlai-quizgen {
+    --quizgen-primary: var(--hlai-primary);
+    --quizgen-primary-light: var(--hlai-primary-light);
+    --quizgen-primary-dark: var(--hlai-primary-dark);
 
-    --iksha-success: var(--hlai-success);
-    --iksha-success-light: var(--hlai-success-light);
-    --iksha-success-dark: #059669;
+    --quizgen-success: var(--hlai-success);
+    --quizgen-success-light: var(--hlai-success-light);
+    --quizgen-success-dark: #059669;
 
-    --iksha-warning: var(--hlai-warning);
-    --iksha-warning-light: var(--hlai-warning-light);
-    --iksha-warning-dark: #D97706;
+    --quizgen-warning: var(--hlai-warning);
+    --quizgen-warning-light: var(--hlai-warning-light);
+    --quizgen-warning-dark: #D97706;
 
-    --iksha-danger: var(--hlai-danger);
-    --iksha-danger-light: var(--hlai-danger-light);
-    --iksha-danger-dark: #DC2626;
+    --quizgen-danger: var(--hlai-danger);
+    --quizgen-danger-light: var(--hlai-danger-light);
+    --quizgen-danger-dark: #DC2626;
 
-    --iksha-info: var(--hlai-info);
-    --iksha-info-light: var(--hlai-info-light);
-    --iksha-info-dark: #0891B2;
+    --quizgen-info: var(--hlai-info);
+    --quizgen-info-light: var(--hlai-info-light);
+    --quizgen-info-dark: #0891B2;
 
-    --iksha-gray-50: var(--hlai-gray-50);
-    --iksha-gray-100: var(--hlai-gray-100);
-    --iksha-gray-200: var(--hlai-gray-200);
-    --iksha-gray-300: var(--hlai-gray-300);
-    --iksha-gray-400: var(--hlai-gray-400);
-    --iksha-gray-500: var(--hlai-gray-500);
-    --iksha-gray-600: var(--hlai-gray-600);
-    --iksha-gray-700: var(--hlai-gray-700);
-    --iksha-gray-800: var(--hlai-gray-800);
-    --iksha-gray-900: var(--hlai-gray-900);
+    --quizgen-gray-50: var(--hlai-gray-50);
+    --quizgen-gray-100: var(--hlai-gray-100);
+    --quizgen-gray-200: var(--hlai-gray-200);
+    --quizgen-gray-300: var(--hlai-gray-300);
+    --quizgen-gray-400: var(--hlai-gray-400);
+    --quizgen-gray-500: var(--hlai-gray-500);
+    --quizgen-gray-600: var(--hlai-gray-600);
+    --quizgen-gray-700: var(--hlai-gray-700);
+    --quizgen-gray-800: var(--hlai-gray-800);
+    --quizgen-gray-900: var(--hlai-gray-900);
 
-    --iksha-font-family: var(--hlai-font-sans);
-    --iksha-font-mono: var(--hlai-font-mono);
+    --quizgen-font-family: var(--hlai-font-sans);
+    --quizgen-font-mono: var(--hlai-font-mono);
 
-    --iksha-text-xs: 0.75rem;
-    --iksha-text-sm: 0.8125rem;
-    --iksha-text-base: 0.875rem;
-    --iksha-text-lg: 1rem;
-    --iksha-text-xl: 1.125rem;
-    --iksha-text-2xl: 1.5rem;
-    --iksha-text-3xl: 1.875rem;
-    --iksha-text-4xl: 2.25rem;
+    --quizgen-text-xs: 0.75rem;
+    --quizgen-text-sm: 0.8125rem;
+    --quizgen-text-base: 0.875rem;
+    --quizgen-text-lg: 1rem;
+    --quizgen-text-xl: 1.125rem;
+    --quizgen-text-2xl: 1.5rem;
+    --quizgen-text-3xl: 1.875rem;
+    --quizgen-text-4xl: 2.25rem;
 
-    --iksha-space-1: var(--hlai-space-1);
-    --iksha-space-2: var(--hlai-space-2);
-    --iksha-space-3: var(--hlai-space-3);
-    --iksha-space-4: var(--hlai-space-4);
-    --iksha-space-5: var(--hlai-space-5);
-    --iksha-space-6: var(--hlai-space-6);
-    --iksha-space-8: 2rem;
+    --quizgen-space-1: var(--hlai-space-1);
+    --quizgen-space-2: var(--hlai-space-2);
+    --quizgen-space-3: var(--hlai-space-3);
+    --quizgen-space-4: var(--hlai-space-4);
+    --quizgen-space-5: var(--hlai-space-5);
+    --quizgen-space-6: var(--hlai-space-6);
+    --quizgen-space-8: 2rem;
 
-    --iksha-radius-sm: var(--hlai-radius-sm);
-    --iksha-radius-md: var(--hlai-radius-md);
-    --iksha-radius-lg: var(--hlai-radius-lg);
-    --iksha-radius-xl: var(--hlai-radius-xl);
-    --iksha-radius-full: var(--hlai-radius-full);
+    --quizgen-radius-sm: var(--hlai-radius-sm);
+    --quizgen-radius-md: var(--hlai-radius-md);
+    --quizgen-radius-lg: var(--hlai-radius-lg);
+    --quizgen-radius-xl: var(--hlai-radius-xl);
+    --quizgen-radius-full: var(--hlai-radius-full);
 
-    --iksha-shadow-sm: var(--hlai-shadow-xs);
-    --iksha-shadow-md: var(--hlai-shadow-sm);
-    --iksha-shadow-lg: var(--hlai-shadow-md);
+    --quizgen-shadow-sm: var(--hlai-shadow-xs);
+    --quizgen-shadow-md: var(--hlai-shadow-sm);
+    --quizgen-shadow-lg: var(--hlai-shadow-md);
 
-    --iksha-transition-fast: var(--hlai-transition-fast);
-    --iksha-transition-base: 200ms ease;
-    --iksha-transition-slow: 300ms ease;
+    --quizgen-transition-fast: var(--hlai-transition-fast);
+    --quizgen-transition-base: 200ms ease;
+    --quizgen-transition-slow: 300ms ease;
 }
 
-.hlai-quizgen-wrapper.local-hlai-iksha,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) {
-    color: var(--iksha-gray-700);
-    font-family: var(--iksha-font-family);
-    font-size: var(--iksha-text-base);
+.hlai-quizgen-wrapper.local-hlai-quizgen,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) {
+    color: var(--quizgen-gray-700);
+    font-family: var(--quizgen-font-family);
+    font-size: var(--quizgen-text-base);
 }
 
-.hlai-quizgen-wrapper.local-hlai-iksha h1,
-.hlai-quizgen-wrapper.local-hlai-iksha h2,
-.hlai-quizgen-wrapper.local-hlai-iksha h3,
-.hlai-quizgen-wrapper.local-hlai-iksha h4,
-.hlai-quizgen-wrapper.local-hlai-iksha h5,
-.hlai-quizgen-wrapper.local-hlai-iksha h6,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) h1,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) h2,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) h3,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) h4,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) h5,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) h6 {
-    color: var(--iksha-gray-900);
+.hlai-quizgen-wrapper.local-hlai-quizgen h1,
+.hlai-quizgen-wrapper.local-hlai-quizgen h2,
+.hlai-quizgen-wrapper.local-hlai-quizgen h3,
+.hlai-quizgen-wrapper.local-hlai-quizgen h4,
+.hlai-quizgen-wrapper.local-hlai-quizgen h5,
+.hlai-quizgen-wrapper.local-hlai-quizgen h6,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) h1,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) h2,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) h3,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) h4,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) h5,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) h6 {
+    color: var(--quizgen-gray-900);
     font-weight: 600;
 }
 
-.hlai-quizgen-wrapper.local-hlai-iksha a,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) a {
-    color: var(--iksha-primary);
+.hlai-quizgen-wrapper.local-hlai-quizgen a,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) a {
+    color: var(--quizgen-primary);
     text-decoration: none;
 }
 
-.hlai-quizgen-wrapper.local-hlai-iksha a:hover,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) a:hover {
-    color: var(--iksha-primary-dark);
+.hlai-quizgen-wrapper.local-hlai-quizgen a:hover,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) a:hover {
+    color: var(--quizgen-primary-dark);
 }
 
-.hlai-quizgen-wrapper.local-hlai-iksha .button,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) .button {
-    border: 1px solid var(--iksha-gray-200);
-    border-radius: var(--iksha-radius-md);
-    color: var(--iksha-gray-700);
-    font-size: var(--iksha-text-sm);
+.hlai-quizgen-wrapper.local-hlai-quizgen .button,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) .button {
+    border: 1px solid var(--quizgen-gray-200);
+    border-radius: var(--quizgen-radius-md);
+    color: var(--quizgen-gray-700);
+    font-size: var(--quizgen-text-sm);
     box-shadow: none;
-    transition: all var(--iksha-transition-fast);
+    transition: all var(--quizgen-transition-fast);
 }
 
-.hlai-quizgen-wrapper.local-hlai-iksha .button:hover,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) .button:hover {
-    border-color: var(--iksha-gray-300);
-    color: var(--iksha-gray-800);
+.hlai-quizgen-wrapper.local-hlai-quizgen .button:hover,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) .button:hover {
+    border-color: var(--quizgen-gray-300);
+    color: var(--quizgen-gray-800);
 }
 
-.hlai-quizgen-wrapper.local-hlai-iksha .button.is-primary,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) .button.is-primary {
-    background: var(--iksha-primary);
-    border-color: var(--iksha-primary);
+.hlai-quizgen-wrapper.local-hlai-quizgen .button.is-primary,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) .button.is-primary {
+    background: var(--quizgen-primary);
+    border-color: var(--quizgen-primary);
     color: #fff;
 }
 
-.hlai-quizgen-wrapper.local-hlai-iksha .button.is-primary:hover,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) .button.is-primary:hover {
-    background: var(--iksha-primary-dark);
-    border-color: var(--iksha-primary-dark);
+.hlai-quizgen-wrapper.local-hlai-quizgen .button.is-primary:hover,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) .button.is-primary:hover {
+    background: var(--quizgen-primary-dark);
+    border-color: var(--quizgen-primary-dark);
 }
 
-.hlai-quizgen-wrapper.local-hlai-iksha .button.is-light,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) .button.is-light {
-    background: var(--iksha-gray-100);
-    border-color: var(--iksha-gray-200);
-    color: var(--iksha-gray-700);
+.hlai-quizgen-wrapper.local-hlai-quizgen .button.is-light,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) .button.is-light {
+    background: var(--quizgen-gray-100);
+    border-color: var(--quizgen-gray-200);
+    color: var(--quizgen-gray-700);
 }
 
-.hlai-quizgen-wrapper.local-hlai-iksha .buttons,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) .buttons {
-    gap: var(--iksha-space-2);
+.hlai-quizgen-wrapper.local-hlai-quizgen .buttons,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) .buttons {
+    gap: var(--quizgen-space-2);
 }
 
-.hlai-quizgen-wrapper.local-hlai-iksha .box,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) .box,
-.hlai-quizgen-wrapper.local-hlai-iksha .panel,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) .panel {
-    border: 1px solid var(--iksha-gray-200);
-    border-radius: var(--iksha-radius-lg);
+.hlai-quizgen-wrapper.local-hlai-quizgen .box,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) .box,
+.hlai-quizgen-wrapper.local-hlai-quizgen .panel,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) .panel {
+    border: 1px solid var(--quizgen-gray-200);
+    border-radius: var(--quizgen-radius-lg);
     box-shadow: none;
 }
 
-.hlai-quizgen-wrapper.local-hlai-iksha .panel-heading,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) .panel-heading {
-    background: var(--iksha-gray-50);
-    border-bottom: 1px solid var(--iksha-gray-200);
-    color: var(--iksha-gray-700);
+.hlai-quizgen-wrapper.local-hlai-quizgen .panel-heading,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) .panel-heading {
+    background: var(--quizgen-gray-50);
+    border-bottom: 1px solid var(--quizgen-gray-200);
+    color: var(--quizgen-gray-700);
 }
 
-.hlai-quizgen-wrapper.local-hlai-iksha .notification.is-light,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) .notification.is-light {
-    border: 1px solid var(--iksha-gray-200);
+.hlai-quizgen-wrapper.local-hlai-quizgen .notification.is-light,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) .notification.is-light {
+    border: 1px solid var(--quizgen-gray-200);
 }
 
-.hlai-quizgen-wrapper.local-hlai-iksha .tag,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) .tag {
-    border-radius: var(--iksha-radius-full);
-    font-size: var(--iksha-text-xs);
+.hlai-quizgen-wrapper.local-hlai-quizgen .tag,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) .tag {
+    border-radius: var(--quizgen-radius-full);
+    font-size: var(--quizgen-text-xs);
 }
 
-.hlai-quizgen-wrapper.local-hlai-iksha .table th,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) .table th {
-    background: var(--iksha-gray-50);
-    color: var(--iksha-gray-500);
-    font-size: var(--iksha-text-xs);
-    border-bottom: 1px solid var(--iksha-gray-200);
+.hlai-quizgen-wrapper.local-hlai-quizgen .table th,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) .table th {
+    background: var(--quizgen-gray-50);
+    color: var(--quizgen-gray-500);
+    font-size: var(--quizgen-text-xs);
+    border-bottom: 1px solid var(--quizgen-gray-200);
 }
 
-.hlai-quizgen-wrapper.local-hlai-iksha .table td,
-.hlai-quizgen-wizard.local-hlai-iksha:not(.hlai-step-4) .table td {
-    border-bottom: 1px solid var(--iksha-gray-100);
-    color: var(--iksha-gray-700);
+.hlai-quizgen-wrapper.local-hlai-quizgen .table td,
+.hlai-quizgen-wizard.local-hlai-quizgen:not(.hlai-step-4) .table td {
+    border-bottom: 1px solid var(--quizgen-gray-100);
+    color: var(--quizgen-gray-700);
 }
 .hlai-quizgen-wrapper.hlai-step-1 .hlai-steps::after,
 .hlai-quizgen-wizard.hlai-step-1 .hlai-steps::after {
@@ -9267,13 +9267,13 @@ body.path-local-hlai_quizgen {
 /* Base layout - avoid z-index manipulation to not break Moodle navigation */
 .hlai-quizgen-wrapper,
 .hlai-quizgen-wizard,
-.hlai-quizgen-wrapper.local-hlai-iksha {
+.hlai-quizgen-wrapper.local-hlai-quizgen {
     position: relative;
 }
 
 .hlai-quizgen-wrapper::after,
 .hlai-quizgen-wizard::after,
-.hlai-quizgen-wrapper.local-hlai-iksha::after {
+.hlai-quizgen-wrapper.local-hlai-quizgen::after {
     content: '';
     display: block;
     clear: both;
@@ -9611,7 +9611,7 @@ body.path-local-hlai_quizgen #page-footer .purgecaches {
    Extracted from admin_dashboard.php inline styles
    ========================================================================== */
 
-/* Iksha-inspired Clean Design System */
+/* QuizGen Clean Design System */
 .hlai-quizgen-wrapper {
     --admin-primary: #3B82F6;
     --admin-primary-light: #EFF6FF;

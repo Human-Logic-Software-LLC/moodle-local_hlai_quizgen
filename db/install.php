@@ -19,9 +19,11 @@
  * Ensures language strings and navigation are properly loaded.
  *
  * @package    local_hlai_quizgen
- * @copyright  2026 Human Logic Software LLC
+ * @copyright  2025 Human Logic Software LLC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * Execute post-installation tasks.

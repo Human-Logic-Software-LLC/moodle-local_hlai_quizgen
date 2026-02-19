@@ -1,0 +1,280 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template    local_hlai_quizgen/index
+    @copyright   2025 Human Logic Software LLC
+    @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Teacher dashboard index page template.
+}}
+<div class="hlai-quizgen-wrapper local-hlai-quizgen hlai-mt-2rem">
+<div class="container">
+    {{! Page Header }}
+    <div class="level mb-5">
+        <div class="level-left">
+            <div class="level-item">
+                <div>
+                    <h1 class="title is-3 mb-1">
+                        <i class="fa fa-graduation-cap hlai-icon-primary"></i>
+                        {{{dashboard_title}}}
+                    </h1>
+                    <p class="subtitle is-6 has-text-grey mt-2">
+                        {{{dashboard_subtitle}}}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <div class="buttons">
+                    <a href="{{{wizardurl}}}" class="button is-primary">
+                        <span class="icon"><i>+</i></span>
+                        <span>{{{create_new_quiz}}}</span>
+                    </a>
+                    <a href="{{{analyticsurl}}}" class="button is-light">
+                        <span><i class="fa fa-bar-chart hlai-icon-primary"></i></span>
+                        <span>{{{view_analytics}}}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{! KPI Stats Row }}
+    <div class="columns mb-5">
+        <div class="column">
+            <div class="box has-text-centered">
+                <p class="is-size-3"><i class="fa fa-file-text-o hlai-icon-primary"></i></p>
+                <p class="title is-3 mb-1">{{totalquizzes}}</p>
+                <p class="heading">{{{quizzes_created}}}</p>
+                <p class="help {{#hascoursequizzes}}has-text-success{{/hascoursequizzes}}{{^hascoursequizzes}}has-text-grey{{/hascoursequizzes}}">
+                    {{#hascoursequizzes}}{{{coursequizzestext}}}{{/hascoursequizzes}}{{^hascoursequizzes}}&nbsp;{{/hascoursequizzes}}
+                </p>
+            </div>
+        </div>
+        <div class="column">
+            <div class="box has-text-centered">
+                <p class="is-size-3"><i class="fa fa-question-circle hlai-icon-info"></i></p>
+                <p class="title is-3 mb-1">{{totalquestions}}</p>
+                <p class="heading">{{{questions_generated_heading}}}</p>
+                <p class="help has-text-grey">&nbsp;</p>
+            </div>
+        </div>
+        <div class="column">
+            <div class="box has-text-centered">
+                <p class="is-size-3"><i class="fa fa-star hlai-icon-warning"></i></p>
+                <p class="title is-3 mb-1">{{{qualityvalue}}}</p>
+                <p class="heading">{{{avg_quality_score}}}</p>
+                <p class="help {{#qualitygood}}has-text-success{{/qualitygood}}{{#qualitybad}}has-text-danger{{/qualitybad}}{{#qualitynone}}has-text-grey{{/qualitynone}}">
+                    {{#qualitygood}}{{{qualitygoodtext}}}{{/qualitygood}}
+                    {{#qualitybad}}{{{qualitybadtext}}}{{/qualitybad}}
+                    {{#qualitynone}}{{{qualitynonetext}}}{{/qualitynone}}
+                </p>
+            </div>
+        </div>
+        <div class="column">
+            <div class="box has-text-centered">
+                <p class="is-size-3"><i class="fa fa-check-circle hlai-icon-success"></i></p>
+                <p class="title is-3 mb-1">{{acceptancerate}}%</p>
+                <p class="heading">{{{acceptance_rate}}}</p>
+                <p class="help {{#acceptancehigh}}has-text-success{{/acceptancehigh}}{{^acceptancehigh}}has-text-grey{{/acceptancehigh}}">
+                    {{{ftartext}}}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {{! Main Content Grid }}
+    <div class="columns">
+        {{! Left Column: Charts }}
+        <div class="column is-two-thirds">
+
+            {{! First-Time Acceptance Rate Chart }}
+            <div class="box mb-4">
+                <p class="title is-5">
+                    <i class="fa fa-bullseye hlai-icon-success"></i>
+                    {{{first_time_acceptance_rate}}}
+                </p>
+                <p class="subtitle is-6 has-text-grey">
+                    {{{questions_approved_without_regen}}}
+                </p>
+                <div id="ftar-gauge-chart" class="hlai-chart-h280"></div>
+                <div class="has-text-centered mt-3">
+                    <span class="tag {{ftarclass}} is-medium">
+                        {{{ftarstatus}}}
+                    </span>
+                </div>
+            </div>
+
+            {{! Quality Trends Chart }}
+            <div class="box mb-4">
+                <p class="title is-5">
+                    <i class="fa fa-line-chart hlai-icon-primary"></i>
+                    {{{quality_trends}}}
+                </p>
+                <p class="subtitle is-6 has-text-grey">
+                    {{{quality_trends_subtitle}}}
+                </p>
+                <div id="acceptance-trend-chart" class="hlai-chart-h300"></div>
+            </div>
+
+            {{! Question Type & Difficulty Charts Row }}
+            <div class="columns">
+                <div class="column is-half">
+                    <div class="box">
+                        <p class="title is-5">
+                            <i class="fa fa-bar-chart hlai-icon-secondary"></i>
+                            {{{question_types}}}
+                        </p>
+                        <div id="question-type-chart" class="hlai-chart-h280">
+                            {{#notypedata}}
+                            <div class="has-text-centered py-6">
+                                <span class="hlai-font-xxl"><i class="fa fa-bar-chart hlai-icon-muted"></i></span>
+                                <p class="has-text-grey mt-3">
+                                    {{{no_questions_yet}}}
+                                </p>
+                                <a href="{{{wizardurl}}}" class="button is-primary is-outlined is-small mt-3">
+                                    {{{create_first_quiz}}}
+                                </a>
+                            </div>
+                            {{/notypedata}}
+                        </div>
+                    </div>
+                </div>
+                <div class="column is-half">
+                    <div class="box">
+                        <p class="title is-5">
+                            <i class="fa fa-line-chart hlai-icon-info"></i>
+                            {{{difficulty_distribution}}}
+                        </p>
+                        <div id="difficulty-chart" class="hlai-chart-h280"></div>
+                    </div>
+                </div>
+            </div>
+
+            {{! Bloom's Taxonomy Charts }}
+            <div class="box mt-4">
+                <p class="title is-5">
+                    <i class="fa fa-lightbulb-o hlai-icon-primary"></i>
+                    {{{blooms_coverage}}}
+                </p>
+                <p class="subtitle is-6 has-text-grey">
+                    {{{blooms_coverage_subtitle}}}
+                </p>
+                <div class="columns">
+                    <div class="column is-half">
+                        <div id="blooms-radar-chart" class="hlai-chart-h400"></div>
+                    </div>
+                    <div class="column is-half">
+                        <div id="blooms-bar-chart" class="hlai-chart-h400"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{! Right Column: Actions & Activity }}
+        <div class="column is-one-third">
+
+            {{! Quick Actions }}
+            <div class="panel mb-4">
+                <p class="panel-heading">
+                    <i class="fa fa-bolt hlai-icon-warning"></i>
+                    {{{quick_actions}}}
+                </p>
+                <a href="{{{wizardurl}}}" class="panel-block">
+                    <span class="panel-icon has-text-primary">+</span>
+                    {{{generate_new_questions}}}
+                </a>
+                <a href="{{{analyticsurl}}}" class="panel-block">
+                    <span class="panel-icon hlai-icon-info"><i class="fa fa-bar-chart"></i></span>
+                    {{{view_analytics}}}
+                </a>
+                <a href="{{{debuglogsurl}}}" class="panel-block">
+                    <span class="panel-icon hlai-icon-secondary"><i class="fa fa-list-alt"></i></span>
+                    {{{view_activity_logs}}}
+                </a>
+            </div>
+
+            {{! Recent Activity }}
+            <div class="panel mb-4">
+                <p class="panel-heading">
+                    <i class="fa fa-clock hlai-icon-info"></i>
+                    {{{recent_activity}}}
+                </p>
+                {{^hasrecentrequests}}
+                <div class="panel-block">
+                    <div class="has-text-centered py-4 hlai-w-full">
+                        <span class="hlai-font-xl"><i class="fa fa-clipboard hlai-icon-muted"></i></span>
+                        <p class="has-text-weight-semibold mt-3">
+                            {{{no_recent_activity}}}
+                        </p>
+                        <p class="has-text-grey is-size-7">{{{start_creating}}}</p>
+                    </div>
+                </div>
+                {{/hasrecentrequests}}
+                {{#hasrecentrequests}}
+                    {{#recentrequests}}
+                    <div class="panel-block is-flex is-justify-content-space-between">
+                        <div class="is-flex is-align-items-center">
+                            <span class="mr-2"><i class="fa {{statusicon}}"></i></span>
+                            <div>
+                                <p class="has-text-weight-medium is-size-7">{{{coursename}}}</p>
+                                <p class="has-text-grey is-size-7">
+                                    {{{progresstext}}}
+                                    &middot; {{{timeago}}}
+                                </p>
+                            </div>
+                        </div>
+                        <span class="tag {{statusclass}} is-light is-small">
+                            {{{statuslabel}}}
+                        </span>
+                    </div>
+                    {{/recentrequests}}
+                {{/hasrecentrequests}}
+            </div>
+
+            {{! Regeneration by Type }}
+            <div class="box">
+                <p class="title is-5">
+                    <i class="fa fa-refresh hlai-icon-warning"></i>
+                    {{{regeneration_by_type}}}
+                </p>
+                <p class="subtitle is-6 has-text-grey">
+                    {{{regeneration_by_type_subtitle}}}
+                </p>
+                <div id="regen-by-type-chart" class="hlai-chart-h250"></div>
+            </div>
+        </div>
+    </div>
+
+    {{! Tips Section }}
+    <div class="notification is-info is-light mt-5 mb-6">
+        <button class="delete hlai-dismiss-notification"></button>
+        <strong>
+            <i class="fa fa-lightbulb-o hlai-icon-warning"></i>
+            {{{tips_title}}}
+        </strong>
+        <ul class="mt-2">
+            <li>{{{tip_detailed_content}}}</li>
+            <li>{{{tip_specific_topics}}}</li>
+            <li>{{{tip_assessment_purpose}}}</li>
+            <li>{{{tip_question_types}}}</li>
+        </ul>
+    </div>
+</div>
+</div>
+<div class="hlai-spacer-60"></div>

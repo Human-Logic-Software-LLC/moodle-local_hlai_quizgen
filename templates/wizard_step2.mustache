@@ -1,0 +1,121 @@
+{{!
+    @template local_hlai_quizgen/wizard_step2
+
+    Wizard step 2: Topic configuration and selection.
+
+    Context variables required for this template:
+    * step2_title - Step heading
+    * step2_description - Step subtitle
+    * errors - Array of error notification objects with: message
+    * has_topics - Whether topics are available for selection
+    * form_url - Form action URL (when topics exist)
+    * sesskey - Session key
+    * topics_found - "Topics Found" heading
+    * topics_select_help - Help text for topic selection
+    * select_all_topics - Select all button text
+    * deselect_all_topics - Deselect all button text
+    * topics_discovered - "N topics discovered" text
+    * topics - Array of topic objects with: id, title, has_description, description
+    * n_topics_selected - "0 topics selected" text
+    * prev_url - Previous step URL
+    * previous - Previous button text
+    * next - Next button text
+    * analyzing - Whether content is still being analyzed
+    * analyzing_content - Analyzing content message
+
+    Example context (json):
+    {
+        "has_topics": true,
+        "topics": [{"id": 1, "title": "Topic 1", "has_description": true, "description": "Description..."}]
+    }
+}}
+<div class="hlai-step-content">
+    <h2 class="title is-4 mb-0">{{{step2_title}}}</h2>
+    <p class="subtitle is-6 has-text-grey mt-1 mb-4">{{{step2_description}}}</p>
+    <hr class="mt-0 mb-5">
+
+    {{! Error notifications from content analysis }}
+    {{#errors}}
+    <div class="notification is-danger">{{{message}}}</div>
+    {{/errors}}
+
+    {{#has_topics}}
+    <form method="post" action="{{form_url}}" id="topic-selection-form">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+
+        <div class="hlai-topics-section">
+            {{! Section header }}
+            <div class="hlai-topics-header">
+                <span class="hlai-topics-icon"><i class="fa fa-book hlai-icon-success"></i></span>
+                <div class="hlai-topics-header-text">
+                    <h3 class="hlai-topics-title">{{{topics_found}}}</h3>
+                    <p class="hlai-topics-subtitle">{{{topics_select_help}}}</p>
+                </div>
+            </div>
+
+            {{! Action bar }}
+            <div class="hlai-topics-actions">
+                <div class="hlai-topics-buttons">
+                    <button type="button" id="select-all-topics" class="hlai-action-btn hlai-action-select">
+                        <i class="fa fa-check"></i> {{{select_all_topics}}}
+                    </button>
+                    <button type="button" id="deselect-all-topics" class="hlai-action-btn hlai-action-deselect">
+                        <i class="fa fa-times"></i> {{{deselect_all_topics}}}
+                    </button>
+                </div>
+                <span class="hlai-topics-count" id="topics-count-display">{{{topics_discovered}}}</span>
+            </div>
+
+            {{! Topics list }}
+            <div class="hlai-topics-list">
+                {{#topics}}
+                <label class="hlai-topic-card">
+                    <input type="checkbox" name="topics[]" value="{{id}}" class="hlai-topic-checkbox">
+                    <span class="hlai-topic-checkmark"></span>
+                    <div class="hlai-topic-content">
+                        <span class="hlai-topic-emoji"><i class="fa fa-book hlai-icon-primary"></i></span>
+                        <div class="hlai-topic-text">
+                            <span class="hlai-topic-title">{{{title}}}</span>
+                            {{#has_description}}
+                            <p class="hlai-topic-description">{{{description}}}</p>
+                            {{/has_description}}
+                        </div>
+                    </div>
+                </label>
+                {{/topics}}
+            </div>
+
+            {{! Selected count indicator }}
+            <div class="hlai-topics-selected-bar">
+                <span class="hlai-selected-icon"><i class="fa fa-check-circle"></i></span>
+                <span id="selected-topics-count" class="hlai-selected-text">{{{n_topics_selected}}}</span>
+            </div>
+        </div>
+
+        {{! Navigation }}
+        <div class="level is-mobile mt-6 pt-4 hlai-border-top">
+            <div class="level-left">
+                <a href="{{prev_url}}" class="button is-light">
+                    <i class="fa fa-arrow-left hlai-icon-info"></i> {{{previous}}}
+                </a>
+            </div>
+            <div class="level-right">
+                <button type="submit" class="button is-primary">
+                    {{{next}}} <i class="fa fa-arrow-right hlai-icon-white"></i>
+                </button>
+            </div>
+        </div>
+    </form>
+    {{/has_topics}}
+
+    {{^has_topics}}
+    {{#analyzing}}
+    <div class="notification is-info">
+        <span class="hlai-font-lg-mr"><i class="fa fa-hourglass-2 hlai-icon-warning"></i></span>
+        {{{analyzing_content}}}
+    </div>
+    {{/analyzing}}
+    {{/has_topics}}
+
+    <div class="hlai-spacer-60"></div>
+</div>

@@ -245,14 +245,15 @@ class diagnostic_external extends \external_api {
         $draftstatus = [];
         $repairedstatus = 0;
 
+        // Batch-load type-specific data to avoid N+1 queries.
+        // Group question IDs by type for efficient IN-clause lookups.
+        $idsByType = [];
         foreach ($questions as $q) {
-            // Count by type.
             if (!isset($bytype[$q->qtype])) {
                 $bytype[$q->qtype] = 0;
             }
             $bytype[$q->qtype]++;
 
-            // Check if version status is not 'ready'.
             if ($q->version_status !== 'ready') {
                 $draftstatus[] = [
                     'id' => $q->id,
@@ -261,28 +262,40 @@ class diagnostic_external extends \external_api {
                 ];
             }
 
-            // Check if question type-specific data exists.
-            $hastypedata = false;
-            switch ($q->qtype) {
-                case 'multichoice':
-                    $hastypedata = $DB->record_exists('qtype_multichoice_options', ['questionid' => $q->id]);
-                    break;
-                case 'truefalse':
-                    $hastypedata = $DB->record_exists('question_truefalse', ['question' => $q->id]);
-                    break;
-                case 'shortanswer':
-                    $hastypedata = $DB->record_exists('qtype_shortanswer_options', ['questionid' => $q->id]);
-                    break;
-                case 'essay':
-                    $hastypedata = $DB->record_exists('qtype_essay_options', ['questionid' => $q->id]);
-                    break;
-                case 'match':
-                case 'matching':
-                    $hastypedata = $DB->record_exists('qtype_match_options', ['questionid' => $q->id]);
-                    break;
-                default:
-                    $hastypedata = true; // Unknown types, assume ok.
+            $idsByType[$q->qtype][$q->id] = $q;
+        }
+
+        // Pre-fetch existing type data with bulk queries (one query per type instead of one per question).
+        $typedataexists = [];
+        $typetablemap = [
+            'multichoice' => ['table' => 'qtype_multichoice_options', 'field' => 'questionid'],
+            'truefalse'   => ['table' => 'question_truefalse', 'field' => 'question'],
+            'shortanswer' => ['table' => 'qtype_shortanswer_options', 'field' => 'questionid'],
+            'essay'       => ['table' => 'qtype_essay_options', 'field' => 'questionid'],
+            'match'       => ['table' => 'qtype_match_options', 'field' => 'questionid'],
+            'matching'    => ['table' => 'qtype_match_options', 'field' => 'questionid'],
+        ];
+
+        foreach ($typetablemap as $qtype => $info) {
+            if (empty($idsByType[$qtype])) {
+                continue;
             }
+            $ids = array_keys($idsByType[$qtype]);
+            [$insql, $inparams] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
+            $existing = $DB->get_fieldset_sql(
+                "SELECT {$info['field']} FROM {{$info['table']}} WHERE {$info['field']} {$insql}",
+                $inparams
+            );
+            foreach ($existing as $eid) {
+                $typedataexists[(int)$eid] = true;
+            }
+        }
+
+        // Now check each question using the pre-fetched data.
+        foreach ($questions as $q) {
+            $hastypedata = isset($typetablemap[$q->qtype])
+                ? isset($typedataexists[$q->id])
+                : true; // Unknown types, assume ok.
 
             if (!$hastypedata) {
                 $missingtypedata[] = [
@@ -293,21 +306,16 @@ class diagnostic_external extends \external_api {
             }
         }
 
-        // Repair: Set all non-ready questions to ready.
+        // Repair: Batch-set all non-ready questions to ready using IN clause.
         if (!empty($draftstatus)) {
-            foreach ($draftstatus as $draft) {
-                try {
-                    $DB->set_field(
-                        'question_versions',
-                        'status',
-                        'ready',
-                        ['questionid' => $draft['id']]
-                    );
-                    $repairedstatus++;
-                } catch (\Exception $e) {
-                    // Ignore errors.
-                    debugging($e->getMessage(), DEBUG_DEVELOPER);
-                }
+            $draftids = array_column($draftstatus, 'id');
+            try {
+                [$insql, $inparams] = $DB->get_in_or_equal($draftids, SQL_PARAMS_NAMED);
+                $DB->set_field_select('question_versions', 'status', 'ready', "questionid {$insql}", $inparams);
+                $repairedstatus = count($draftids);
+            } catch (\Exception $e) {
+                // Ignore errors.
+                debugging($e->getMessage(), DEBUG_DEVELOPER);
             }
         }
 

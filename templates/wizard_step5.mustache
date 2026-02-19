@@ -1,0 +1,126 @@
+{{!
+    @template local_hlai_quizgen/wizard_step5
+
+    Wizard step 5: Deployment options.
+
+    Context variables required for this template:
+    * step5_title - Step heading
+    * step5_description - Step subtitle
+    * no_questions - Whether there are no questions at all
+    * no_questions_message - Warning when no questions exist
+    * back_to_step3_url - URL to go back to step 3
+    * back_to_step3 - Back button text
+    * no_approved - Whether there are no approved questions
+    * no_approved_message - Warning when none approved
+    * back_to_step4_url - URL to go back to step 4
+    * back_to_step4 - Back button text
+    * has_approved - Whether approved questions exist
+    * ready_deploy_message - Success message with counts
+    * form_url - Form action URL
+    * sesskey - Session key for form
+    * deployment_options - Section heading
+    * create_new_quiz - Radio label
+    * create_quiz_desc - Radio description
+    * quiz_name_label - Label for quiz name input
+    * default_quiz_name - Default quiz name value
+    * export_to_qbank - Radio label
+    * qbank_desc - Radio description
+    * category_name_label - Label for category input
+    * default_category_name - Default category name value
+    * category_help - Help text for category
+    * prev_url - Previous step URL
+    * previous - Previous button text
+    * deploy_questions - Deploy button text
+
+    Example context (json):
+    {
+        "has_approved": true,
+        "ready_deploy_message": "5 of 10 questions ready to deploy"
+    }
+}}
+<div class="hlai-step-content">
+    <h2 class="title is-4 mb-0"><i class="fa fa-rocket hlai-icon-primary"></i> {{{step5_title}}}</h2>
+    <p class="subtitle is-6 has-text-grey mt-1 mb-4">{{{step5_description}}}</p>
+    <hr class="mt-0 mb-5">
+
+    {{#no_questions}}
+    <div class="notification is-warning">{{{no_questions_message}}}</div>
+    <a href="{{back_to_step3_url}}" class="button is-primary mt-4">
+        <i class="fa fa-arrow-left hlai-icon-white"></i> {{{back_to_step3}}}
+    </a>
+    {{/no_questions}}
+
+    {{#no_approved}}
+    <div class="notification is-warning">{{{no_approved_message}}}</div>
+    <a href="{{back_to_step4_url}}" class="button is-primary mt-4">
+        <i class="fa fa-arrow-left hlai-icon-white"></i> {{{back_to_step4}}}
+    </a>
+    {{/no_approved}}
+
+    {{#has_approved}}
+    <div class="notification is-success">
+        <strong><i class="fa fa-check-circle"></i> {{{ready_deploy_message}}}</strong>
+    </div>
+
+    <form method="post" action="{{form_url}}" id="deployment-form">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+
+        <h4 class="title is-5 mb-4"><i class="fa fa-cube hlai-icon-primary"></i> {{{deployment_options}}}</h4>
+
+        {{! Option 1: Create new quiz }}
+        <div class="field mb-4">
+            <label class="radio hlai-deploy-label">
+                <input type="radio" name="deploy_type" value="new_quiz" id="deploy_new_quiz" class="deploy-type-radio hlai-radio-mt" checked="checked">
+                <div>
+                    <strong>{{{create_new_quiz}}}</strong>
+                    <p class="help mb-0">{{{create_quiz_desc}}}</p>
+                </div>
+            </label>
+        </div>
+
+        <div class="ml-5 mb-4" id="new_quiz_options">
+            <div class="field">
+                <label for="quiz_name" class="label is-small">{{{quiz_name_label}}}</label>
+                <div class="control">
+                    <input type="text" name="quiz_name" id="quiz_name" value="{{default_quiz_name}}" class="input" required="required">
+                </div>
+            </div>
+        </div>
+
+        {{! Option 2: Question bank only }}
+        <div class="field mb-4">
+            <label class="radio hlai-deploy-label">
+                <input type="radio" name="deploy_type" value="question_bank" id="deploy_qbank" class="deploy-type-radio hlai-radio-mt">
+                <div>
+                    <strong>{{{export_to_qbank}}}</strong>
+                    <p class="help mb-0">{{{qbank_desc}}}</p>
+                </div>
+            </label>
+        </div>
+
+        <div class="ml-5 mb-3 hlai-hidden" id="qbank_options">
+            <div class="field">
+                <label for="category_name" class="label is-small">{{{category_name_label}}}</label>
+                <div class="control">
+                    <input type="text" name="category_name" id="category_name" value="{{default_category_name}}" class="input">
+                </div>
+                <p class="help">{{{category_help}}}</p>
+            </div>
+        </div>
+
+        {{! Navigation }}
+        <div class="level is-mobile mt-5">
+            <div class="level-left">
+                <a href="{{prev_url}}" class="button is-light">
+                    <i class="fa fa-arrow-left hlai-icon-secondary"></i> {{{previous}}}
+                </a>
+            </div>
+            <div class="level-right">
+                <button type="submit" class="button is-success">
+                    <i class="fa fa-rocket hlai-icon-white"></i> {{{deploy_questions}}}
+                </button>
+            </div>
+        </div>
+    </form>
+    {{/has_approved}}
+</div>

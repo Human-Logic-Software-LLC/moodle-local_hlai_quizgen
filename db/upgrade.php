@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
  * Upgrade the local_hlai_quizgen plugin.
  *
@@ -542,7 +544,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
             $dbman->add_field($table, $field);
 
             // Try to populate from any existing data or set to 0.
-            $DB->execute("UPDATE {local_hlai_quizgen_questions} SET requestid = 0 WHERE requestid IS NULL");
+            $DB->set_field_select('local_hlai_quizgen_questions', 'requestid', 0, 'requestid IS NULL');
 
             // Now make it NOT NULL.
             $field = new xmldb_field('requestid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'id');
@@ -634,7 +636,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
             // Set default for existing rows.
-            $DB->execute("UPDATE {local_hlai_quizgen_questions} SET questiontype = 'multichoice' WHERE questiontype IS NULL");
+            $DB->set_field_select('local_hlai_quizgen_questions', 'questiontype', 'multichoice', 'questiontype IS NULL');
             // Now make it NOT NULL.
             $field = new xmldb_field('questiontype', XMLDB_TYPE_CHAR, '50', null, XMLDB_NOTNULL, null, 'multichoice', 'topicid');
             $dbman->change_field_notnull($table, $field);
@@ -645,7 +647,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
             // Set default for existing rows.
-            $DB->execute("UPDATE {local_hlai_quizgen_questions} SET questiontext = '' WHERE questiontext IS NULL");
+            $DB->set_field_select('local_hlai_quizgen_questions', 'questiontext', '', 'questiontext IS NULL');
             // Now make it NOT NULL.
             $field = new xmldb_field('questiontext', XMLDB_TYPE_TEXT, null, null, XMLDB_NOTNULL, null, null, 'questiontype');
             $dbman->change_field_notnull($table, $field);
@@ -656,7 +658,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
             // Set default for existing rows.
-            $DB->execute("UPDATE {local_hlai_quizgen_questions} SET questiontextformat = 1 WHERE questiontextformat IS NULL");
+            $DB->set_field_select('local_hlai_quizgen_questions', 'questiontextformat', 1, 'questiontextformat IS NULL');
             // Now make it NOT NULL.
             $field = new xmldb_field('questiontextformat', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1', 'questiontext');
             $dbman->change_field_notnull($table, $field);
@@ -746,19 +748,31 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         $field = new xmldb_field('courseid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timedeployed');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
-            // Populate from request table.
-            $DB->execute("UPDATE {local_hlai_quizgen_questions} q
-                         SET courseid = (SELECT courseid FROM {local_hlai_quizgen_requests} r WHERE r.id = q.requestid)
-                         WHERE courseid = 0");
+            // Populate from request table using DML helpers.
+            $records = $DB->get_records_sql(
+                "SELECT q.id, r.courseid
+                   FROM {local_hlai_quizgen_questions} q
+                   JOIN {local_hlai_quizgen_requests} r ON r.id = q.requestid
+                  WHERE q.courseid = 0"
+            );
+            foreach ($records as $rec) {
+                $DB->set_field('local_hlai_quizgen_questions', 'courseid', $rec->courseid, ['id' => $rec->id]);
+            }
         }
 
         $field = new xmldb_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'courseid');
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
-            // Populate from request table.
-            $DB->execute("UPDATE {local_hlai_quizgen_questions} q
-                         SET userid = (SELECT userid FROM {local_hlai_quizgen_requests} r WHERE r.id = q.requestid)
-                         WHERE userid = 0");
+            // Populate from request table using DML helpers.
+            $records = $DB->get_records_sql(
+                "SELECT q.id, r.userid
+                   FROM {local_hlai_quizgen_questions} q
+                   JOIN {local_hlai_quizgen_requests} r ON r.id = q.requestid
+                  WHERE q.userid = 0"
+            );
+            foreach ($records as $rec) {
+                $DB->set_field('local_hlai_quizgen_questions', 'userid', $rec->userid, ['id' => $rec->id]);
+            }
         }
 
         // Add foreign keys.
@@ -1235,13 +1249,13 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         if (!$dbman->field_exists($table, $field)) {
             $dbman->add_field($table, $field);
             // Populate for existing approved questions: first try if regeneration_count = 0.
-            $DB->execute(
-                "UPDATE {local_hlai_quizgen_questions} SET accepted_on_first_try = 1 " .
-                "WHERE status = 'approved' AND regeneration_count = 0"
+            $DB->set_field_select(
+                'local_hlai_quizgen_questions', 'accepted_on_first_try', 1,
+                "status = 'approved' AND regeneration_count = 0"
             );
-            $DB->execute(
-                "UPDATE {local_hlai_quizgen_questions} SET accepted_on_first_try = 0 " .
-                "WHERE status = 'approved' AND regeneration_count > 0"
+            $DB->set_field_select(
+                'local_hlai_quizgen_questions', 'accepted_on_first_try', 0,
+                "status = 'approved' AND regeneration_count > 0"
             );
         }
 

@@ -74,7 +74,7 @@ class file_external extends \external_api {
         self::validate_context($context);
         require_capability('local/hlai_quizgen:generatequestions', $context);
 
-        // Generate a unique item ID for the permanent file area (matching ajax.php pattern).
+        // Generate a unique item ID for the permanent file area.
         $itemid = time();
 
         // Move files from the user's draft area to the plugin's permanent file area.
@@ -86,7 +86,7 @@ class file_external extends \external_api {
             $itemid,
             [
                 'maxfiles' => 1,
-                'maxbytes' => 50 * 1024 * 1024, // 50MB, matching ajax.php limit.
+                'maxbytes' => 50 * 1024 * 1024, // 50MB.
                 'accepted_types' => ['.pdf', '.doc', '.docx', '.ppt', '.pptx', '.txt'],
             ]
         );

@@ -589,9 +589,9 @@ class api {
         // Get current question.
         $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
 
-        // Check permissions - user must own the question or have managequestions capability.
+        // Check permissions - user must own the question or have editquestions capability.
         $context = \context_course::instance($question->courseid);
-        if ($question->userid != $USER->id && !has_capability('local/hlai_quizgen:managequestions', $context)) {
+        if ($question->userid != $USER->id && !has_capability('local/hlai_quizgen:editquestions', $context)) {
             throw new \moodle_exception('nopermission', 'error');
         }
 

@@ -1,0 +1,39 @@
+{{!
+    @template local_hlai_quizgen/wizard_step3_5
+
+    Wizard step 3.5: Progress monitoring during question generation.
+
+    Context variables required for this template:
+    * is_failed - Whether generation has failed
+    * generating_questions - Heading text
+    * failed_message - Error message when failed (HTML safe)
+    * start_over_url - URL to restart wizard
+    * wizard_start_over - "Start Over" button text
+    * generating_questions_desc - Description text
+    * progress - Progress percentage (0-100)
+    * statusmessage - Current status message text
+
+    Example context (json):
+    {
+        "is_failed": false,
+        "generating_questions": "Generating Questions",
+        "generating_questions_desc": "Please wait while questions are generated...",
+        "progress": 45,
+        "statusmessage": "Processing batch 2 of 4..."
+    }
+}}
+{{#is_failed}}
+<h3>{{{generating_questions}}}</h3>
+<div class="notification is-danger is-light mt-4">{{{failed_message}}}</div>
+<a href="{{start_over_url}}" class="button is-primary mt-3">
+    <i class="fa fa-refresh hlai-icon-info"></i> {{{wizard_start_over}}}
+</a>
+{{/is_failed}}
+{{^is_failed}}
+<h3 class="title is-5">{{{generating_questions}}}</h3>
+<p class="has-text-grey">{{{generating_questions_desc}}}</p>
+<div class="progress-monitor mt-4">
+    <progress id="progress-bar" class="progress is-primary" value="{{progress}}" max="100" aria-valuenow="{{progress}}" aria-valuemin="0" aria-valuemax="100">{{progress}}%</progress>
+    <p id="progress-message" class="has-text-centered mt-3">{{statusmessage}}</p>
+</div>
+{{/is_failed}}

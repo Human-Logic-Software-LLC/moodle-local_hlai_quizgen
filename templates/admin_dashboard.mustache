@@ -1,0 +1,292 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+}}
+{{!
+    @template    local_hlai_quizgen/admin_dashboard
+    @copyright   2025 Human Logic Software LLC
+    @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+
+    Admin dashboard page template.
+}}
+<div class="hlai-quizgen-wrapper local-hlai-quizgen">
+<div class="container is-fluid">
+
+    {{! Page Title }}
+    <div class="page-title-section">
+        <h1>
+            <i class="fa fa-line-chart hlai-icon-admin-primary"></i>
+            {{{admin_site_analytics_title}}}
+        </h1>
+        <p class="page-subtitle">
+            {{{admin_site_analytics_subtitle}}}
+        </p>
+    </div>
+
+    {{! Site-Wide Overview Cards }}
+    <div class="section-header">
+        <h2><i class="fa fa-bar-chart"></i> {{{admin_site_overview}}}</h2>
+    </div>
+
+    <div class="columns is-multiline">
+        {{! Total Questions Generated }}
+        <div class="column is-4">
+            <div class="admin-stat-card">
+                <div class="stat-icon-container is-primary">
+                    <i class="fa fa-question-circle stat-icon-large"></i>
+                </div>
+                <div class="stat-label">{{{admin_total_questions_generated}}}</div>
+                <div class="stat-value">{{{totalquestionsgenerated}}}</div>
+            </div>
+        </div>
+
+        {{! Total Quizzes Created }}
+        <div class="column is-4">
+            <div class="admin-stat-card">
+                <div class="stat-icon-container is-info">
+                    <i class="fa fa-file-text-o stat-icon-large"></i>
+                </div>
+                <div class="stat-label">{{{admin_total_quizzes_created}}}</div>
+                <div class="stat-value">{{{totalquizzescreated}}}</div>
+            </div>
+        </div>
+
+        {{! Active Teachers }}
+        <div class="column is-4">
+            <div class="admin-stat-card">
+                <div class="stat-icon-container is-success">
+                    <i class="fa fa-users stat-icon-large"></i>
+                </div>
+                <div class="stat-label">{{{admin_active_teachers}}}</div>
+                <div class="stat-value">{{{activeteachers}}}</div>
+                <div class="stat-subtext">
+                    {{{admin_adoption_rate}}}
+                </div>
+            </div>
+        </div>
+
+        {{! Active Courses }}
+        <div class="column is-4">
+            <div class="admin-stat-card">
+                <div class="stat-icon-container is-warning">
+                    <i class="fa fa-graduation-cap stat-icon-large"></i>
+                </div>
+                <div class="stat-label">{{{admin_courses_using_plugin}}}</div>
+                <div class="stat-value">{{{activecourses}}}</div>
+                <div class="stat-subtext">
+                    {{{admin_course_coverage}}}
+                </div>
+            </div>
+        </div>
+
+        {{! Average Quality Score }}
+        <div class="column is-4">
+            <div class="admin-stat-card">
+                <div class="stat-icon-container is-warning">
+                    <i class="fa fa-star stat-icon-large"></i>
+                </div>
+                <div class="stat-label">{{{avg_quality_score}}}</div>
+                <div class="stat-value">{{{avgqualityscore}}}</div>
+            </div>
+        </div>
+
+        {{! Site-Wide FTAR }}
+        <div class="column is-4">
+            <div class="admin-stat-card">
+                <div class="stat-icon-container is-danger">
+                    <i class="fa fa-bullseye stat-icon-large"></i>
+                </div>
+                <div class="stat-label">{{{admin_site_wide_ftar}}}</div>
+                <div class="stat-value">{{siteftar}}%</div>
+                <div class="stat-subtext">{{{first_time_acceptance_rate}}}</div>
+            </div>
+        </div>
+    </div>
+
+    {{! Adoption & Usage Metrics }}
+    <div class="section-header">
+        <h2><i class="fa fa-line-chart"></i> {{{admin_adoption_usage}}}</h2>
+    </div>
+
+    <div class="columns">
+        <div class="column is-8">
+            <div class="chart-container">
+                <h3 class="chart-title">
+                    <i class="fa fa-area-chart"></i> {{{admin_usage_trend}}}
+                </h3>
+                <div id="usageTrendChart"></div>
+            </div>
+        </div>
+        <div class="column is-4">
+            <div class="chart-container">
+                <h3 class="chart-title">
+                    <i class="fa fa-pie-chart"></i> {{{admin_adoption_overview}}}
+                </h3>
+                <div id="adoptionChart"></div>
+            </div>
+        </div>
+    </div>
+
+    {{! Quality Overview (Site-Wide) }}
+    <div class="section-header">
+        <h2><i class="fa fa-star"></i> {{{admin_quality_overview}}}</h2>
+    </div>
+
+    <div class="columns is-multiline">
+        <div class="column is-6">
+            <div class="chart-container">
+                <h3 class="chart-title">
+                    <i class="fa fa-th-list"></i> {{{blooms_taxonomy}}}
+                </h3>
+                <div id="bloomsDistributionChart"></div>
+            </div>
+        </div>
+        <div class="column is-6">
+            <div class="chart-container">
+                <h3 class="chart-title">
+                    <i class="fa fa-tasks"></i> {{{admin_question_type_popularity}}}
+                </h3>
+                <div id="questionTypeChart"></div>
+            </div>
+        </div>
+        <div class="column is-12">
+            <div class="chart-container">
+                <h3 class="chart-title">
+                    <i class="fa fa-signal"></i> {{{difficulty_distribution}}}
+                </h3>
+                <div id="difficultyChart"></div>
+            </div>
+        </div>
+    </div>
+
+    {{! Top Performers }}
+    <div class="section-header">
+        <h2><i class="fa fa-trophy"></i> {{{admin_top_performers}}}</h2>
+    </div>
+
+    <div class="columns">
+        <div class="column is-6">
+            <div class="chart-container">
+                <h3 class="chart-title">
+                    <i class="fa fa-trophy"></i> {{{admin_top_courses}}}
+                </h3>
+                {{#hastopcourses}}
+                    {{#topcourses}}
+                        <div class="top-performer-row">
+                            <div class="is-flex is-align-items-center hlai-gap-075">
+                                <span class="performer-rank">#{{rank}}</span>
+                                <strong class="performer-name">{{{fullname}}}</strong>
+                            </div>
+                            <span class="performer-badge">
+                                {{{questioncount}}}
+                            </span>
+                        </div>
+                    {{/topcourses}}
+                {{/hastopcourses}}
+                {{^hastopcourses}}
+                    <p class="has-text-grey">{{{admin_no_course_data}}}</p>
+                {{/hastopcourses}}
+            </div>
+        </div>
+
+        <div class="column is-6">
+            <div class="chart-container">
+                <h3 class="chart-title">
+                    <i class="fa fa-trophy"></i> {{{admin_top_teachers}}}
+                </h3>
+                {{#hastopteachers}}
+                    {{#topteachers}}
+                        <div class="top-performer-row">
+                            <div class="is-flex is-align-items-center hlai-gap-075">
+                                <span class="performer-rank">#{{rank}}</span>
+                                <div>
+                                    <strong class="performer-name">{{{fullname}}}</strong>
+                                    <div class="performer-details">
+                                        {{{fractiontext}}}
+                                    </div>
+                                </div>
+                            </div>
+                            <span class="performer-badge">
+                                {{acceptancerate}}%
+                            </span>
+                        </div>
+                    {{/topteachers}}
+                {{/hastopteachers}}
+                {{^hastopteachers}}
+                    <p class="has-text-grey">{{{admin_no_teacher_data}}}</p>
+                {{/hastopteachers}}
+            </div>
+        </div>
+    </div>
+
+    {{! System Health }}
+    <div class="section-header">
+        <h2><i class="fa fa-wrench"></i> {{{admin_system_health}}}</h2>
+    </div>
+
+    <div class="columns">
+        <div class="column is-12">
+            <div class="chart-container">
+                <div class="system-health-grid">
+                    <div class="health-metric">
+                        <strong>{{{admin_ai_provider_status}}}</strong>
+                        <span class="health-indicator {{#aiproviderconfigured}}is-healthy{{/aiproviderconfigured}}{{^aiproviderconfigured}}is-error{{/aiproviderconfigured}}">
+                            <i class="fa {{#aiproviderconfigured}}fa-check-circle{{/aiproviderconfigured}}{{^aiproviderconfigured}}fa-times-circle{{/aiproviderconfigured}}"></i>
+                            {{#aiproviderconfigured}}{{{admin_connected}}}{{/aiproviderconfigured}}
+                            {{^aiproviderconfigured}}{{{admin_not_configured}}}{{/aiproviderconfigured}}
+                        </span>
+                    </div>
+                    <div class="health-metric">
+                        <strong>{{{admin_pending_generations}}}</strong>
+                        <span class="health-value is-warning">
+                            <i class="fa fa-clock"></i> {{pendinggenerations}}
+                        </span>
+                    </div>
+                    <div class="health-metric">
+                        <strong>{{{admin_recent_errors}}}</strong>
+                        <span class="health-value {{#haserrors}}is-danger{{/haserrors}}{{^haserrors}}is-success{{/haserrors}}">
+                            <i class="fa fa-exclamation-triangle"></i> {{recenterrors}}
+                        </span>
+                    </div>
+                    <div class="health-metric">
+                        <strong>{{{admin_total_failed}}}</strong>
+                        <span class="health-value is-dark">
+                            <i class="fa fa-ban"></i> {{failedgenerations}}
+                        </span>
+                    </div>
+                </div>
+
+                <hr class="hlai-admin-hr">
+
+                <h3 class="chart-title">
+                    <i class="fa fa-cog"></i> {{{admin_quick_config_links}}}
+                </h3>
+                <div class="config-buttons">
+                    <a href="{{{settingsurl}}}" class="config-button">
+                        <i class="fa fa-wrench"></i> {{{admin_plugin_settings}}}
+                    </a>
+                    <a href="{{{capurl}}}" class="config-button">
+                        <i class="fa fa-users"></i> {{{admin_user_capabilities}}}
+                    </a>
+                    <a href="{{{debuglogsurl}}}" class="config-button">
+                        <i class="fa fa-file-text-o"></i> {{{admin_view_error_logs}}}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+</div>

@@ -228,6 +228,7 @@ class question_external extends \external_api {
     public static function reorder_answers_parameters() {
         return new \external_function_parameters([
             'questionid' => new \external_value(PARAM_INT, 'The question ID', VALUE_REQUIRED),
+            // PARAM_RAW required for JSON array input; validated via json_decode() in method body.
             'order' => new \external_value(PARAM_RAW, 'JSON array of answer IDs in new order', VALUE_REQUIRED),
         ]);
     }
@@ -481,6 +482,7 @@ class question_external extends \external_api {
      */
     public static function bulk_approve_parameters() {
         return new \external_function_parameters([
+            // PARAM_RAW required for JSON array input; validated via json_decode() in method body.
             'questionids' => new \external_value(PARAM_RAW, 'JSON array of question IDs to approve', VALUE_REQUIRED),
         ]);
     }
@@ -529,12 +531,22 @@ class question_external extends \external_api {
         // Approve each question owned by the current user.
         $approved = 0;
         $now = time();
+        $ownedids = [];
         foreach ($intids as $qid) {
             if (isset($questions[$qid]) && $questions[$qid]->userid == $USER->id) {
-                $DB->set_field('local_hlai_quizgen_questions', 'status', 'approved', ['id' => $qid]);
-                $DB->set_field('local_hlai_quizgen_questions', 'timemodified', $now, ['id' => $qid]);
+                $ownedids[] = $qid;
                 $approved++;
             }
+        }
+        // Batch update using a single query with IN clause.
+        if (!empty($ownedids)) {
+            [$insql, $inparams] = $DB->get_in_or_equal($ownedids, SQL_PARAMS_NAMED);
+            $inparams['newstatus'] = 'approved';
+            $inparams['timemod'] = $now;
+            $DB->execute(
+                "UPDATE {local_hlai_quizgen_questions} SET status = :newstatus, timemodified = :timemod WHERE id {$insql}",
+                $inparams
+            );
         }
 
         return [
@@ -564,6 +576,7 @@ class question_external extends \external_api {
      */
     public static function bulk_reject_parameters() {
         return new \external_function_parameters([
+            // PARAM_RAW required for JSON array input; validated via json_decode() in method body.
             'questionids' => new \external_value(PARAM_RAW, 'JSON array of question IDs to reject', VALUE_REQUIRED),
             'reason' => new \external_value(PARAM_TEXT, 'Reason for rejection', VALUE_DEFAULT, ''),
         ]);
@@ -616,12 +629,22 @@ class question_external extends \external_api {
         // Reject each question owned by the current user.
         $rejected = 0;
         $now = time();
+        $ownedids = [];
         foreach ($intids as $qid) {
             if (isset($questions[$qid]) && $questions[$qid]->userid == $USER->id) {
-                $DB->set_field('local_hlai_quizgen_questions', 'status', 'rejected', ['id' => $qid]);
-                $DB->set_field('local_hlai_quizgen_questions', 'timemodified', $now, ['id' => $qid]);
+                $ownedids[] = $qid;
                 $rejected++;
             }
+        }
+        // Batch update using a single query with IN clause.
+        if (!empty($ownedids)) {
+            [$insql, $inparams] = $DB->get_in_or_equal($ownedids, SQL_PARAMS_NAMED);
+            $inparams['newstatus'] = 'rejected';
+            $inparams['timemod'] = $now;
+            $DB->execute(
+                "UPDATE {local_hlai_quizgen_questions} SET status = :newstatus, timemodified = :timemod WHERE id {$insql}",
+                $inparams
+            );
         }
 
         return [
