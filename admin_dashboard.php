@@ -249,6 +249,7 @@ echo $OUTPUT->header();
 
 ?>
 
+<div class="hlai-quizgen-wrapper local-hlai-iksha">
 <div class="container is-fluid">
 
     <!-- Page Title -->
@@ -540,6 +541,7 @@ echo $OUTPUT->header();
         </div>
     </div>
 
+</div>
 </div>
 
 <?php
