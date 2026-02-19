@@ -134,7 +134,6 @@ class provider implements
             'privacy:metadata:local_hlai_quizgen_reviews'
         );
 
-
         // Question revisions.
         $collection->add_database_table(
             'local_hlai_quizgen_revisions',
@@ -144,7 +143,6 @@ class provider implements
             ],
             'privacy:metadata:local_hlai_quizgen_revisions'
         );
-
 
         // External data sent to AI gateway.
         $collection->add_external_location_link(
@@ -313,7 +311,6 @@ class provider implements
                 );
             }
 
-
             // Export logs.
             $logs = $DB->get_records('local_hlai_quizgen_logs', [
                 'userid' => $userid,
@@ -334,7 +331,6 @@ class provider implements
                 );
             }
 
-
             // Export revisions.
             $revisions = $DB->get_records('local_hlai_quizgen_revisions', [
                 'userid' => $userid,
@@ -354,7 +350,6 @@ class provider implements
                     (object)['revisions' => $data]
                 );
             }
-
 
             // Export templates.
             $templates = $DB->get_records('local_hlai_quizgen_templates', [

@@ -218,8 +218,7 @@
         <INDEX NAME="lastaccessed" UNIQUE="false" FIELDS="lastaccessed"/>
       </INDEXES>
     </TABLE>
-    
-    
+
     <TABLE NAME="local_hlai_quizgen_reviews" COMMENT="Peer review and approval workflow">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
@@ -271,7 +270,6 @@
         <INDEX NAME="reviewid_time" UNIQUE="false" FIELDS="reviewid, timecreated"/>
       </INDEXES>
     </TABLE>
-    
 
     <TABLE NAME="local_hlai_quizgen_wizstate" COMMENT="Stores wizard session state for resumption">
       <FIELDS>
