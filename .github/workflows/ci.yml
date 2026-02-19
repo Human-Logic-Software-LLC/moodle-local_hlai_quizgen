@@ -103,6 +103,8 @@ jobs:
       - name: Rebuild and upload grunt AMD files (debug)
         if: ${{ failure() && steps.grunt.outcome == 'failure' }}
         run: |
+          source $NVM_DIR/nvm.sh
+          nvm use
           cd moodle
           npx grunt rollup --root=local/hlai_quizgen
           mkdir -p /tmp/grunt-output
