@@ -821,7 +821,7 @@ function local_hlai_quizgen_handle_save_topic_selection(int $requestid) {
 
     // Batch-update selected topics to avoid N+1 queries.
     if (!empty($selectedtopics)) {
-        list($insql, $inparams) = $DB->get_in_or_equal($selectedtopics, SQL_PARAMS_NAMED);
+        [$insql, $inparams] = $DB->get_in_or_equal($selectedtopics, SQL_PARAMS_NAMED);
         $DB->set_field_select('local_hlai_quizgen_topics', 'selected', 1, "id $insql", $inparams);
         $DB->set_field_select('local_hlai_quizgen_topics', 'num_questions', 5, "id $insql", $inparams);
     }

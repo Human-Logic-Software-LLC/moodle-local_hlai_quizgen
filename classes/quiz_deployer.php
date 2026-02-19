@@ -91,7 +91,7 @@ class quiz_deployer {
         $questionnumber = 1;
 
         // Batch-fetch all questions to avoid N+1 queries.
-        list($qinsql, $qinparams) = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED);
+        [$qinsql, $qinparams] = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED);
         $allgenquestions = $DB->get_records_select(
             'local_hlai_quizgen_questions',
             "id $qinsql",
@@ -1256,7 +1256,7 @@ class quiz_deployer {
         $questionsperpage = $quiz->questionsperpage ?? 1;
 
         // Batch-fetch question bank entries to avoid N+1 queries.
-        list($vinsql, $vinparams) = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED);
+        [$vinsql, $vinparams] = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED);
         $allversions = $DB->get_records_sql(
             "SELECT qv.questionid, qv.questionbankentryid
                FROM {question_versions} qv

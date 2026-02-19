@@ -519,7 +519,7 @@ class question_external extends \external_api {
 
         // Batch-fetch all questions to avoid N+1 queries.
         $intids = array_map('intval', $questionids);
-        list($insql, $inparams) = $DB->get_in_or_equal($intids, SQL_PARAMS_NAMED);
+        [$insql, $inparams] = $DB->get_in_or_equal($intids, SQL_PARAMS_NAMED);
         $questions = $DB->get_records_select(
             'local_hlai_quizgen_questions',
             "id $insql",
@@ -606,7 +606,7 @@ class question_external extends \external_api {
 
         // Batch-fetch all questions to avoid N+1 queries.
         $intids = array_map('intval', $questionids);
-        list($insql, $inparams) = $DB->get_in_or_equal($intids, SQL_PARAMS_NAMED);
+        [$insql, $inparams] = $DB->get_in_or_equal($intids, SQL_PARAMS_NAMED);
         $questions = $DB->get_records_select(
             'local_hlai_quizgen_questions',
             "id $insql",

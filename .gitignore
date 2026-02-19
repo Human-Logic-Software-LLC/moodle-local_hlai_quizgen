@@ -26,8 +26,11 @@ venv/
 env/
 ENV/
 
-# Node modules (if any)
+# Node modules and build tooling (if any)
 node_modules/
+package.json
+package-lock.json
+build_amd.mjs
 
 # Log files
 *.log

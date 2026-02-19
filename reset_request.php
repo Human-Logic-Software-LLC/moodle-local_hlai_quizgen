@@ -64,7 +64,8 @@ if ($doreset && confirm_sesskey() && $requestid) {
         $update->timemodified = time();
         $update->timecompleted = null;
         $DB->update_record('local_hlai_quizgen_requests', $update);
-        echo html_writer::div(get_string('reset_request_success', 'local_hlai_quizgen', $requestid), 'notification is-success is-light');
+        $msg = get_string('reset_request_success', 'local_hlai_quizgen', $requestid);
+        echo html_writer::div($msg, 'notification is-success is-light');
     }
 }
 
@@ -74,7 +75,8 @@ echo html_writer::start_tag('form', ['method' => 'post', 'action' => $formurl->o
 echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()]);
 echo html_writer::empty_tag('input', ['type' => 'hidden', 'name' => 'doreset', 'value' => 1]);
 echo html_writer::start_div('field');
-echo html_writer::tag('label', get_string('reset_request_id_label', 'local_hlai_quizgen'), ['for' => 'requestid', 'class' => 'label']);
+$label = get_string('reset_request_id_label', 'local_hlai_quizgen');
+echo html_writer::tag('label', $label, ['for' => 'requestid', 'class' => 'label']);
 echo html_writer::start_div('control');
 echo html_writer::empty_tag('input', [
     'type' => 'number',
@@ -86,7 +88,8 @@ echo html_writer::empty_tag('input', [
 ]);
 echo html_writer::end_div();
 echo html_writer::end_div();
-echo html_writer::tag('button', get_string('reset_request_submit', 'local_hlai_quizgen'), ['type' => 'submit', 'class' => 'button is-primary']);
+$btntext = get_string('reset_request_submit', 'local_hlai_quizgen');
+echo html_writer::tag('button', $btntext, ['type' => 'submit', 'class' => 'button is-primary']);
 echo html_writer::end_tag('form');
 
 echo html_writer::end_div();
