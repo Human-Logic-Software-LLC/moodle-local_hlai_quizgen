@@ -9267,13 +9267,13 @@ body.path-local-hlai_quizgen {
 /* Base layout - avoid z-index manipulation to not break Moodle navigation */
 .hlai-quizgen-wrapper,
 .hlai-quizgen-wizard,
-.local-hlai-iksha {
+.hlai-quizgen-wrapper.local-hlai-iksha {
     position: relative;
 }
 
 .hlai-quizgen-wrapper::after,
 .hlai-quizgen-wizard::after,
-.local-hlai-iksha::after {
+.hlai-quizgen-wrapper.local-hlai-iksha::after {
     content: '';
     display: block;
     clear: both;
