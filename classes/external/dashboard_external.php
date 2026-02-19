@@ -45,22 +45,32 @@ class dashboard_external extends \external_api {
      * @return \external_function_parameters
      */
     public static function get_dashboard_stats_parameters() {
-        return new \external_function_parameters([]);
+        return new \external_function_parameters([
+            'courseid' => new \external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+        ]);
     }
 
     /**
      * Get quick stats for dashboard cards.
      *
+     * @param int $courseid Course ID for context validation.
      * @return array Dashboard statistics.
      */
-    public static function get_dashboard_stats() {
+    public static function get_dashboard_stats($courseid = 0) {
         global $DB, $USER;
 
-        // Validate parameters (none required).
-        self::validate_parameters(self::get_dashboard_stats_parameters(), []);
+        // Validate parameters.
+        $params = self::validate_parameters(self::get_dashboard_stats_parameters(), [
+            'courseid' => $courseid,
+        ]);
+        $courseid = $params['courseid'];
 
-        // Validate context.
-        $context = \context_system::instance();
+        // Validate context - use course context when available for teacher access.
+        if ($courseid > 0) {
+            $context = \context_course::instance($courseid);
+        } else {
+            $context = \context_system::instance();
+        }
         self::validate_context($context);
 
         $userid = $USER->id;
@@ -163,6 +173,7 @@ class dashboard_external extends \external_api {
     public static function get_question_type_distribution_parameters() {
         return new \external_function_parameters([
             'filtercourseid' => new \external_value(PARAM_INT, 'Course ID to filter by (0 for all)', VALUE_DEFAULT, 0),
+            'courseid' => new \external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -170,19 +181,26 @@ class dashboard_external extends \external_api {
      * Get question type distribution for charts.
      *
      * @param int $filtercourseid Course ID to filter by (0 for all).
+     * @param int $courseid Course ID for context validation.
      * @return array Labels and values arrays.
      */
-    public static function get_question_type_distribution($filtercourseid = 0) {
+    public static function get_question_type_distribution($filtercourseid = 0, $courseid = 0) {
         global $DB, $USER;
 
         // Validate parameters.
         $params = self::validate_parameters(self::get_question_type_distribution_parameters(), [
             'filtercourseid' => $filtercourseid,
+            'courseid' => $courseid,
         ]);
         $filtercourseid = $params['filtercourseid'];
+        $courseid = $params['courseid'];
 
-        // Validate context.
-        $context = \context_system::instance();
+        // Validate context - use course context when available for teacher access.
+        if ($courseid > 0) {
+            $context = \context_course::instance($courseid);
+        } else {
+            $context = \context_system::instance();
+        }
         self::validate_context($context);
 
         $userid = $USER->id;
@@ -242,22 +260,32 @@ class dashboard_external extends \external_api {
      * @return \external_function_parameters
      */
     public static function get_difficulty_distribution_parameters() {
-        return new \external_function_parameters([]);
+        return new \external_function_parameters([
+            'courseid' => new \external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+        ]);
     }
 
     /**
      * Get difficulty distribution of generated questions.
      *
+     * @param int $courseid Course ID for context validation.
      * @return array Counts for easy, medium, hard.
      */
-    public static function get_difficulty_distribution() {
+    public static function get_difficulty_distribution($courseid = 0) {
         global $DB, $USER;
 
-        // Validate parameters (none required).
-        self::validate_parameters(self::get_difficulty_distribution_parameters(), []);
+        // Validate parameters.
+        $params = self::validate_parameters(self::get_difficulty_distribution_parameters(), [
+            'courseid' => $courseid,
+        ]);
+        $courseid = $params['courseid'];
 
-        // Validate context.
-        $context = \context_system::instance();
+        // Validate context - use course context when available for teacher access.
+        if ($courseid > 0) {
+            $context = \context_course::instance($courseid);
+        } else {
+            $context = \context_system::instance();
+        }
         self::validate_context($context);
 
         $userid = $USER->id;
@@ -307,22 +335,32 @@ class dashboard_external extends \external_api {
      * @return \external_function_parameters
      */
     public static function get_blooms_distribution_parameters() {
-        return new \external_function_parameters([]);
+        return new \external_function_parameters([
+            'courseid' => new \external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+        ]);
     }
 
     /**
      * Get Bloom's taxonomy distribution of generated questions.
      *
+     * @param int $courseid Course ID for context validation.
      * @return array Counts for each Bloom's level.
      */
-    public static function get_blooms_distribution() {
+    public static function get_blooms_distribution($courseid = 0) {
         global $DB, $USER;
 
-        // Validate parameters (none required).
-        self::validate_parameters(self::get_blooms_distribution_parameters(), []);
+        // Validate parameters.
+        $params = self::validate_parameters(self::get_blooms_distribution_parameters(), [
+            'courseid' => $courseid,
+        ]);
+        $courseid = $params['courseid'];
 
-        // Validate context.
-        $context = \context_system::instance();
+        // Validate context - use course context when available for teacher access.
+        if ($courseid > 0) {
+            $context = \context_course::instance($courseid);
+        } else {
+            $context = \context_system::instance();
+        }
         self::validate_context($context);
 
         $userid = $USER->id;
@@ -388,6 +426,7 @@ class dashboard_external extends \external_api {
     public static function get_acceptance_trend_parameters() {
         return new \external_function_parameters([
             'limit' => new \external_value(PARAM_INT, 'Number of recent generations to include', VALUE_DEFAULT, 10),
+            'courseid' => new \external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -395,19 +434,26 @@ class dashboard_external extends \external_api {
      * Get acceptance rate trend over last N quiz generations.
      *
      * @param int $limit Number of recent generations to include.
+     * @param int $courseid Course ID for context validation.
      * @return array Labels, acceptance rates, and FTAR rates.
      */
-    public static function get_acceptance_trend($limit = 10) {
+    public static function get_acceptance_trend($limit = 10, $courseid = 0) {
         global $DB, $USER;
 
         // Validate parameters.
         $params = self::validate_parameters(self::get_acceptance_trend_parameters(), [
             'limit' => $limit,
+            'courseid' => $courseid,
         ]);
         $limit = $params['limit'];
+        $courseid = $params['courseid'];
 
-        // Validate context.
-        $context = \context_system::instance();
+        // Validate context - use course context when available for teacher access.
+        if ($courseid > 0) {
+            $context = \context_course::instance($courseid);
+        } else {
+            $context = \context_system::instance();
+        }
         self::validate_context($context);
 
         $userid = $USER->id;
@@ -496,7 +542,9 @@ class dashboard_external extends \external_api {
      * @return \external_function_parameters
      */
     public static function get_regeneration_by_type_parameters() {
-        return new \external_function_parameters([]);
+        return new \external_function_parameters([
+            'courseid' => new \external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+        ]);
     }
 
     /**
@@ -506,16 +554,24 @@ class dashboard_external extends \external_api {
      * (keyed by question type), which Moodle's external API does not
      * support natively with typed structures.
      *
+     * @param int $courseid Course ID for context validation.
      * @return array Contains a 'data' key with JSON-encoded regeneration stats.
      */
-    public static function get_regeneration_by_type() {
+    public static function get_regeneration_by_type($courseid = 0) {
         global $DB, $USER;
 
-        // Validate parameters (none required).
-        self::validate_parameters(self::get_regeneration_by_type_parameters(), []);
+        // Validate parameters.
+        $params = self::validate_parameters(self::get_regeneration_by_type_parameters(), [
+            'courseid' => $courseid,
+        ]);
+        $courseid = $params['courseid'];
 
-        // Validate context.
-        $context = \context_system::instance();
+        // Validate context - use course context when available for teacher access.
+        if ($courseid > 0) {
+            $context = \context_course::instance($courseid);
+        } else {
+            $context = \context_system::instance();
+        }
         self::validate_context($context);
 
         $userid = $USER->id;
@@ -568,22 +624,32 @@ class dashboard_external extends \external_api {
      * @return \external_function_parameters
      */
     public static function get_quality_distribution_parameters() {
-        return new \external_function_parameters([]);
+        return new \external_function_parameters([
+            'courseid' => new \external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+        ]);
     }
 
     /**
      * Get quality score distribution (histogram data).
      *
+     * @param int $courseid Course ID for context validation.
      * @return array Labels (score ranges) and values (counts).
      */
-    public static function get_quality_distribution() {
+    public static function get_quality_distribution($courseid = 0) {
         global $DB, $USER;
 
-        // Validate parameters (none required).
-        self::validate_parameters(self::get_quality_distribution_parameters(), []);
+        // Validate parameters.
+        $params = self::validate_parameters(self::get_quality_distribution_parameters(), [
+            'courseid' => $courseid,
+        ]);
+        $courseid = $params['courseid'];
 
-        // Validate context.
-        $context = \context_system::instance();
+        // Validate context - use course context when available for teacher access.
+        if ($courseid > 0) {
+            $context = \context_course::instance($courseid);
+        } else {
+            $context = \context_system::instance();
+        }
         self::validate_context($context);
 
         $userid = $USER->id;
@@ -647,6 +713,7 @@ class dashboard_external extends \external_api {
     public static function get_recent_requests_parameters() {
         return new \external_function_parameters([
             'limit' => new \external_value(PARAM_INT, 'Maximum number of requests to return', VALUE_DEFAULT, 5),
+            'courseid' => new \external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -654,19 +721,26 @@ class dashboard_external extends \external_api {
      * Get recent quiz generation requests for the dashboard.
      *
      * @param int $limit Maximum number of requests to return.
+     * @param int $courseid Course ID for context validation.
      * @return array Array containing a 'requests' key with the list of request items.
      */
-    public static function get_recent_requests($limit = 5) {
+    public static function get_recent_requests($limit = 5, $courseid = 0) {
         global $DB, $USER;
 
         // Validate parameters.
         $params = self::validate_parameters(self::get_recent_requests_parameters(), [
             'limit' => $limit,
+            'courseid' => $courseid,
         ]);
         $limit = $params['limit'];
+        $courseid = $params['courseid'];
 
-        // Validate context.
-        $context = \context_system::instance();
+        // Validate context - use course context when available for teacher access.
+        if ($courseid > 0) {
+            $context = \context_course::instance($courseid);
+        } else {
+            $context = \context_system::instance();
+        }
         self::validate_context($context);
 
         $userid = $USER->id;

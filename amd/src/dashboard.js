@@ -195,11 +195,12 @@ define(['jquery', 'core/ajax', 'local_hlai_quizgen/charts'], function($, Ajax, C
          * @returns {Promise}
          */
         fetchData: function(action) {
+            var cid = this.courseid || 0;
             var methodMap = {
-                'acceptancetrend': {methodname: 'local_hlai_quizgen_get_acceptance_trend', args: {}},
-                'difficultydist': {methodname: 'local_hlai_quizgen_get_difficulty_distribution', args: {}},
-                'bloomsdist': {methodname: 'local_hlai_quizgen_get_blooms_distribution', args: {}},
-                'regenbytype': {methodname: 'local_hlai_quizgen_get_regeneration_by_type', args: {}}
+                'acceptancetrend': {methodname: 'local_hlai_quizgen_get_acceptance_trend', args: {courseid: cid}},
+                'difficultydist': {methodname: 'local_hlai_quizgen_get_difficulty_distribution', args: {courseid: cid}},
+                'bloomsdist': {methodname: 'local_hlai_quizgen_get_blooms_distribution', args: {courseid: cid}},
+                'regenbytype': {methodname: 'local_hlai_quizgen_get_regeneration_by_type', args: {courseid: cid}}
             };
 
             var call = methodMap[action];
