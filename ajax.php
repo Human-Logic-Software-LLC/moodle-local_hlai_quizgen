@@ -348,15 +348,29 @@ try {
                 '91-100' => [91, 100],
             ];
 
-            $distribution = [];
-            foreach ($ranges as $label => $range) {
-                $count = $DB->count_records_sql(
-                    "SELECT COUNT(*) FROM {local_hlai_quizgen_questions}
-                     WHERE userid = ? AND validation_score >= ? AND validation_score <= ?",
-                    [$userid, $range[0], $range[1]]
-                );
-                $distribution[] = (int)$count;
-            }
+            // Single query with CASE WHEN to avoid N+1 count queries.
+            $row = $DB->get_record_sql(
+                "SELECT
+                    SUM(CASE WHEN validation_score BETWEEN 0 AND 10 THEN 1 ELSE 0 END) AS r0,
+                    SUM(CASE WHEN validation_score BETWEEN 11 AND 20 THEN 1 ELSE 0 END) AS r1,
+                    SUM(CASE WHEN validation_score BETWEEN 21 AND 30 THEN 1 ELSE 0 END) AS r2,
+                    SUM(CASE WHEN validation_score BETWEEN 31 AND 40 THEN 1 ELSE 0 END) AS r3,
+                    SUM(CASE WHEN validation_score BETWEEN 41 AND 50 THEN 1 ELSE 0 END) AS r4,
+                    SUM(CASE WHEN validation_score BETWEEN 51 AND 60 THEN 1 ELSE 0 END) AS r5,
+                    SUM(CASE WHEN validation_score BETWEEN 61 AND 70 THEN 1 ELSE 0 END) AS r6,
+                    SUM(CASE WHEN validation_score BETWEEN 71 AND 80 THEN 1 ELSE 0 END) AS r7,
+                    SUM(CASE WHEN validation_score BETWEEN 81 AND 90 THEN 1 ELSE 0 END) AS r8,
+                    SUM(CASE WHEN validation_score BETWEEN 91 AND 100 THEN 1 ELSE 0 END) AS r9
+                 FROM {local_hlai_quizgen_questions}
+                 WHERE userid = ?",
+                [$userid]
+            );
+            $distribution = $row ? [
+                (int)($row->r0 ?? 0), (int)($row->r1 ?? 0), (int)($row->r2 ?? 0),
+                (int)($row->r3 ?? 0), (int)($row->r4 ?? 0), (int)($row->r5 ?? 0),
+                (int)($row->r6 ?? 0), (int)($row->r7 ?? 0), (int)($row->r8 ?? 0),
+                (int)($row->r9 ?? 0),
+            ] : array_fill(0, 10, 0);
 
             local_hlai_quizgen_send_response(true, [
                 'labels' => array_keys($ranges),
