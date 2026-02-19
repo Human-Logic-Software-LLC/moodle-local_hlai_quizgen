@@ -29,9 +29,6 @@ ENV/
 # Node modules (if any)
 node_modules/
 
-# AMD build artifacts (built by Moodle's grunt, not committed to git)
-amd/build/
-
 # Log files
 *.log
 *.log.*

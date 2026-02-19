@@ -108,7 +108,6 @@ jobs:
         run: moodle-plugin-ci mustache
 
       - name: Grunt
-        continue-on-error: true
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci grunt --max-lint-warnings 0
 
