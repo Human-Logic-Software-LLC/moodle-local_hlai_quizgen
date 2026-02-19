@@ -1,9 +1,6 @@
 name: Moodle Plugin CI
 
-on:
-  push:
-  pull_request:
-  workflow_dispatch:
+on: [push, pull_request]
 
 jobs:
   test:
@@ -34,27 +31,21 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Minimum supported version: Moodle 4.1 with PHP 8.0 (pgsql).
           - php: '8.0'
             moodle-branch: 'MOODLE_401_STABLE'
             database: 'pgsql'
-          # Minimum supported version: Moodle 4.1 with PHP 8.1 (mariadb).
           - php: '8.1'
             moodle-branch: 'MOODLE_401_STABLE'
             database: 'mariadb'
-          # Mid-range version: Moodle 4.5 with PHP 8.1 (pgsql).
           - php: '8.1'
             moodle-branch: 'MOODLE_405_STABLE'
             database: 'pgsql'
-          # Mid-range version: Moodle 4.5 with PHP 8.3 (mariadb).
           - php: '8.3'
             moodle-branch: 'MOODLE_405_STABLE'
             database: 'mariadb'
-          # Maximum supported version: Moodle 5.0 with PHP 8.2 (pgsql).
           - php: '8.2'
             moodle-branch: 'MOODLE_500_STABLE'
             database: 'pgsql'
-          # Maximum supported version: Moodle 5.0 with PHP 8.3 (mariadb).
           - php: '8.3'
             moodle-branch: 'MOODLE_500_STABLE'
             database: 'mariadb'
@@ -69,7 +60,6 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: ${{ matrix.database == 'pgsql' && 'pgsql, zip, gd, xmlrpc, soap, intl' || 'mysqli, zip, gd, xmlrpc, soap, intl' }}
           ini-values: max_input_vars=5000
           coverage: none
 
@@ -82,20 +72,14 @@ jobs:
           echo "NVM_DIR=$HOME/.nvm" >> $GITHUB_ENV
 
       - name: Install moodle-plugin-ci
-        run: moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1 --no-init
+        run: moodle-plugin-ci install --plugin ./plugin --db-host=127.0.0.1
         env:
           DB: ${{ matrix.database }}
           MOODLE_BRANCH: ${{ matrix.moodle-branch }}
-          IGNORE_PATHS: 'gateway,check_standards.php'
 
       - name: PHP Lint
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci phplint
-
-      - name: PHP Copy/Paste Detector
-        continue-on-error: true
-        if: ${{ !cancelled() }}
-        run: moodle-plugin-ci phpcpd
 
       - name: PHP Mess Detector
         continue-on-error: true
@@ -104,11 +88,11 @@ jobs:
 
       - name: Moodle Code Checker
         if: ${{ !cancelled() }}
-        run: moodle-plugin-ci phpcs
+        run: moodle-plugin-ci phpcs --max-warnings 0
 
       - name: Moodle PHPDoc Checker
         if: ${{ !cancelled() }}
-        run: moodle-plugin-ci phpdoc
+        run: moodle-plugin-ci phpdoc --max-warnings 0
 
       - name: Validating
         if: ${{ !cancelled() }}
@@ -124,19 +108,26 @@ jobs:
 
       - name: Grunt
         if: ${{ !cancelled() }}
-        continue-on-error: true
-        run: moodle-plugin-ci grunt
+        run: moodle-plugin-ci grunt --max-lint-warnings 0
 
       - name: PHPUnit tests
         if: ${{ !cancelled() }}
-        continue-on-error: true
-        run: moodle-plugin-ci phpunit --fail-on-warning || echo "PHPUnit tests skipped or failed"
+        run: moodle-plugin-ci phpunit --fail-on-warning
 
       - name: Behat features
+        id: behat
         if: ${{ !cancelled() }}
-        continue-on-error: true
-        run: moodle-plugin-ci behat --profile chrome || echo "Behat tests skipped or failed"
+        run: moodle-plugin-ci behat --profile chrome --scss-deprecations
 
-      - name: Mark cancelled jobs as failed
+      - name: Upload Behat Faildump
+        if: ${{ failure() && steps.behat.outcome == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: Behat Faildump (${{ join(matrix.*, ', ') }})
+          path: ${{ github.workspace }}/moodledata/behat_dump
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Mark cancelled jobs as failed.
         if: ${{ cancelled() }}
         run: exit 1
