@@ -320,6 +320,8 @@ class quiz_deployer {
         global $DB, $CFG, $USER;
 
         require_once($CFG->dirroot . '/course/lib.php');
+        require_once($CFG->dirroot . '/mod/quiz/lib.php');
+        require_once($CFG->dirroot . '/mod/quiz/locallib.php');
 
         $context = \context_course::instance($courseid);
         require_capability('mod/quiz:addinstance', $context);
