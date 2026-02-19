@@ -41,6 +41,7 @@
 
     Example context (json):
     {
+        "form_url": "#",
         "has_activities": true,
         "activities": [{"id": 1, "name": "Lesson 1", "type": "Page", "emoji_html": "<i class=\"fa fa-file\"></i>"}]
     }
@@ -68,11 +69,11 @@
                     <div class="column is-4">
                         <label class="hlai-source-card" for="source_manual">
                             <input type="checkbox" name="content_sources[]" value="manual" id="source_manual" class="content-source-checkbox hlai-source-check" data-source="manual">
-                            <div class="hlai-source-content">
+                            <span class="hlai-source-content">
                                 <span class="hlai-source-icon"><i class="fa fa-pencil hlai-icon-warning"></i></span>
                                 <strong class="hlai-source-title">{{{source_manual}}}</strong>
-                                <p class="hlai-source-desc">{{{source_manual_desc}}}</p>
-                            </div>
+                                <span class="hlai-source-desc">{{{source_manual_desc}}}</span>
+                            </span>
                         </label>
                     </div>
 
@@ -80,11 +81,11 @@
                     <div class="column is-4">
                         <label class="hlai-source-card" for="source_upload">
                             <input type="checkbox" name="content_sources[]" value="upload" id="source_upload" class="content-source-checkbox hlai-source-check" data-source="upload">
-                            <div class="hlai-source-content">
+                            <span class="hlai-source-content">
                                 <span class="hlai-source-icon"><i class="fa fa-folder-open hlai-icon-purple"></i></span>
                                 <strong class="hlai-source-title">{{{source_upload}}}</strong>
-                                <p class="hlai-source-desc">{{{source_upload_desc}}}</p>
-                            </div>
+                                <span class="hlai-source-desc">{{{source_upload_desc}}}</span>
+                            </span>
                         </label>
                     </div>
 
@@ -92,11 +93,11 @@
                     <div class="column is-4">
                         <label class="hlai-source-card" for="source_url">
                             <input type="checkbox" name="content_sources[]" value="url" id="source_url" class="content-source-checkbox hlai-source-check" data-source="url">
-                            <div class="hlai-source-content">
+                            <span class="hlai-source-content">
                                 <span class="hlai-source-icon"><i class="fa fa-globe hlai-icon-info"></i></span>
                                 <strong class="hlai-source-title">{{{source_url_title}}}</strong>
-                                <p class="hlai-source-desc">{{{source_url_desc}}}</p>
-                            </div>
+                                <span class="hlai-source-desc">{{{source_url_desc}}}</span>
+                            </span>
                         </label>
                     </div>
                 </div>
@@ -110,14 +111,14 @@
                     <div class="column is-6">
                         <label class="hlai-source-card hlai-source-featured" for="source_activities">
                             <input type="checkbox" name="content_sources[]" value="activities" id="source_activities" class="content-source-checkbox hlai-source-check" data-source="activities">
-                            <div class="hlai-source-content">
+                            <span class="hlai-source-content">
                                 <span class="hlai-source-icon hlai-icon-lg"><i class="fa fa-book hlai-icon-primary"></i></span>
-                                <div class="hlai-source-text">
+                                <span class="hlai-source-text">
                                     <strong class="hlai-source-title">{{{source_activities}}}</strong>
-                                    <p class="hlai-source-desc">{{{source_activities_desc}}}</p>
+                                    <span class="hlai-source-desc">{{{source_activities_desc}}}</span>
                                     <span class="hlai-source-badge"><i class="fa fa-star hlai-icon-warning"></i> {{{wizard_recommended}}}</span>
-                                </div>
-                            </div>
+                                </span>
+                            </span>
                         </label>
                     </div>
 
@@ -125,11 +126,11 @@
                     <div class="column is-6">
                         <label class="hlai-source-card" for="source_scan_course">
                             <input type="checkbox" name="content_sources[]" value="scan_course" id="source_scan_course" class="content-source-checkbox hlai-source-check" data-source="scan_course">
-                            <div class="hlai-source-content">
+                            <span class="hlai-source-content">
                                 <span class="hlai-source-icon"><i class="fa fa-graduation-cap hlai-icon-success"></i></span>
                                 <strong class="hlai-source-title">{{{source_scan_course}}}</strong>
-                                <p class="hlai-source-desc">{{{source_scan_course_desc}}}</p>
-                            </div>
+                                <span class="hlai-source-desc">{{{source_scan_course_desc}}}</span>
+                            </span>
                         </label>
                     </div>
 
@@ -137,11 +138,11 @@
                     <div class="column is-6">
                         <label class="hlai-source-card" for="source_scan_resources">
                             <input type="checkbox" name="content_sources[]" value="scan_resources" id="source_scan_resources" class="content-source-checkbox hlai-source-check" data-source="scan_resources">
-                            <div class="hlai-source-content">
+                            <span class="hlai-source-content">
                                 <span class="hlai-source-icon"><i class="fa fa-book hlai-icon-purple"></i></span>
                                 <strong class="hlai-source-title">{{{source_scan_resources}}}</strong>
-                                <p class="hlai-source-desc">{{{source_scan_resources_desc}}}</p>
-                            </div>
+                                <span class="hlai-source-desc">{{{source_scan_resources_desc}}}</span>
+                            </span>
                         </label>
                     </div>
 
@@ -149,11 +150,11 @@
                     <div class="column is-6">
                         <label class="hlai-source-card" for="source_scan_activities">
                             <input type="checkbox" name="content_sources[]" value="scan_activities" id="source_scan_activities" class="content-source-checkbox hlai-source-check" data-source="scan_activities">
-                            <div class="hlai-source-content">
+                            <span class="hlai-source-content">
                                 <span class="hlai-source-icon"><i class="fa fa-edit hlai-icon-danger"></i></span>
                                 <strong class="hlai-source-title">{{{source_scan_activities}}}</strong>
-                                <p class="hlai-source-desc">{{{source_scan_activities_desc}}}</p>
-                            </div>
+                                <span class="hlai-source-desc">{{{source_scan_activities_desc}}}</span>
+                            </span>
                         </label>
                     </div>
                 </div>
@@ -237,13 +238,13 @@
                 <label class="hlai-activity-card">
                     <input type="checkbox" name="activityids[]" value="{{id}}" class="hlai-activity-checkbox">
                     <span class="hlai-activity-checkmark"></span>
-                    <div class="hlai-activity-content">
+                    <span class="hlai-activity-content">
                         <span class="hlai-activity-emoji">{{{emoji_html}}}</span>
-                        <div class="hlai-activity-text">
+                        <span class="hlai-activity-text">
                             <span class="hlai-activity-name">{{{name}}}</span>
                             <span class="hlai-activity-type">{{{type}}}</span>
-                        </div>
-                    </div>
+                        </span>
+                    </span>
                 </label>
                 {{/activities}}
             </div>

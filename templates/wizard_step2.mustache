@@ -25,6 +25,7 @@
 
     Example context (json):
     {
+        "form_url": "#",
         "has_topics": true,
         "topics": [{"id": 1, "title": "Topic 1", "has_description": true, "description": "Description..."}]
     }
@@ -72,15 +73,15 @@
                 <label class="hlai-topic-card">
                     <input type="checkbox" name="topics[]" value="{{id}}" class="hlai-topic-checkbox">
                     <span class="hlai-topic-checkmark"></span>
-                    <div class="hlai-topic-content">
+                    <span class="hlai-topic-content">
                         <span class="hlai-topic-emoji"><i class="fa fa-book hlai-icon-primary"></i></span>
-                        <div class="hlai-topic-text">
+                        <span class="hlai-topic-text">
                             <span class="hlai-topic-title">{{{title}}}</span>
                             {{#has_description}}
-                            <p class="hlai-topic-description">{{{description}}}</p>
+                            <span class="hlai-topic-description">{{{description}}}</span>
                             {{/has_description}}
-                        </div>
-                    </div>
+                        </span>
+                    </span>
                 </label>
                 {{/topics}}
             </div>

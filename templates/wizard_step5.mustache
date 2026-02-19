@@ -34,6 +34,7 @@
 
     Example context (json):
     {
+        "form_url": "#",
         "has_approved": true,
         "ready_deploy_message": "5 of 10 questions ready to deploy"
     }
@@ -71,10 +72,10 @@
         <div class="field mb-4">
             <label class="radio hlai-deploy-label">
                 <input type="radio" name="deploy_type" value="new_quiz" id="deploy_new_quiz" class="deploy-type-radio hlai-radio-mt" checked="checked">
-                <div>
+                <span>
                     <strong>{{{create_new_quiz}}}</strong>
-                    <p class="help mb-0">{{{create_quiz_desc}}}</p>
-                </div>
+                    <span class="help mb-0">{{{create_quiz_desc}}}</span>
+                </span>
             </label>
         </div>
 
@@ -91,10 +92,10 @@
         <div class="field mb-4">
             <label class="radio hlai-deploy-label">
                 <input type="radio" name="deploy_type" value="question_bank" id="deploy_qbank" class="deploy-type-radio hlai-radio-mt">
-                <div>
+                <span>
                     <strong>{{{export_to_qbank}}}</strong>
-                    <p class="help mb-0">{{{qbank_desc}}}</p>
-                </div>
+                    <span class="help mb-0">{{{qbank_desc}}}</span>
+                </span>
             </label>
         </div>
 
