@@ -26,6 +26,7 @@
 
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/filelib.php');
+require_once(__DIR__ . '/lib.php');
 
 // Load Composer autoloader for document parsing libraries.
 if (file_exists(__DIR__ . '/vendor/autoload.php')) {
