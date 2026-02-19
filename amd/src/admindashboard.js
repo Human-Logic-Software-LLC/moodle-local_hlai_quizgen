@@ -43,6 +43,9 @@ define(['jquery'], function($) {
             var self = this;
             this.waitForApexCharts().then(function() {
                 self.renderCharts(data);
+                return undefined;
+            }).catch(function() {
+                // ApexCharts loading failed silently.
             });
         },
 
@@ -67,7 +70,6 @@ define(['jquery'], function($) {
                         resolve();
                     } else if (attempts >= maxAttempts) {
                         clearInterval(checkInterval);
-                        // eslint-disable-next-line no-console
                         // ApexCharts did not load in time.
                         resolve();
                     }

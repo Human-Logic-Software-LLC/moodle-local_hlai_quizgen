@@ -49,6 +49,9 @@ define(['jquery', 'core/ajax', 'local_hlai_quizgen/charts'], function($, Ajax, C
                 Dashboard.initializeCharts();
                 Dashboard.loadChartData();
                 Dashboard.setupEventListeners();
+                return undefined;
+            }).catch(function() {
+                // ApexCharts loading failed silently.
             });
         },
 
@@ -156,21 +159,33 @@ define(['jquery', 'core/ajax', 'local_hlai_quizgen/charts'], function($, Ajax, C
             // Load acceptance trend
             this.fetchData('acceptancetrend').then(function(data) {
                 self.renderAcceptanceTrendChart(data);
+                return undefined;
+            }).catch(function() {
+                // Data fetch handled by fetchData.
             });
 
             // Load difficulty distribution
             this.fetchData('difficultydist').then(function(data) {
                 self.renderDifficultyChart(data);
+                return undefined;
+            }).catch(function() {
+                // Data fetch handled by fetchData.
             });
 
             // Load Bloom's distribution
             this.fetchData('bloomsdist').then(function(data) {
                 self.renderBloomsCharts(data);
+                return undefined;
+            }).catch(function() {
+                // Data fetch handled by fetchData.
             });
 
             // Load regeneration by type
             this.fetchData('regenbytype').then(function(data) {
                 self.renderRegenByTypeChart(data);
+                return undefined;
+            }).catch(function() {
+                // Data fetch handled by fetchData.
             });
         },
 
@@ -199,7 +214,6 @@ define(['jquery', 'core/ajax', 'local_hlai_quizgen/charts'], function($, Ajax, C
                 }
                 return response;
             }).catch(function(error) {
-                // eslint-disable-next-line no-console
                 // eslint-disable-next-line no-console
                 console.error('External service call failed for ' + action + ':', error);
                 return null;
@@ -331,7 +345,7 @@ define(['jquery', 'core/ajax', 'local_hlai_quizgen/charts'], function($, Ajax, C
                         type: 'radar',
                         height: 400,
                         fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
-                        toolbar: { show: false },
+                        toolbar: {show: false},
                         dropShadow: {
                             enabled: true,
                             blur: 4,
@@ -422,7 +436,7 @@ define(['jquery', 'core/ajax', 'local_hlai_quizgen/charts'], function($, Ajax, C
                         type: 'bar',
                         height: 400,
                         fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif',
-                        toolbar: { show: false }
+                        toolbar: {show: false}
                     },
                     series: [{
                         name: 'Questions',

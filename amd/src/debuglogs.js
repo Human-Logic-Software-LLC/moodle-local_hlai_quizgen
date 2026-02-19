@@ -43,6 +43,7 @@ define(['jquery'], function($) {
                 // Attach click handlers for confirm-action links.
                 $(document).on('click', '.hlai-confirm-action', function(e) {
                     var message = $(this).data('confirm') || 'Are you sure?';
+                    // eslint-disable-next-line no-alert
                     if (!confirm(message)) {
                         e.preventDefault();
                     }

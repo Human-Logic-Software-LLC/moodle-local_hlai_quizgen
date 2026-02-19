@@ -261,7 +261,7 @@ define(['jquery'], function($) {
 
         // Explicitly override legend if showLegend is false
         if (options.showLegend === false) {
-            chartOptions.legend = { show: false };
+            chartOptions.legend = {show: false};
         }
 
         var chart = new ApexCharts(document.querySelector(selector), chartOptions);
@@ -357,8 +357,12 @@ define(['jquery'], function($) {
      */
     function createRadialChart(selector, options) {
         // Support both options.value and options.series[0] for flexibility
-        var value = options.value !== undefined ? options.value :
-                    (options.series && options.series.length > 0 ? options.series[0] : 0);
+        var value = 0;
+        if (options.value !== undefined) {
+            value = options.value;
+        } else if (options.series && options.series.length > 0) {
+            value = options.series[0];
+        }
 
         // Use provided color or determine based on thresholds
         var color = options.colors && options.colors.length > 0 ? options.colors[0] : colors.primary;
@@ -468,7 +472,7 @@ define(['jquery'], function($) {
                 stepSize: options.stepSize || 1,
                 tickAmount: 0,
                 labels: {
-                    show: false  // Remove numbers from radar chart
+                    show: false // Remove numbers from radar chart
                 }
             },
             fill: {
@@ -494,7 +498,7 @@ define(['jquery'], function($) {
 
         // Explicitly override legend if showLegend is false
         if (options.showLegend === false) {
-            chartOptions.legend = { show: false };
+            chartOptions.legend = {show: false};
         }
 
         var chart = new ApexCharts(document.querySelector(selector), chartOptions);
@@ -534,9 +538,9 @@ define(['jquery'], function($) {
                     radius: 4,
                     colorScale: {
                         ranges: [
-                            { from: 0, to: 50, color: colors.danger, name: 'Poor' },
-                            { from: 51, to: 70, color: colors.warning, name: 'Fair' },
-                            { from: 71, to: 100, color: colors.success, name: 'Good' }
+                            {from: 0, to: 50, color: colors.danger, name: 'Poor'},
+                            {from: 51, to: 70, color: colors.warning, name: 'Fair'},
+                            {from: 71, to: 100, color: colors.success, name: 'Good'}
                         ]
                     }
                 }
@@ -570,7 +574,7 @@ define(['jquery'], function($) {
                 height: options.height || 100,
                 stacked: true,
                 stackType: '100%',
-                toolbar: { show: false },
+                toolbar: {show: false},
                 fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
             },
             series: options.series || [],
@@ -582,12 +586,12 @@ define(['jquery'], function($) {
             },
             colors: options.colors || [colors.success, colors.warning, colors.danger],
             xaxis: {
-                labels: { show: false },
-                axisBorder: { show: false },
-                axisTicks: { show: false }
+                labels: {show: false},
+                axisBorder: {show: false},
+                axisTicks: {show: false}
             },
-            yaxis: { show: false },
-            grid: { show: false },
+            yaxis: {show: false},
+            grid: {show: false},
             dataLabels: {
                 enabled: true,
                 formatter: function(val) {

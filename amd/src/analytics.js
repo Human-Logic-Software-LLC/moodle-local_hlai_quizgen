@@ -50,6 +50,9 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
             // Wait for ApexCharts to load
             this.waitForApexCharts().then(function() {
                 Analytics.renderAllCharts();
+                return undefined;
+            }).catch(function() {
+                // ApexCharts loading failed silently.
             });
         },
 
@@ -119,7 +122,7 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
                 chart: {
                     type: 'bar',
                     height: 350,
-                    toolbar: { show: false }
+                    toolbar: {show: false}
                 },
                 plotOptions: {
                     bar: {
@@ -150,9 +153,9 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
                     categories: ['Generated', 'Reviewed', 'Approved', 'Deployed']
                 },
                 yaxis: {
-                    labels: { show: false }
+                    labels: {show: false}
                 },
-                legend: { show: false }
+                legend: {show: false}
             };
 
             this.charts.funnel = new ApexCharts(document.querySelector('#funnel-chart'), options);
@@ -178,7 +181,7 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
                 chart: {
                     type: 'bar',
                     height: 350,
-                    toolbar: { show: false }
+                    toolbar: {show: false}
                 },
                 plotOptions: {
                     bar: {
@@ -196,12 +199,12 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
                 },
                 xaxis: {
                     categories: ['0-20', '21-40', '41-60', '61-80', '81-100'],
-                    title: { text: 'Quality Score Range' }
+                    title: {text: 'Quality Score Range'}
                 },
                 yaxis: {
-                    title: { text: 'Percentage of Questions' }
+                    title: {text: 'Percentage of Questions'}
                 },
-                legend: { show: false }
+                legend: {show: false}
             };
 
             this.charts.qualityDist = new ApexCharts(document.querySelector('#quality-dist-chart'), options);
@@ -231,13 +234,13 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
 
             var options = {
                 series: [
-                    { name: 'Total', data: totalData },
-                    { name: 'Approved', data: approvedData }
+                    {name: 'Total', data: totalData},
+                    {name: 'Approved', data: approvedData}
                 ],
                 chart: {
                     type: 'bar',
                     height: 350,
-                    toolbar: { show: false }
+                    toolbar: {show: false}
                 },
                 plotOptions: {
                     bar: {
@@ -247,14 +250,14 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
                     }
                 },
                 colors: ['#94A3B8', '#10B981'],
-                dataLabels: { enabled: false },
-                xaxis: { categories: categories },
-                yaxis: { title: { text: 'Number of Questions' } },
+                dataLabels: {enabled: false},
+                xaxis: {categories: categories},
+                yaxis: {title: {text: 'Number of Questions'}},
                 legend: {
                     position: 'top',
                     horizontalAlign: 'right'
                 },
-                fill: { opacity: 1 }
+                fill: {opacity: 1}
             };
 
             this.charts.typeAcceptance = new ApexCharts(document.querySelector('#type-acceptance-chart'), options);
@@ -310,11 +313,11 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
 
             // Use custom radar chart with filled styling like dashboard
             var options = {
-                series: [{ name: 'Questions', data: series }],
+                series: [{name: 'Questions', data: series}],
                 chart: {
                     type: 'radar',
                     height: 350,
-                    toolbar: { show: false },
+                    toolbar: {show: false},
                     animations: {
                         enabled: true,
                         speed: 800
@@ -333,10 +336,10 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
                 },
                 yaxis: {
                     show: false,
-                    labels: { show: false },
+                    labels: {show: false},
                     tickAmount: 0
                 },
-                grid: { show: false },
+                grid: {show: false},
                 fill: {
                     opacity: 0.2,
                     type: 'solid'
@@ -350,11 +353,11 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
                     colors: ['#4F46E5'],
                     strokeColors: '#fff',
                     strokeWidth: 2,
-                    hover: { size: 7 }
+                    hover: {size: 7}
                 },
                 colors: ['#4F46E5'],
-                legend: { show: false },
-                dataLabels: { enabled: false }
+                legend: {show: false},
+                dataLabels: {enabled: false}
             };
 
             this.charts.bloomsCoverage = new ApexCharts(document.querySelector('#blooms-coverage-chart'), options);
@@ -378,7 +381,7 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
                 chart: {
                     type: 'bar',
                     height: 280,
-                    toolbar: { show: false }
+                    toolbar: {show: false}
                 },
                 plotOptions: {
                     bar: {
@@ -396,12 +399,12 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
                 },
                 xaxis: {
                     categories: ['0', '1', '2', '3', '4+'],
-                    title: { text: 'Number of Regenerations' }
+                    title: {text: 'Number of Regenerations'}
                 },
                 yaxis: {
-                    title: { text: 'Percentage' }
+                    title: {text: 'Percentage'}
                 },
-                legend: { show: false }
+                legend: {show: false}
             };
 
             this.charts.regenDist = new ApexCharts(document.querySelector('#regen-dist-chart'), options);
@@ -424,7 +427,7 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
                 chart: {
                     type: 'bar',
                     height: 280,
-                    toolbar: { show: false }
+                    toolbar: {show: false}
                 },
                 plotOptions: {
                     bar: {
@@ -435,12 +438,12 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
                     }
                 },
                 colors: ['#10B981', '#F59E0B', '#EF4444'],
-                dataLabels: { enabled: true },
+                dataLabels: {enabled: true},
                 xaxis: {
                     categories: ['Easy', 'Medium', 'Hard'],
-                    title: { text: 'Avg Regenerations' }
+                    title: {text: 'Avg Regenerations'}
                 },
-                legend: { show: false }
+                legend: {show: false}
             };
 
             this.charts.regenByDiff = new ApexCharts(document.querySelector('#regen-by-difficulty-chart'), options);
@@ -487,7 +490,7 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
             for (var i = 29; i >= 0; i--) {
                 var date = new Date(now);
                 date.setDate(date.getDate() - i);
-                categories.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+                categories.push(date.toLocaleDateString('en-US', {month: 'short', day: 'numeric'}));
             }
 
             // Simulated data
@@ -501,16 +504,16 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
 
             var options = {
                 series: [
-                    { name: 'Generated', data: generated },
-                    { name: 'Approved', data: approved }
+                    {name: 'Generated', data: generated},
+                    {name: 'Approved', data: approved}
                 ],
                 chart: {
                     type: 'area',
                     height: 350,
-                    toolbar: { show: false },
-                    zoom: { enabled: false }
+                    toolbar: {show: false},
+                    zoom: {enabled: false}
                 },
-                dataLabels: { enabled: false },
+                dataLabels: {enabled: false},
                 stroke: {
                     curve: 'smooth',
                     width: 2
@@ -531,14 +534,14 @@ define(['jquery', 'local_hlai_quizgen/charts'], function($, Charts) {
                     }
                 },
                 yaxis: {
-                    title: { text: 'Questions' }
+                    title: {text: 'Questions'}
                 },
                 legend: {
                     position: 'top',
                     horizontalAlign: 'right'
                 },
                 tooltip: {
-                    x: { format: 'MMM dd' }
+                    x: {format: 'MMM dd'}
                 }
             };
 

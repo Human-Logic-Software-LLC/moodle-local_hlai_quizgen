@@ -67,7 +67,7 @@ define(['jquery'], function($) {
                     this.initStep3();
                     break;
                 case '3.5':
-                    this.initStep3_5();
+                    this.initProgressStep();
                     break;
                 case '4':
                     this.initStep4();
@@ -115,7 +115,6 @@ define(['jquery'], function($) {
                 form.addEventListener('submit', function(e) {
                     if (!self._validateStep1Form()) {
                         e.preventDefault();
-                        return false;
                     }
                 });
             }
@@ -130,83 +129,145 @@ define(['jquery'], function($) {
          * @return {boolean} True if the form is valid.
          */
         _validateStep1Form: function() {
-            var el;
+            var states = this._getSourceStates();
 
-            // Gather checkbox states.
-            el = document.getElementById('source_manual');
-            var manualChecked = el ? el.checked : false;
-            el = document.getElementById('source_upload');
-            var uploadChecked = el ? el.checked : false;
-            el = document.getElementById('source_url');
-            var urlChecked = el ? el.checked : false;
-            el = document.getElementById('source_activities');
-            var activitiesChecked = el ? el.checked : false;
-            el = document.getElementById('source_scan_course');
-            var scanCourseChecked = el ? el.checked : false;
-            el = document.getElementById('source_scan_resources');
-            var scanResourcesChecked = el ? el.checked : false;
-            el = document.getElementById('source_scan_activities');
-            var scanActivitiesChecked = el ? el.checked : false;
-
-            // At least one source must be selected.
-            if (!manualChecked && !uploadChecked && !urlChecked && !activitiesChecked &&
-                !scanCourseChecked && !scanResourcesChecked && !scanActivitiesChecked) {
-                alert('Please select at least one content source!');
+            if (!this._validateSourceSelected(states)) {
+                return false;
+            }
+            if (states.manualChecked && !this._validateManualSource()) {
+                return false;
+            }
+            if (states.uploadChecked && !this._validateUploadSource()) {
+                return false;
+            }
+            if (states.urlChecked && !this._validateUrlSource()) {
+                return false;
+            }
+            if (states.activitiesChecked && !this._validateActivitySource()) {
                 return false;
             }
 
-            // Manual entry validation.
-            if (manualChecked) {
-                var manualTextEl = document.getElementById('manual_text');
-                var manualText = manualTextEl ? manualTextEl.value.trim() : '';
-                if (manualText === '') {
-                    alert('Please enter some manual text or uncheck the Manual Entry option.');
-                    return false;
-                }
-            }
+            return true;
+        },
 
-            // File upload validation.
-            if (uploadChecked) {
-                var fileInput = document.getElementById('content-files');
-                var files = fileInput ? fileInput.files : [];
-                if (files.length === 0) {
-                    alert('Please select files to upload or uncheck the Upload Files option.');
-                    return false;
-                }
-                var maxFileSizeMB = 50;
-                var maxFileSizeBytes = maxFileSizeMB * 1024 * 1024;
-                var oversizedFiles = [];
-                Array.from(files).forEach(function(file) {
-                    if (file.size > maxFileSizeBytes) {
-                        oversizedFiles.push(file.name + ' (' + (file.size / 1024 / 1024).toFixed(2) + ' MB)');
-                    }
-                });
-                if (oversizedFiles.length > 0) {
-                    alert('The following files exceed the maximum size of ' + maxFileSizeMB + ' MB:\n\n' +
-                        oversizedFiles.join('\n') + '\n\nPlease remove these files and try again.');
-                    return false;
-                }
-            }
+        /**
+         * Gather the checked state of all content-source checkboxes.
+         *
+         * @private
+         * @return {Object} Map of source checkbox states.
+         */
+        _getSourceStates: function() {
+            var get = function(id) {
+                var el = document.getElementById(id);
+                return el ? el.checked : false;
+            };
+            return {
+                manualChecked: get('source_manual'),
+                uploadChecked: get('source_upload'),
+                urlChecked: get('source_url'),
+                activitiesChecked: get('source_activities'),
+                scanCourseChecked: get('source_scan_course'),
+                scanResourcesChecked: get('source_scan_resources'),
+                scanActivitiesChecked: get('source_scan_activities')
+            };
+        },
 
-            // URL validation.
-            if (urlChecked) {
-                var urlListEl = document.getElementById('url_list');
-                var urlList = urlListEl ? urlListEl.value.trim() : '';
-                if (urlList === '') {
-                    alert('Please enter at least one URL or uncheck the URL option.');
-                    return false;
-                }
+        /**
+         * Validate that at least one content source is selected.
+         *
+         * @private
+         * @param {Object} states - Source checkbox states from _getSourceStates.
+         * @return {boolean} True if at least one source is selected.
+         */
+        _validateSourceSelected: function(states) {
+            if (!states.manualChecked && !states.uploadChecked && !states.urlChecked &&
+                !states.activitiesChecked && !states.scanCourseChecked &&
+                !states.scanResourcesChecked && !states.scanActivitiesChecked) {
+                // eslint-disable-next-line no-alert
+                alert('Please select at least one content source!');
+                return false;
             }
+            return true;
+        },
 
-            // Activity selection validation.
-            if (activitiesChecked) {
-                var selectedActivities = document.querySelectorAll('.hlai-activity-checkbox:checked');
-                if (selectedActivities.length === 0) {
-                    alert('Please select at least one activity or uncheck the Course Activities option.');
-                    return false;
-                }
+        /**
+         * Validate that manual text has been entered.
+         *
+         * @private
+         * @return {boolean} True if manual text is valid.
+         */
+        _validateManualSource: function() {
+            var manualTextEl = document.getElementById('manual_text');
+            var manualText = manualTextEl ? manualTextEl.value.trim() : '';
+            if (manualText === '') {
+                // eslint-disable-next-line no-alert
+                alert('Please enter some manual text or uncheck the Manual Entry option.');
+                return false;
             }
+            return true;
+        },
 
+        /**
+         * Validate that files have been selected and none exceed the size limit.
+         *
+         * @private
+         * @return {boolean} True if the upload is valid.
+         */
+        _validateUploadSource: function() {
+            var fileInput = document.getElementById('content-files');
+            var files = fileInput ? fileInput.files : [];
+            if (files.length === 0) {
+                // eslint-disable-next-line no-alert
+                alert('Please select files to upload or uncheck the Upload Files option.');
+                return false;
+            }
+            var maxFileSizeMB = 50;
+            var maxFileSizeBytes = maxFileSizeMB * 1024 * 1024;
+            var oversizedFiles = [];
+            Array.from(files).forEach(function(file) {
+                if (file.size > maxFileSizeBytes) {
+                    oversizedFiles.push(file.name + ' (' + (file.size / 1024 / 1024).toFixed(2) + ' MB)');
+                }
+            });
+            if (oversizedFiles.length > 0) {
+                // eslint-disable-next-line no-alert
+                alert('The following files exceed the maximum size of ' + maxFileSizeMB + ' MB:\n\n' +
+                    oversizedFiles.join('\n') + '\n\nPlease remove these files and try again.');
+                return false;
+            }
+            return true;
+        },
+
+        /**
+         * Validate that at least one URL has been entered.
+         *
+         * @private
+         * @return {boolean} True if the URL input is valid.
+         */
+        _validateUrlSource: function() {
+            var urlListEl = document.getElementById('url_list');
+            var urlList = urlListEl ? urlListEl.value.trim() : '';
+            if (urlList === '') {
+                // eslint-disable-next-line no-alert
+                alert('Please enter at least one URL or uncheck the URL option.');
+                return false;
+            }
+            return true;
+        },
+
+        /**
+         * Validate that at least one activity is selected.
+         *
+         * @private
+         * @return {boolean} True if the activity selection is valid.
+         */
+        _validateActivitySource: function() {
+            var selectedActivities = document.querySelectorAll('.hlai-activity-checkbox:checked');
+            if (selectedActivities.length === 0) {
+                // eslint-disable-next-line no-alert
+                alert('Please select at least one activity or uncheck the Course Activities option.');
+                return false;
+            }
             return true;
         },
 
@@ -664,19 +725,21 @@ define(['jquery'], function($) {
 
                     if (total === 0) {
                         e.preventDefault();
+                        // eslint-disable-next-line no-alert
                         alert('Please specify at least one question type with a quantity greater than 0.');
-                        return false;
+                        return;
                     }
 
                     if (total !== totalRequired) {
                         e.preventDefault();
+                        // eslint-disable-next-line no-alert
                         alert('Question type total (' + total + ') must equal total questions (' + totalRequired + ').');
-                        return false;
+                        return;
                     }
 
                     if (isSubmitting) {
                         e.preventDefault();
-                        return false;
+                        return;
                     }
 
                     isSubmitting = true;
@@ -701,7 +764,7 @@ define(['jquery'], function($) {
          * after a short delay so the user sees the progress page before
          * polling continues.
          */
-        initStep3_5: function() {
+        initProgressStep: function() {
             var refreshUrl = this.config.refreshUrl;
             if (refreshUrl) {
                 setTimeout(function() {
@@ -762,6 +825,7 @@ define(['jquery'], function($) {
                 var action = selectEl ? selectEl.value : '';
 
                 if (!action) {
+                    // eslint-disable-next-line no-alert
                     alert('Please select an action');
                     return;
                 }
@@ -772,12 +836,14 @@ define(['jquery'], function($) {
                 });
 
                 if (selectedQuestions.length === 0) {
+                    // eslint-disable-next-line no-alert
                     alert('Please select at least one question');
                     return;
                 }
 
                 var confirmMsg = 'Are you sure you want to ' + action + ' ' +
                     selectedQuestions.length + ' question(s)?';
+                // eslint-disable-next-line no-alert
                 if (!confirm(confirmMsg)) {
                     return;
                 }
@@ -909,7 +975,7 @@ define(['jquery'], function($) {
                 deploymentForm.addEventListener('submit', function(e) {
                     if (isSubmitting) {
                         e.preventDefault();
-                        return false;
+                        return;
                     }
                     isSubmitting = true;
                     var submitBtn = deploymentForm.querySelector('button[type="submit"]');
