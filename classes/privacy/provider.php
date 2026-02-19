@@ -144,6 +144,66 @@ class provider implements
             'privacy:metadata:local_hlai_quizgen_refinements'
         );
 
+        // Review comments.
+        $collection->add_database_table(
+            'local_hlai_quizgen_review_comments',
+            [
+                'userid' => 'privacy:metadata:local_hlai_quizgen_review_comments:userid',
+                'timecreated' => 'privacy:metadata:local_hlai_quizgen_review_comments:timecreated',
+            ],
+            'privacy:metadata:local_hlai_quizgen_review_comments'
+        );
+
+        // Review ratings.
+        $collection->add_database_table(
+            'local_hlai_quizgen_review_ratings',
+            [
+                'userid' => 'privacy:metadata:local_hlai_quizgen_review_ratings:userid',
+                'timecreated' => 'privacy:metadata:local_hlai_quizgen_review_ratings:timecreated',
+            ],
+            'privacy:metadata:local_hlai_quizgen_review_ratings'
+        );
+
+        // Question revisions.
+        $collection->add_database_table(
+            'local_hlai_quizgen_revisions',
+            [
+                'userid' => 'privacy:metadata:local_hlai_quizgen_revisions:userid',
+                'timecreated' => 'privacy:metadata:local_hlai_quizgen_revisions:timecreated',
+            ],
+            'privacy:metadata:local_hlai_quizgen_revisions'
+        );
+
+        // Review activity log.
+        $collection->add_database_table(
+            'local_hlai_quizgen_review_log',
+            [
+                'userid' => 'privacy:metadata:local_hlai_quizgen_review_log:userid',
+                'timecreated' => 'privacy:metadata:local_hlai_quizgen_review_log:timecreated',
+            ],
+            'privacy:metadata:local_hlai_quizgen_review_log'
+        );
+
+        // Refinement suggestions.
+        $collection->add_database_table(
+            'local_hlai_quizgen_refine_suggest',
+            [
+                'userid' => 'privacy:metadata:local_hlai_quizgen_refine_suggest:userid',
+                'timecreated' => 'privacy:metadata:local_hlai_quizgen_refine_suggest:timecreated',
+            ],
+            'privacy:metadata:local_hlai_quizgen_refine_suggest'
+        );
+
+        // Question edit history.
+        $collection->add_database_table(
+            'local_hlai_quizgen_qst_history',
+            [
+                'userid' => 'privacy:metadata:local_hlai_quizgen_qst_history:userid',
+                'timecreated' => 'privacy:metadata:local_hlai_quizgen_qst_history:timecreated',
+            ],
+            'privacy:metadata:local_hlai_quizgen_qst_history'
+        );
+
         // External data sent to AI gateway.
         $collection->add_external_location_link(
             'aigateway',
@@ -380,6 +440,36 @@ class provider implements
                 'userid' => $userid,
             ]);
 
+            // Delete review comments.
+            $DB->delete_records('local_hlai_quizgen_review_comments', [
+                'userid' => $userid,
+            ]);
+
+            // Delete review ratings.
+            $DB->delete_records('local_hlai_quizgen_review_ratings', [
+                'userid' => $userid,
+            ]);
+
+            // Delete revisions.
+            $DB->delete_records('local_hlai_quizgen_revisions', [
+                'userid' => $userid,
+            ]);
+
+            // Delete review log.
+            $DB->delete_records('local_hlai_quizgen_review_log', [
+                'userid' => $userid,
+            ]);
+
+            // Delete refinement suggestions.
+            $DB->delete_records('local_hlai_quizgen_refine_suggest', [
+                'userid' => $userid,
+            ]);
+
+            // Delete question history.
+            $DB->delete_records('local_hlai_quizgen_qst_history', [
+                'userid' => $userid,
+            ]);
+
             // Delete wizard state.
             $DB->delete_records('local_hlai_quizgen_wizard_state', [
                 'userid' => $userid,
@@ -460,6 +550,36 @@ class provider implements
                 'userid' => $userid,
             ]);
 
+            // Delete review comments.
+            $DB->delete_records('local_hlai_quizgen_review_comments', [
+                'userid' => $userid,
+            ]);
+
+            // Delete review ratings.
+            $DB->delete_records('local_hlai_quizgen_review_ratings', [
+                'userid' => $userid,
+            ]);
+
+            // Delete revisions.
+            $DB->delete_records('local_hlai_quizgen_revisions', [
+                'userid' => $userid,
+            ]);
+
+            // Delete review log.
+            $DB->delete_records('local_hlai_quizgen_review_log', [
+                'userid' => $userid,
+            ]);
+
+            // Delete refinement suggestions.
+            $DB->delete_records('local_hlai_quizgen_refine_suggest', [
+                'userid' => $userid,
+            ]);
+
+            // Delete question history.
+            $DB->delete_records('local_hlai_quizgen_qst_history', [
+                'userid' => $userid,
+            ]);
+
             // Delete wizard state.
             $DB->delete_records('local_hlai_quizgen_wizard_state', [
                 'userid' => $userid,
@@ -525,6 +645,36 @@ class provider implements
 
             // Delete refinements.
             $DB->delete_records('local_hlai_quizgen_refinements', [
+                'userid' => $userid,
+            ]);
+
+            // Delete review comments.
+            $DB->delete_records('local_hlai_quizgen_review_comments', [
+                'userid' => $userid,
+            ]);
+
+            // Delete review ratings.
+            $DB->delete_records('local_hlai_quizgen_review_ratings', [
+                'userid' => $userid,
+            ]);
+
+            // Delete revisions.
+            $DB->delete_records('local_hlai_quizgen_revisions', [
+                'userid' => $userid,
+            ]);
+
+            // Delete review log.
+            $DB->delete_records('local_hlai_quizgen_review_log', [
+                'userid' => $userid,
+            ]);
+
+            // Delete refinement suggestions.
+            $DB->delete_records('local_hlai_quizgen_refine_suggest', [
+                'userid' => $userid,
+            ]);
+
+            // Delete question history.
+            $DB->delete_records('local_hlai_quizgen_qst_history', [
                 'userid' => $userid,
             ]);
 

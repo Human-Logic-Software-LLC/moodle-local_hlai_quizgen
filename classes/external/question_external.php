@@ -517,14 +517,22 @@ class question_external extends \external_api {
         $context = \context_course::instance($request->courseid);
         self::validate_context($context);
 
+        // Batch-fetch all questions to avoid N+1 queries.
+        $intids = array_map('intval', $questionids);
+        list($insql, $inparams) = $DB->get_in_or_equal($intids, SQL_PARAMS_NAMED);
+        $questions = $DB->get_records_select(
+            'local_hlai_quizgen_questions',
+            "id $insql",
+            $inparams
+        );
+
         // Approve each question owned by the current user.
         $approved = 0;
-        foreach ($questionids as $qid) {
-            $qid = (int)$qid;
-            $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $qid]);
-            if ($question && $question->userid == $USER->id) {
+        $now = time();
+        foreach ($intids as $qid) {
+            if (isset($questions[$qid]) && $questions[$qid]->userid == $USER->id) {
                 $DB->set_field('local_hlai_quizgen_questions', 'status', 'approved', ['id' => $qid]);
-                $DB->set_field('local_hlai_quizgen_questions', 'timemodified', time(), ['id' => $qid]);
+                $DB->set_field('local_hlai_quizgen_questions', 'timemodified', $now, ['id' => $qid]);
                 $approved++;
             }
         }
@@ -596,14 +604,22 @@ class question_external extends \external_api {
         $context = \context_course::instance($request->courseid);
         self::validate_context($context);
 
+        // Batch-fetch all questions to avoid N+1 queries.
+        $intids = array_map('intval', $questionids);
+        list($insql, $inparams) = $DB->get_in_or_equal($intids, SQL_PARAMS_NAMED);
+        $questions = $DB->get_records_select(
+            'local_hlai_quizgen_questions',
+            "id $insql",
+            $inparams
+        );
+
         // Reject each question owned by the current user.
         $rejected = 0;
-        foreach ($questionids as $qid) {
-            $qid = (int)$qid;
-            $question = $DB->get_record('local_hlai_quizgen_questions', ['id' => $qid]);
-            if ($question && $question->userid == $USER->id) {
+        $now = time();
+        foreach ($intids as $qid) {
+            if (isset($questions[$qid]) && $questions[$qid]->userid == $USER->id) {
                 $DB->set_field('local_hlai_quizgen_questions', 'status', 'rejected', ['id' => $qid]);
-                $DB->set_field('local_hlai_quizgen_questions', 'timemodified', time(), ['id' => $qid]);
+                $DB->set_field('local_hlai_quizgen_questions', 'timemodified', $now, ['id' => $qid]);
                 $rejected++;
             }
         }

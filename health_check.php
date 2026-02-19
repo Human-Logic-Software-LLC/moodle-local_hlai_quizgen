@@ -35,7 +35,7 @@ if (empty($expectedtoken)) {
     require_capability('moodle/site:config', context_system::instance());
 } else if (!hash_equals($expectedtoken, $token)) {
     http_response_code(401);
-    echo json_encode(['status' => 'error', 'message' => 'Invalid token']);
+    echo json_encode(['status' => 'error', 'message' => get_string('health_invalid_token', 'local_hlai_quizgen')]);
     die();
 }
 
@@ -53,7 +53,7 @@ try {
     global $DB;
     $health['checks']['database'] = [
         'status' => 'ok',
-        'message' => 'Database connection successful',
+        'message' => get_string('health_db_ok', 'local_hlai_quizgen'),
     ];
 
     // Check 2: AI gateway availability.
@@ -63,7 +63,7 @@ try {
     if ($providerready) {
         $health['checks']['gateway'] = [
             'status' => 'ok',
-            'message' => 'Gateway configured and ready',
+            'message' => get_string('health_gateway_ok', 'local_hlai_quizgen'),
             'details' => [
                 'gateway_url' => $gatewayurl,
             ],
@@ -71,7 +71,7 @@ try {
     } else {
         $health['checks']['gateway'] = [
             'status' => 'error',
-            'message' => 'Gateway not configured. Please configure AI Service URL and API Key in plugin settings.',
+            'message' => get_string('health_gateway_not_configured', 'local_hlai_quizgen'),
             'details' => [
                 'gateway_url' => $gatewayurl,
             ],
@@ -99,12 +99,12 @@ try {
     if (empty($missingtables)) {
         $health['checks']['database_schema'] = [
             'status' => 'ok',
-            'message' => 'All required tables exist',
+            'message' => get_string('health_tables_ok', 'local_hlai_quizgen'),
         ];
     } else {
         $health['checks']['database_schema'] = [
             'status' => 'error',
-            'message' => 'Missing tables: ' . implode(', ', $missingtables),
+            'message' => get_string('health_tables_missing', 'local_hlai_quizgen', implode(', ', $missingtables)),
         ];
         $health['status'] = 'unhealthy';
     }
@@ -141,14 +141,14 @@ try {
             $health['checks']['error_rate'] = [
                 'status' => 'error',
                 'error_rate' => round($errorrate, 2) . '%',
-                'message' => 'High error rate detected',
+                'message' => get_string('health_error_rate_high', 'local_hlai_quizgen'),
             ];
             $health['status'] = 'unhealthy';
         } else if ($errorrate > 20) {
             $health['checks']['error_rate'] = [
                 'status' => 'warning',
                 'error_rate' => round($errorrate, 2) . '%',
-                'message' => 'Elevated error rate',
+                'message' => get_string('health_error_rate_elevated', 'local_hlai_quizgen'),
             ];
             if ($health['status'] === 'healthy') {
                 $health['status'] = 'degraded';
@@ -163,7 +163,7 @@ try {
         $health['checks']['error_rate'] = [
             'status' => 'ok',
             'error_rate' => '0%',
-            'message' => 'No recent requests',
+            'message' => get_string('health_no_recent_requests', 'local_hlai_quizgen'),
         ];
     }
 
@@ -182,12 +182,12 @@ try {
         // Warn if cache is getting large.
         if ($cachestats['storage_mb'] > 100) {
             $health['checks']['cache']['status'] = 'warning';
-            $health['checks']['cache']['message'] = 'Cache size exceeds 100MB';
+            $health['checks']['cache']['message'] = get_string('health_cache_large', 'local_hlai_quizgen');
         }
     } else {
         $health['checks']['cache'] = [
             'status' => 'disabled',
-            'message' => 'Caching is disabled',
+            'message' => get_string('health_cache_disabled', 'local_hlai_quizgen'),
         ];
     }
 
@@ -203,7 +203,7 @@ try {
         if ($task) {
             $lastrun = $task->get_last_run_time();
             $taskstatuses[basename(str_replace('\\', '/', $taskclass))] = [
-                'last_run' => $lastrun ? userdate($lastrun) : 'Never',
+                'last_run' => $lastrun ? userdate($lastrun) : get_string('health_never', 'local_hlai_quizgen'),
                 'disabled' => $task->get_disabled(),
             ];
         }
@@ -230,12 +230,12 @@ try {
     if (empty($permissionissues)) {
         $health['checks']['file_permissions'] = [
             'status' => 'ok',
-            'message' => 'All directories writable',
+            'message' => get_string('health_dirs_writable', 'local_hlai_quizgen'),
         ];
     } else {
         $health['checks']['file_permissions'] = [
             'status' => 'warning',
-            'message' => 'Some directories not writable',
+            'message' => get_string('health_dirs_not_writable', 'local_hlai_quizgen'),
             'directories' => $permissionissues,
         ];
         if ($health['status'] === 'healthy') {
@@ -253,7 +253,7 @@ try {
     }
 } catch (\Exception $e) {
     $health['status'] = 'error';
-    $health['message'] = 'Health check failed: ' . $e->getMessage();
+    $health['message'] = get_string('health_check_failed', 'local_hlai_quizgen', $e->getMessage());
     http_response_code(500);
 }
 

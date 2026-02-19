@@ -250,8 +250,8 @@
 .hlai-quizgen-wrapper .loader,
 .hlai-quizgen-wrapper .select.is-loading::after,
 .hlai-quizgen-wrapper .control.is-loading::after{
-  -webkit-animation: spinAround 500ms infinite linear;
-          animation: spinAround 500ms infinite linear;
+  -webkit-animation: hlai-spinAround 500ms infinite linear;
+          animation: hlai-spinAround 500ms infinite linear;
   border: 2px solid #dbdbdb;
   border-radius: 9999px;
   border-right-color: transparent;
@@ -515,7 +515,7 @@
   color: #363636;
 }
 
-@-webkit-keyframes spinAround {
+@-webkit-keyframes hlai-spinAround {
   from {
     transform: rotate(0deg);
   }
@@ -524,7 +524,7 @@
   }
 }
 
-@keyframes spinAround {
+@keyframes hlai-spinAround {
   from {
     transform: rotate(0deg);
   }
@@ -2956,8 +2956,8 @@
           animation-duration: 1.5s;
   -webkit-animation-iteration-count: infinite;
           animation-iteration-count: infinite;
-  -webkit-animation-name: moveIndeterminate;
-          animation-name: moveIndeterminate;
+  -webkit-animation-name: hlai-moveIndeterminate;
+          animation-name: hlai-moveIndeterminate;
   -webkit-animation-timing-function: linear;
           animation-timing-function: linear;
   background-color: #ededed;
@@ -2991,7 +2991,7 @@
   height: 1.5rem;
 }
 
-@-webkit-keyframes moveIndeterminate {
+@-webkit-keyframes hlai-moveIndeterminate {
   from {
     background-position: 200% 0;
   }
@@ -3000,7 +3000,7 @@
   }
 }
 
-@keyframes moveIndeterminate {
+@keyframes hlai-moveIndeterminate {
   from {
     background-position: 200% 0;
   }
