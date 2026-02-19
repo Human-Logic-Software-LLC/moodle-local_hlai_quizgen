@@ -100,15 +100,15 @@ jobs:
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci grunt --max-lint-warnings 0
 
-      - name: Show grunt diff (debug)
+      - name: Upload grunt-built AMD files (debug)
         if: ${{ failure() && steps.grunt.outcome == 'failure' }}
-        run: |
-          cd moodle/local/hlai_quizgen
-          git diff amd/build/
-          echo "---"
-          xxd amd/build/dashboard.min.js | tail -5
-          echo "---"
-          xxd amd/build/dashboard.min.js.map | tail -5
+        uses: actions/upload-artifact@v4
+        with:
+          name: grunt-built-amd-${{ join(matrix.*, '-') }}
+          path: |
+            moodle/local/hlai_quizgen/amd/build/dashboard.min.js
+            moodle/local/hlai_quizgen/amd/build/dashboard.min.js.map
+          retention-days: 3
 
       - name: PHPUnit tests
         if: ${{ !cancelled() }}
