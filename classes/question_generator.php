@@ -772,7 +772,7 @@ class question_generator {
         }
 
         // Get URL content.
-        $urlcontent = $DB->get_records('local_hlai_quizgen_url_content', ['requestid' => $request->id]);
+        $urlcontent = $DB->get_records('local_hlai_quizgen_urlcont', ['requestid' => $request->id]);
         foreach ($urlcontent as $url) {
             $fullcontent .= "\n\n=== Content from {$url->title} ===\n\n";
             $fullcontent .= $url->content;

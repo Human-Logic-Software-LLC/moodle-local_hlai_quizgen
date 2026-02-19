@@ -95,22 +95,22 @@ class provider implements
 
         // Wizard session state.
         $collection->add_database_table(
-            'local_hlai_quizgen_wizard_state',
+            'local_hlai_quizgen_wizstate',
             [
-                'userid' => 'privacy:metadata:local_hlai_quizgen_wizard_state:userid',
-                'timecreated' => 'privacy:metadata:local_hlai_quizgen_wizard_state:timecreated',
+                'userid' => 'privacy:metadata:local_hlai_quizgen_wizstate:userid',
+                'timecreated' => 'privacy:metadata:local_hlai_quizgen_wizstate:timecreated',
             ],
-            'privacy:metadata:local_hlai_quizgen_wizard_state'
+            'privacy:metadata:local_hlai_quizgen_wizstate'
         );
 
         // Rate limit tracking.
         $collection->add_database_table(
-            'local_hlai_quizgen_ratelimit_log',
+            'local_hlai_quizgen_ratelog',
             [
-                'userid' => 'privacy:metadata:local_hlai_quizgen_ratelimit_log:userid',
-                'timecreated' => 'privacy:metadata:local_hlai_quizgen_ratelimit_log:timecreated',
+                'userid' => 'privacy:metadata:local_hlai_quizgen_ratelog:userid',
+                'timecreated' => 'privacy:metadata:local_hlai_quizgen_ratelog:timecreated',
             ],
-            'privacy:metadata:local_hlai_quizgen_ratelimit_log'
+            'privacy:metadata:local_hlai_quizgen_ratelog'
         );
 
         // User templates.
@@ -134,35 +134,6 @@ class provider implements
             'privacy:metadata:local_hlai_quizgen_reviews'
         );
 
-        // AI refinements.
-        $collection->add_database_table(
-            'local_hlai_quizgen_refinements',
-            [
-                'userid' => 'privacy:metadata:local_hlai_quizgen_refinements:userid',
-                'timecreated' => 'privacy:metadata:local_hlai_quizgen_refinements:timecreated',
-            ],
-            'privacy:metadata:local_hlai_quizgen_refinements'
-        );
-
-        // Review comments.
-        $collection->add_database_table(
-            'local_hlai_quizgen_review_comments',
-            [
-                'userid' => 'privacy:metadata:local_hlai_quizgen_review_comments:userid',
-                'timecreated' => 'privacy:metadata:local_hlai_quizgen_review_comments:timecreated',
-            ],
-            'privacy:metadata:local_hlai_quizgen_review_comments'
-        );
-
-        // Review ratings.
-        $collection->add_database_table(
-            'local_hlai_quizgen_review_ratings',
-            [
-                'userid' => 'privacy:metadata:local_hlai_quizgen_review_ratings:userid',
-                'timecreated' => 'privacy:metadata:local_hlai_quizgen_review_ratings:timecreated',
-            ],
-            'privacy:metadata:local_hlai_quizgen_review_ratings'
-        );
 
         // Question revisions.
         $collection->add_database_table(
@@ -174,35 +145,6 @@ class provider implements
             'privacy:metadata:local_hlai_quizgen_revisions'
         );
 
-        // Review activity log.
-        $collection->add_database_table(
-            'local_hlai_quizgen_review_log',
-            [
-                'userid' => 'privacy:metadata:local_hlai_quizgen_review_log:userid',
-                'timecreated' => 'privacy:metadata:local_hlai_quizgen_review_log:timecreated',
-            ],
-            'privacy:metadata:local_hlai_quizgen_review_log'
-        );
-
-        // Refinement suggestions.
-        $collection->add_database_table(
-            'local_hlai_quizgen_refine_suggest',
-            [
-                'userid' => 'privacy:metadata:local_hlai_quizgen_refine_suggest:userid',
-                'timecreated' => 'privacy:metadata:local_hlai_quizgen_refine_suggest:timecreated',
-            ],
-            'privacy:metadata:local_hlai_quizgen_refine_suggest'
-        );
-
-        // Question edit history.
-        $collection->add_database_table(
-            'local_hlai_quizgen_qst_history',
-            [
-                'userid' => 'privacy:metadata:local_hlai_quizgen_qst_history:userid',
-                'timecreated' => 'privacy:metadata:local_hlai_quizgen_qst_history:timecreated',
-            ],
-            'privacy:metadata:local_hlai_quizgen_qst_history'
-        );
 
         // External data sent to AI gateway.
         $collection->add_external_location_link(
@@ -371,27 +313,6 @@ class provider implements
                 );
             }
 
-            // Export refinements.
-            $refinements = $DB->get_records('local_hlai_quizgen_refinements', [
-                'userid' => $userid,
-            ]);
-
-            if (!empty($refinements)) {
-                $data = [];
-                foreach ($refinements as $refinement) {
-                    $data[] = [
-                        'refinement_type' => $refinement->refinement_type,
-                        'changes' => $refinement->changes,
-                        'improvements_applied' => $refinement->improvements_applied,
-                        'timecreated' => transform::datetime($refinement->timecreated),
-                    ];
-                }
-
-                writer::with_context($context)->export_data(
-                    [get_string('pluginname', 'local_hlai_quizgen'), 'refinements'],
-                    (object)['refinements' => $data]
-                );
-            }
 
             // Export logs.
             $logs = $DB->get_records('local_hlai_quizgen_logs', [
@@ -413,45 +334,6 @@ class provider implements
                 );
             }
 
-            // Export review comments.
-            $comments = $DB->get_records('local_hlai_quizgen_review_comments', [
-                'userid' => $userid,
-            ]);
-
-            if (!empty($comments)) {
-                $data = [];
-                foreach ($comments as $comment) {
-                    $data[] = [
-                        'comment' => $comment->comment ?? '',
-                        'timecreated' => transform::datetime($comment->timecreated),
-                    ];
-                }
-
-                writer::with_context($context)->export_data(
-                    [get_string('pluginname', 'local_hlai_quizgen'), 'review_comments'],
-                    (object)['review_comments' => $data]
-                );
-            }
-
-            // Export review ratings.
-            $ratings = $DB->get_records('local_hlai_quizgen_review_ratings', [
-                'userid' => $userid,
-            ]);
-
-            if (!empty($ratings)) {
-                $data = [];
-                foreach ($ratings as $rating) {
-                    $data[] = [
-                        'rating' => $rating->rating ?? '',
-                        'timecreated' => transform::datetime($rating->timecreated),
-                    ];
-                }
-
-                writer::with_context($context)->export_data(
-                    [get_string('pluginname', 'local_hlai_quizgen'), 'review_ratings'],
-                    (object)['review_ratings' => $data]
-                );
-            }
 
             // Export revisions.
             $revisions = $DB->get_records('local_hlai_quizgen_revisions', [
@@ -473,65 +355,6 @@ class provider implements
                 );
             }
 
-            // Export review log.
-            $reviewlogs = $DB->get_records('local_hlai_quizgen_review_log', [
-                'userid' => $userid,
-            ]);
-
-            if (!empty($reviewlogs)) {
-                $data = [];
-                foreach ($reviewlogs as $log) {
-                    $data[] = [
-                        'action' => $log->action ?? '',
-                        'timecreated' => transform::datetime($log->timecreated),
-                    ];
-                }
-
-                writer::with_context($context)->export_data(
-                    [get_string('pluginname', 'local_hlai_quizgen'), 'review_log'],
-                    (object)['review_log' => $data]
-                );
-            }
-
-            // Export refinement suggestions.
-            $suggestions = $DB->get_records('local_hlai_quizgen_refine_suggest', [
-                'userid' => $userid,
-            ]);
-
-            if (!empty($suggestions)) {
-                $data = [];
-                foreach ($suggestions as $suggestion) {
-                    $data[] = [
-                        'suggestion' => $suggestion->suggestion ?? '',
-                        'timecreated' => transform::datetime($suggestion->timecreated),
-                    ];
-                }
-
-                writer::with_context($context)->export_data(
-                    [get_string('pluginname', 'local_hlai_quizgen'), 'refine_suggestions'],
-                    (object)['refine_suggestions' => $data]
-                );
-            }
-
-            // Export question history.
-            $history = $DB->get_records('local_hlai_quizgen_qst_history', [
-                'userid' => $userid,
-            ]);
-
-            if (!empty($history)) {
-                $data = [];
-                foreach ($history as $entry) {
-                    $data[] = [
-                        'changes' => $entry->changes ?? '',
-                        'timecreated' => transform::datetime($entry->timecreated),
-                    ];
-                }
-
-                writer::with_context($context)->export_data(
-                    [get_string('pluginname', 'local_hlai_quizgen'), 'question_history'],
-                    (object)['question_history' => $data]
-                );
-            }
 
             // Export templates.
             $templates = $DB->get_records('local_hlai_quizgen_templates', [
@@ -555,7 +378,7 @@ class provider implements
             }
 
             // Export wizard state.
-            $wizardstates = $DB->get_records('local_hlai_quizgen_wizard_state', [
+            $wizardstates = $DB->get_records('local_hlai_quizgen_wizstate', [
                 'userid' => $userid,
             ]);
 
@@ -575,7 +398,7 @@ class provider implements
             }
 
             // Export rate limit log.
-            $ratelimits = $DB->get_records('local_hlai_quizgen_ratelimit_log', [
+            $ratelimits = $DB->get_records('local_hlai_quizgen_ratelog', [
                 'userid' => $userid,
             ]);
 
@@ -635,48 +458,13 @@ class provider implements
                 'submitterid' => $userid,
             ]);
 
-            // Delete refinements.
-            $DB->delete_records('local_hlai_quizgen_refinements', [
-                'userid' => $userid,
-            ]);
-
-            // Delete review comments.
-            $DB->delete_records('local_hlai_quizgen_review_comments', [
-                'userid' => $userid,
-            ]);
-
-            // Delete review ratings.
-            $DB->delete_records('local_hlai_quizgen_review_ratings', [
-                'userid' => $userid,
-            ]);
-
-            // Delete revisions.
-            $DB->delete_records('local_hlai_quizgen_revisions', [
-                'userid' => $userid,
-            ]);
-
-            // Delete review log.
-            $DB->delete_records('local_hlai_quizgen_review_log', [
-                'userid' => $userid,
-            ]);
-
-            // Delete refinement suggestions.
-            $DB->delete_records('local_hlai_quizgen_refine_suggest', [
-                'userid' => $userid,
-            ]);
-
-            // Delete question history.
-            $DB->delete_records('local_hlai_quizgen_qst_history', [
-                'userid' => $userid,
-            ]);
-
             // Delete wizard state.
-            $DB->delete_records('local_hlai_quizgen_wizard_state', [
+            $DB->delete_records('local_hlai_quizgen_wizstate', [
                 'userid' => $userid,
             ]);
 
             // Delete rate limit log.
-            $DB->delete_records('local_hlai_quizgen_ratelimit_log', [
+            $DB->delete_records('local_hlai_quizgen_ratelog', [
                 'userid' => $userid,
             ]);
 
@@ -745,48 +533,13 @@ class provider implements
                 'submitterid' => $userid,
             ]);
 
-            // Delete refinements.
-            $DB->delete_records('local_hlai_quizgen_refinements', [
-                'userid' => $userid,
-            ]);
-
-            // Delete review comments.
-            $DB->delete_records('local_hlai_quizgen_review_comments', [
-                'userid' => $userid,
-            ]);
-
-            // Delete review ratings.
-            $DB->delete_records('local_hlai_quizgen_review_ratings', [
-                'userid' => $userid,
-            ]);
-
-            // Delete revisions.
-            $DB->delete_records('local_hlai_quizgen_revisions', [
-                'userid' => $userid,
-            ]);
-
-            // Delete review log.
-            $DB->delete_records('local_hlai_quizgen_review_log', [
-                'userid' => $userid,
-            ]);
-
-            // Delete refinement suggestions.
-            $DB->delete_records('local_hlai_quizgen_refine_suggest', [
-                'userid' => $userid,
-            ]);
-
-            // Delete question history.
-            $DB->delete_records('local_hlai_quizgen_qst_history', [
-                'userid' => $userid,
-            ]);
-
             // Delete wizard state.
-            $DB->delete_records('local_hlai_quizgen_wizard_state', [
+            $DB->delete_records('local_hlai_quizgen_wizstate', [
                 'userid' => $userid,
             ]);
 
             // Delete rate limit log.
-            $DB->delete_records('local_hlai_quizgen_ratelimit_log', [
+            $DB->delete_records('local_hlai_quizgen_ratelog', [
                 'userid' => $userid,
             ]);
 
@@ -843,48 +596,13 @@ class provider implements
                 'submitterid' => $userid,
             ]);
 
-            // Delete refinements.
-            $DB->delete_records('local_hlai_quizgen_refinements', [
-                'userid' => $userid,
-            ]);
-
-            // Delete review comments.
-            $DB->delete_records('local_hlai_quizgen_review_comments', [
-                'userid' => $userid,
-            ]);
-
-            // Delete review ratings.
-            $DB->delete_records('local_hlai_quizgen_review_ratings', [
-                'userid' => $userid,
-            ]);
-
-            // Delete revisions.
-            $DB->delete_records('local_hlai_quizgen_revisions', [
-                'userid' => $userid,
-            ]);
-
-            // Delete review log.
-            $DB->delete_records('local_hlai_quizgen_review_log', [
-                'userid' => $userid,
-            ]);
-
-            // Delete refinement suggestions.
-            $DB->delete_records('local_hlai_quizgen_refine_suggest', [
-                'userid' => $userid,
-            ]);
-
-            // Delete question history.
-            $DB->delete_records('local_hlai_quizgen_qst_history', [
-                'userid' => $userid,
-            ]);
-
             // Delete wizard state.
-            $DB->delete_records('local_hlai_quizgen_wizard_state', [
+            $DB->delete_records('local_hlai_quizgen_wizstate', [
                 'userid' => $userid,
             ]);
 
             // Delete rate limit log.
-            $DB->delete_records('local_hlai_quizgen_ratelimit_log', [
+            $DB->delete_records('local_hlai_quizgen_ratelog', [
                 'userid' => $userid,
             ]);
 
@@ -910,20 +628,11 @@ class provider implements
         foreach ($questions as $question) {
             // Delete all child records linked to this question.
             $DB->delete_records('local_hlai_quizgen_answers', ['questionid' => $question->id]);
-            $DB->delete_records('local_hlai_quizgen_outcome_map', ['questionid' => $question->id]);
-            $DB->delete_records('local_hlai_quizgen_calibration', ['questionid' => $question->id]);
-            $DB->delete_records('local_hlai_quizgen_alternatives', ['original_questionid' => $question->id]);
-            $DB->delete_records('local_hlai_quizgen_refinements', ['questionid' => $question->id]);
-            $DB->delete_records('local_hlai_quizgen_refine_suggest', ['questionid' => $question->id]);
 
             // Delete review records and their children.
             $reviews = $DB->get_records('local_hlai_quizgen_reviews', ['questionid' => $question->id]);
             foreach ($reviews as $review) {
-                $DB->delete_records('local_hlai_quizgen_review_comments', ['reviewid' => $review->id]);
-                $DB->delete_records('local_hlai_quizgen_review_ratings', ['reviewid' => $review->id]);
-                $DB->delete_records('local_hlai_quizgen_revision_issues', ['reviewid' => $review->id]);
                 $DB->delete_records('local_hlai_quizgen_revisions', ['reviewid' => $review->id]);
-                $DB->delete_records('local_hlai_quizgen_review_log', ['reviewid' => $review->id]);
             }
             $DB->delete_records('local_hlai_quizgen_reviews', ['questionid' => $question->id]);
         }
@@ -931,7 +640,7 @@ class provider implements
         // Delete request-level child records.
         $DB->delete_records('local_hlai_quizgen_questions', ['requestid' => $requestid]);
         $DB->delete_records('local_hlai_quizgen_topics', ['requestid' => $requestid]);
-        $DB->delete_records('local_hlai_quizgen_url_content', ['requestid' => $requestid]);
+        $DB->delete_records('local_hlai_quizgen_urlcont', ['requestid' => $requestid]);
         $DB->delete_records('local_hlai_quizgen_logs', ['requestid' => $requestid]);
         $DB->delete_records('local_hlai_quizgen_requests', ['id' => $requestid]);
     }

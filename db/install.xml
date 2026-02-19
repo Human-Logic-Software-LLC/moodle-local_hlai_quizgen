@@ -179,7 +179,7 @@
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="local_hlai_quizgen_url_content" COMMENT="Stores extracted content from URLs">
+    <TABLE NAME="local_hlai_quizgen_urlcont" COMMENT="Stores extracted content from URLs">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="requestid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Parent request ID"/>
@@ -219,69 +219,6 @@
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="local_hlai_quizgen_outcome_map" COMMENT="Maps questions to learning outcomes">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Question ID"/>
-        <FIELD NAME="courseid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Course ID"/>
-        <FIELD NAME="outcome_text" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Learning outcome text"/>
-        <FIELD NAME="blooms_level" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="alignment_score" TYPE="number" LENGTH="10" NOTNULL="true" DEFAULT="0.0" DECIMALS="2" SEQUENCE="false" COMMENT="0-100 alignment confidence"/>
-        <FIELD NAME="similarity_score" TYPE="number" LENGTH="10" NOTNULL="true" DEFAULT="0.0" DECIMALS="2" SEQUENCE="false" COMMENT="Text similarity 0-100"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="local_hlai_quizgen_questions" REFFIELDS="id"/>
-        <KEY NAME="courseid" TYPE="foreign" FIELDS="courseid" REFTABLE="course" REFFIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="questionid_course" UNIQUE="false" FIELDS="questionid, courseid"/>
-        <INDEX NAME="blooms_level" UNIQUE="false" FIELDS="blooms_level"/>
-      </INDEXES>
-    </TABLE>
-    
-    <TABLE NAME="local_hlai_quizgen_calibration" COMMENT="Historical difficulty calibration data">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Question ID"/>
-        <FIELD NAME="moodle_questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="attempts_analyzed" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="average_score" TYPE="number" LENGTH="10" NOTNULL="true" DEFAULT="0.0" DECIMALS="2" SEQUENCE="false"/>
-        <FIELD NAME="discrimination_index" TYPE="number" LENGTH="10" NOTNULL="true" DEFAULT="0.0" DECIMALS="3" SEQUENCE="false"/>
-        <FIELD NAME="actual_difficulty" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="intended_difficulty" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="quality_rating" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="recommendations" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="JSON array of recommendations"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="local_hlai_quizgen_questions" REFFIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="questionid_time" UNIQUE="false" FIELDS="questionid, timecreated"/>
-        <INDEX NAME="quality_rating" UNIQUE="false" FIELDS="quality_rating"/>
-      </INDEXES>
-    </TABLE>
-    
-    <TABLE NAME="local_hlai_quizgen_analytics_cache" COMMENT="Cached analytics calculations">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="entity_type" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false" COMMENT="question, request, course"/>
-        <FIELD NAME="entity_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="analytics_data" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="JSON analytics data"/>
-        <FIELD NAME="last_updated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="expires_at" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="entity" UNIQUE="true" FIELDS="entity_type, entity_id"/>
-        <INDEX NAME="expires_at" UNIQUE="false" FIELDS="expires_at"/>
-      </INDEXES>
-    </TABLE>
     
     <TABLE NAME="local_hlai_quizgen_reviews" COMMENT="Peer review and approval workflow">
       <FIELDS>
@@ -315,65 +252,6 @@
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="local_hlai_quizgen_review_comments" COMMENT="Review comments and discussions">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="reviewid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="comment" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="comment_type" TYPE="char" LENGTH="50" NOTNULL="true" DEFAULT="review" SEQUENCE="false"/>
-        <FIELD NAME="is_resolved" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="reviewid" TYPE="foreign" FIELDS="reviewid" REFTABLE="local_hlai_quizgen_reviews" REFFIELDS="id"/>
-        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="reviewid_time" UNIQUE="false" FIELDS="reviewid, timecreated"/>
-      </INDEXES>
-    </TABLE>
-    
-    <TABLE NAME="local_hlai_quizgen_review_ratings" COMMENT="Quality ratings for questions">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="reviewid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="clarity" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="1-5 rating"/>
-        <FIELD NAME="accuracy" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="difficulty" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="pedagogical_value" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="distractor_quality" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="overall_rating" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="fk_rating_review" TYPE="foreign" FIELDS="reviewid" REFTABLE="local_hlai_quizgen_reviews" REFFIELDS="id"/>
-        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
-      </KEYS>
-    </TABLE>
-    
-    <TABLE NAME="local_hlai_quizgen_revision_issues" COMMENT="Issues requiring revision">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="reviewid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="issue_type" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="description" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="severity" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="medium" SEQUENCE="false"/>
-        <FIELD NAME="suggested_fix" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="is_resolved" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="reviewid" TYPE="foreign" FIELDS="reviewid" REFTABLE="local_hlai_quizgen_reviews" REFFIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="reviewid_resolved" UNIQUE="false" FIELDS="reviewid, is_resolved"/>
-      </INDEXES>
-    </TABLE>
     
     <TABLE NAME="local_hlai_quizgen_revisions" COMMENT="Revision history">
       <FIELDS>
@@ -394,76 +272,8 @@
       </INDEXES>
     </TABLE>
     
-    <TABLE NAME="local_hlai_quizgen_review_log" COMMENT="Audit log for review actions">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="reviewid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="action" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="reviewid" TYPE="foreign" FIELDS="reviewid" REFTABLE="local_hlai_quizgen_reviews" REFFIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="reviewid_time" UNIQUE="false" FIELDS="reviewid, timecreated"/>
-      </INDEXES>
-    </TABLE>
-    
-    <TABLE NAME="local_hlai_quizgen_refinements" COMMENT="AI refinement history">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="refinement_type" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="changes" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="JSON changes"/>
-        <FIELD NAME="improvements_applied" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="local_hlai_quizgen_questions" REFFIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="questionid_time" UNIQUE="false" FIELDS="questionid, timecreated"/>
-      </INDEXES>
-    </TABLE>
-    
-    <TABLE NAME="local_hlai_quizgen_refine_suggest" COMMENT="AI-generated improvement suggestions">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="refinement_type" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="suggestions" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="JSON suggestions"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="local_hlai_quizgen_questions" REFFIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="questionid_type" UNIQUE="false" FIELDS="questionid, refinement_type"/>
-      </INDEXES>
-    </TABLE>
-    
-    <TABLE NAME="local_hlai_quizgen_alternatives" COMMENT="Alternative question versions">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="original_questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="questiontext" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="answers" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="JSON answers"/>
-        <FIELD NAME="rationale" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="original_questionid" TYPE="foreign" FIELDS="original_questionid" REFTABLE="local_hlai_quizgen_questions" REFFIELDS="id"/>
-      </KEYS>
-    </TABLE>
 
-    <TABLE NAME="local_hlai_quizgen_wizard_state" COMMENT="Stores wizard session state for resumption">
+    <TABLE NAME="local_hlai_quizgen_wizstate" COMMENT="Stores wizard session state for resumption">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -486,7 +296,7 @@
       </INDEXES>
     </TABLE>
 
-    <TABLE NAME="local_hlai_quizgen_ratelimit_log" COMMENT="Rate limiting log for API calls">
+    <TABLE NAME="local_hlai_quizgen_ratelog" COMMENT="Rate limiting log for API calls">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User making the request"/>
@@ -500,40 +310,6 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="userid_time" UNIQUE="false" FIELDS="userid, timecreated"/>
-      </INDEXES>
-    </TABLE>
-
-    <TABLE NAME="local_hlai_quizgen_qst_history" COMMENT="Question version history for tracking changes">
-      <FIELDS>
-        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="original_questionid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Original question ID"/>
-        <FIELD NAME="requestid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Parent request ID"/>
-        <FIELD NAME="topicid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Topic ID"/>
-        <FIELD NAME="questiontype" TYPE="char" LENGTH="50" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="questiontext" TYPE="text" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="questiontextformat" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
-        <FIELD NAME="generalfeedback" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="difficulty" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="medium" SEQUENCE="false"/>
-        <FIELD NAME="blooms_level" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="ai_reasoning" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="validation_score" TYPE="int" LENGTH="3" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="quality_rating" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false"/>
-        <FIELD NAME="version_number" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Version number of this snapshot"/>
-        <FIELD NAME="answers_json" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="JSON-encoded answers"/>
-        <FIELD NAME="replaced_by_questionid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="ID of replacement question"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-      </FIELDS>
-      <KEYS>
-        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-        <KEY NAME="requestid" TYPE="foreign" FIELDS="requestid" REFTABLE="local_hlai_quizgen_requests" REFFIELDS="id"/>
-        <KEY NAME="topicid" TYPE="foreign" FIELDS="topicid" REFTABLE="local_hlai_quizgen_topics" REFFIELDS="id"/>
-        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
-      </KEYS>
-      <INDEXES>
-        <INDEX NAME="original_questionid" UNIQUE="false" FIELDS="original_questionid"/>
-        <INDEX NAME="original_version" UNIQUE="false" FIELDS="original_questionid, version_number"/>
-        <INDEX NAME="timecreated" UNIQUE="false" FIELDS="timecreated"/>
       </INDEXES>
     </TABLE>
 

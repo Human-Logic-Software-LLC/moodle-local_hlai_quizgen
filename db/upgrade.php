@@ -1330,5 +1330,49 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2026020401, 'local', 'hlai_quizgen');
     }
 
+    if ($oldversion < 2026021901) {
+        // Fix table names exceeding Moodle's 28-character limit.
+        // Rename 3 active tables and drop 11 orphaned tables.
+
+        // Rename active tables to shortened names.
+        $renames = [
+            'local_hlai_quizgen_url_content'  => 'local_hlai_quizgen_urlcont',
+            'local_hlai_quizgen_wizard_state'  => 'local_hlai_quizgen_wizstate',
+            'local_hlai_quizgen_ratelimit_log' => 'local_hlai_quizgen_ratelog',
+        ];
+        foreach ($renames as $oldname => $newname) {
+            $table = new xmldb_table($oldname);
+            if ($dbman->table_exists($table)) {
+                $newtable = new xmldb_table($newname);
+                if (!$dbman->table_exists($newtable)) {
+                    $dbman->rename_table($table, $newname);
+                }
+            }
+        }
+
+        // Drop orphaned tables whose class files no longer exist.
+        $orphaned = [
+            'local_hlai_quizgen_outcome_map',
+            'local_hlai_quizgen_calibration',
+            'local_hlai_quizgen_analytics_cache',
+            'local_hlai_quizgen_review_comments',
+            'local_hlai_quizgen_review_ratings',
+            'local_hlai_quizgen_revision_issues',
+            'local_hlai_quizgen_review_log',
+            'local_hlai_quizgen_refinements',
+            'local_hlai_quizgen_refine_suggest',
+            'local_hlai_quizgen_alternatives',
+            'local_hlai_quizgen_qst_history',
+        ];
+        foreach ($orphaned as $tablename) {
+            $table = new xmldb_table($tablename);
+            if ($dbman->table_exists($table)) {
+                $dbman->drop_table($table);
+            }
+        }
+
+        upgrade_plugin_savepoint(true, 2026021901, 'local', 'hlai_quizgen');
+    }
+
     return true;
 }

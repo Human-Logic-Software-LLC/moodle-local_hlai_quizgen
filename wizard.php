@@ -684,7 +684,7 @@ function local_hlai_quizgen_handle_content_upload(int $courseid, context $contex
                 $urlrecord->word_count = $urlcontent['word_count'];
                 $urlrecord->timecreated = time();
 
-                $DB->insert_record('local_hlai_quizgen_url_content', $urlrecord);
+                $DB->insert_record('local_hlai_quizgen_urlcont', $urlrecord);
             } catch (Exception $e) {
                 // Continue with other URLs even if one fails.
                 debugging($e->getMessage(), DEBUG_DEVELOPER);

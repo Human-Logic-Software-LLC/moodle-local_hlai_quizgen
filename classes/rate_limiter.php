@@ -278,7 +278,7 @@ class rate_limiter {
         $record->timecreated = time();
 
         try {
-            $DB->insert_record('local_hlai_quizgen_ratelimit_log', $record);
+            $DB->insert_record('local_hlai_quizgen_ratelog', $record);
         } catch (\Exception $e) {
             // Silently fail - violations are informational.
             debugging($e->getMessage(), DEBUG_DEVELOPER);
@@ -300,7 +300,7 @@ class rate_limiter {
         }
 
         $sql = "SELECT userid, COUNT(*) as violations
-                FROM {local_hlai_quizgen_ratelimit_log}
+                FROM {local_hlai_quizgen_ratelog}
                 WHERE timecreated > ?
                 GROUP BY userid
                 ORDER BY violations DESC";

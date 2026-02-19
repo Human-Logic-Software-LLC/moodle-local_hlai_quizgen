@@ -205,7 +205,7 @@ class wizard_external extends \external_api {
     /**
      * Save the wizard state for the current user and course.
      *
-     * Upserts into local_hlai_quizgen_wizard_state. If a record already
+     * Upserts into local_hlai_quizgen_wizstate. If a record already
      * exists for the user+course combination, it is updated; otherwise
      * a new record is inserted.
      *
@@ -241,13 +241,13 @@ class wizard_external extends \external_api {
         }
 
         // Upsert: check for existing record for this user+course.
-        $existing = $DB->get_record('local_hlai_quizgen_wizard_state', [
+        $existing = $DB->get_record('local_hlai_quizgen_wizstate', [
             'userid' => $USER->id,
             'courseid' => $courseid,
         ]);
 
         if ($existing) {
-            $DB->update_record('local_hlai_quizgen_wizard_state', [
+            $DB->update_record('local_hlai_quizgen_wizstate', [
                 'id' => $existing->id,
                 'current_step' => $step,
                 'state_data' => json_encode($statedata),
@@ -255,7 +255,7 @@ class wizard_external extends \external_api {
                 'timemodified' => time(),
             ]);
         } else {
-            $DB->insert_record('local_hlai_quizgen_wizard_state', [
+            $DB->insert_record('local_hlai_quizgen_wizstate', [
                 'userid' => $USER->id,
                 'courseid' => $courseid,
                 'current_step' => $step,
@@ -318,7 +318,7 @@ class wizard_external extends \external_api {
         self::validate_context($context);
 
         // Look up state for this user+course.
-        $state = $DB->get_record('local_hlai_quizgen_wizard_state', [
+        $state = $DB->get_record('local_hlai_quizgen_wizstate', [
             'userid' => $USER->id,
             'courseid' => $courseid,
         ]);
@@ -389,7 +389,7 @@ class wizard_external extends \external_api {
         self::validate_context($context);
 
         // Delete wizard state for this user+course.
-        $DB->delete_records('local_hlai_quizgen_wizard_state', [
+        $DB->delete_records('local_hlai_quizgen_wizstate', [
             'userid' => $USER->id,
             'courseid' => $courseid,
         ]);
