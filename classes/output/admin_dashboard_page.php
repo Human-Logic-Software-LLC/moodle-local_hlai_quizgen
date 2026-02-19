@@ -39,7 +39,6 @@ use moodle_url;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class admin_dashboard_page implements renderable, templatable {
-
     /** @var array Overview statistics. */
     private $overview;
 
@@ -75,8 +74,10 @@ class admin_dashboard_page implements renderable, templatable {
      */
     public function export_for_template(renderer_base $output): array {
         $settingsurl = (new moodle_url('/admin/settings.php', ['section' => 'local_hlai_quizgen']))->out(false);
-        $capurl = (new moodle_url('/admin/roles/check.php',
-            ['capability' => 'local/hlai_quizgen:generatequestions']))->out(false);
+        $capurl = (new moodle_url(
+            '/admin/roles/check.php',
+            ['capability' => 'local/hlai_quizgen:generatequestions']
+        ))->out(false);
         $debuglogsurl = (new moodle_url('/local/hlai_quizgen/debug_logs.php'))->out(false);
 
         // Top courses with rank.

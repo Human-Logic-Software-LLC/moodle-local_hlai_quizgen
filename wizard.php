@@ -1559,7 +1559,12 @@ function local_hlai_quizgen_render_step2(int $courseid, int $requestid): string 
         $fs = get_file_storage();
         $coursecontext = context_course::instance($courseid);
         $files = $fs->get_area_files(
-            $coursecontext->id, 'local_hlai_quizgen', 'content', $requestid, 'filename', false
+            $coursecontext->id,
+            'local_hlai_quizgen',
+            'content',
+            $requestid,
+            'filename',
+            false
         );
 
         if (!empty($files)) {
@@ -1900,9 +1905,24 @@ function local_hlai_quizgen_render_step3(int $courseid, int $requestid): string 
     // Difficulty options.
     $context['question_difficulty_label'] = get_string('question_difficulty', 'local_hlai_quizgen');
     $context['difficulty_options'] = [
-        ['value' => 'easy_only', 'label' => get_string('diff_easy', 'local_hlai_quizgen'), 'css_class' => 'is-easy', 'is_checked' => false],
-        ['value' => 'balanced', 'label' => get_string('wizard_balanced', 'local_hlai_quizgen'), 'css_class' => 'is-balanced', 'is_checked' => true],
-        ['value' => 'hard_only', 'label' => get_string('diff_hard', 'local_hlai_quizgen'), 'css_class' => 'is-hard', 'is_checked' => false],
+        [
+            'value' => 'easy_only',
+            'label' => get_string('diff_easy', 'local_hlai_quizgen'),
+            'css_class' => 'is-easy',
+            'is_checked' => false,
+        ],
+        [
+            'value' => 'balanced',
+            'label' => get_string('wizard_balanced', 'local_hlai_quizgen'),
+            'css_class' => 'is-balanced',
+            'is_checked' => true,
+        ],
+        [
+            'value' => 'hard_only',
+            'label' => get_string('diff_hard', 'local_hlai_quizgen'),
+            'css_class' => 'is-hard',
+            'is_checked' => false,
+        ],
     ];
 
     // Question types.

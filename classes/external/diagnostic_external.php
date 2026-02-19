@@ -247,7 +247,7 @@ class diagnostic_external extends \external_api {
 
         // Batch-load type-specific data to avoid N+1 queries.
         // Group question IDs by type for efficient IN-clause lookups.
-        $idsByType = [];
+        $idsbytype = [];
         foreach ($questions as $q) {
             if (!isset($bytype[$q->qtype])) {
                 $bytype[$q->qtype] = 0;
@@ -262,7 +262,7 @@ class diagnostic_external extends \external_api {
                 ];
             }
 
-            $idsByType[$q->qtype][$q->id] = $q;
+            $idsbytype[$q->qtype][$q->id] = $q;
         }
 
         // Pre-fetch existing type data with bulk queries (one query per type instead of one per question).
@@ -277,10 +277,10 @@ class diagnostic_external extends \external_api {
         ];
 
         foreach ($typetablemap as $qtype => $info) {
-            if (empty($idsByType[$qtype])) {
+            if (empty($idsbytype[$qtype])) {
                 continue;
             }
-            $ids = array_keys($idsByType[$qtype]);
+            $ids = array_keys($idsbytype[$qtype]);
             [$insql, $inparams] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
             $existing = $DB->get_fieldset_sql(
                 "SELECT {$info['field']} FROM {{$info['table']}} WHERE {$info['field']} {$insql}",

@@ -22,8 +22,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
  * Upgrade the local_hlai_quizgen plugin.
  *
@@ -1250,11 +1248,15 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
             $dbman->add_field($table, $field);
             // Populate for existing approved questions: first try if regeneration_count = 0.
             $DB->set_field_select(
-                'local_hlai_quizgen_questions', 'accepted_on_first_try', 1,
+                'local_hlai_quizgen_questions',
+                'accepted_on_first_try',
+                1,
                 "status = 'approved' AND regeneration_count = 0"
             );
             $DB->set_field_select(
-                'local_hlai_quizgen_questions', 'accepted_on_first_try', 0,
+                'local_hlai_quizgen_questions',
+                'accepted_on_first_try',
+                0,
                 "status = 'approved' AND regeneration_count > 0"
             );
         }

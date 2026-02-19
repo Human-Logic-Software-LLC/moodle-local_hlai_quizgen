@@ -16,8 +16,6 @@
 
 namespace local_hlai_quizgen\output;
 
-defined('MOODLE_INTERNAL') || die();
-
 use renderable;
 use templatable;
 use renderer_base;
@@ -34,7 +32,6 @@ use renderer_base;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class wizard_page implements renderable, templatable {
-
     /** @var string|int Current step identifier */
     private $currentstep;
 

@@ -39,7 +39,6 @@ use moodle_url;
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class analytics_page implements renderable, templatable {
-
     /** @var int Course ID. */
     private $courseid;
 
@@ -157,8 +156,11 @@ class analytics_page implements renderable, templatable {
             'approvedquestions' => $this->stats['approvedquestions'],
             'approved_label' => get_string('approved', 'local_hlai_quizgen'),
             'acceptancerate' => $this->stats['acceptancerate'],
-            'analytics_pct_acceptance' => get_string('analytics_pct_acceptance', 'local_hlai_quizgen',
-                $this->stats['acceptancerate']),
+            'analytics_pct_acceptance' => get_string(
+                'analytics_pct_acceptance',
+                'local_hlai_quizgen',
+                $this->stats['acceptancerate']
+            ),
             'rejectedquestions' => $this->stats['rejectedquestions'],
             'rejected_label' => get_string('rejected', 'local_hlai_quizgen'),
             'avgquality' => $this->stats['avgquality'],
@@ -198,7 +200,7 @@ class analytics_page implements renderable, templatable {
             'analytics_rejection_analysis' => get_string('analytics_rejection_analysis', 'local_hlai_quizgen'),
             'analytics_rejection_analysis_desc' => get_string('analytics_rejection_analysis_desc', 'local_hlai_quizgen'),
             'analytics_top_rejection_reasons' => get_string('analytics_top_rejection_reasons', 'local_hlai_quizgen'),
-            'rejectionreasons' => array_map(function($reason) {
+            'rejectionreasons' => array_map(function ($reason) {
                 return [
                     'reason' => htmlspecialchars($reason->reason),
                     'count' => $reason->count,
@@ -244,8 +246,11 @@ class analytics_page implements renderable, templatable {
                 'type' => 'warning',
                 'iconclass' => 'fa-refresh hlai-icon-info',
                 'title' => get_string('analytics_insight_high_regen_title', 'local_hlai_quizgen'),
-                'message' => get_string('analytics_insight_high_regen_msg', 'local_hlai_quizgen',
-                    $this->stats['avgregenerations']),
+                'message' => get_string(
+                    'analytics_insight_high_regen_msg',
+                    'local_hlai_quizgen',
+                    $this->stats['avgregenerations']
+                ),
             ];
         }
 
