@@ -343,7 +343,7 @@ class quiz_deployer {
         $quiz->canredoquestions = 0;
         $quiz->attempts = $settings['attempts'] ?? 1;
         $quiz->attemptonlast = 0;
-        $quiz->grademethod = QUIZ_GRADEHIGHEST;
+        $quiz->grademethod = \QUIZ_GRADEHIGHEST;
         $quiz->decimalpoints = 2;
         $quiz->questiondecimalpoints = -1;
         $quiz->reviewattempt = 0x11110;
