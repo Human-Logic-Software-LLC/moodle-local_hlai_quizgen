@@ -537,14 +537,17 @@ function local_hlai_quizgen_handle_content_upload(int $courseid, context $contex
                 $uniquetopics[] = $topic;
             }
 
-            // Now insert the deduplicated topics.
+            // Batch-insert the deduplicated topics.
+            $now = time();
+            $inserttopics = [];
             foreach ($uniquetopics as $topic) {
                 $newtopic = clone $topic;
                 unset($newtopic->id);
                 $newtopic->requestid = $requestid;
-                $newtopic->timecreated = time();
-                $DB->insert_record('local_hlai_quizgen_topics', $newtopic);
+                $newtopic->timecreated = $now;
+                $inserttopics[] = $newtopic;
             }
+            $DB->insert_records('local_hlai_quizgen_topics', $inserttopics);
 
             // Skip to step 2 (topic selection) since we already have topics.
             redirect(new moodle_url('/local/hlai_quizgen/wizard.php', [
@@ -816,10 +819,11 @@ function local_hlai_quizgen_handle_save_topic_selection(int $requestid) {
     // Update all topics to deselected first.
     $DB->set_field('local_hlai_quizgen_topics', 'selected', 0, ['requestid' => $requestid]);
 
-    // Set default num_questions for selected topics.
-    foreach ($selectedtopics as $topicid) {
-        $DB->set_field('local_hlai_quizgen_topics', 'selected', 1, ['id' => $topicid]);
-        $DB->set_field('local_hlai_quizgen_topics', 'num_questions', 5, ['id' => $topicid]); // Default 5 questions.
+    // Batch-update selected topics to avoid N+1 queries.
+    if (!empty($selectedtopics)) {
+        list($insql, $inparams) = $DB->get_in_or_equal($selectedtopics, SQL_PARAMS_NAMED);
+        $DB->set_field_select('local_hlai_quizgen_topics', 'selected', 1, "id $insql", $inparams);
+        $DB->set_field_select('local_hlai_quizgen_topics', 'num_questions', 5, "id $insql", $inparams);
     }
 
     // Redirect to step 3.

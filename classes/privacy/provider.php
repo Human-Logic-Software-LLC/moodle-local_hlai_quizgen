@@ -392,6 +392,206 @@ class provider implements
                     (object)['refinements' => $data]
                 );
             }
+
+            // Export logs.
+            $logs = $DB->get_records('local_hlai_quizgen_logs', [
+                'userid' => $userid,
+            ]);
+
+            if (!empty($logs)) {
+                $data = [];
+                foreach ($logs as $log) {
+                    $data[] = [
+                        'action' => $log->action,
+                        'timecreated' => transform::datetime($log->timecreated),
+                    ];
+                }
+
+                writer::with_context($context)->export_data(
+                    [get_string('pluginname', 'local_hlai_quizgen'), 'logs'],
+                    (object)['logs' => $data]
+                );
+            }
+
+            // Export review comments.
+            $comments = $DB->get_records('local_hlai_quizgen_review_comments', [
+                'userid' => $userid,
+            ]);
+
+            if (!empty($comments)) {
+                $data = [];
+                foreach ($comments as $comment) {
+                    $data[] = [
+                        'comment' => $comment->comment ?? '',
+                        'timecreated' => transform::datetime($comment->timecreated),
+                    ];
+                }
+
+                writer::with_context($context)->export_data(
+                    [get_string('pluginname', 'local_hlai_quizgen'), 'review_comments'],
+                    (object)['review_comments' => $data]
+                );
+            }
+
+            // Export review ratings.
+            $ratings = $DB->get_records('local_hlai_quizgen_review_ratings', [
+                'userid' => $userid,
+            ]);
+
+            if (!empty($ratings)) {
+                $data = [];
+                foreach ($ratings as $rating) {
+                    $data[] = [
+                        'rating' => $rating->rating ?? '',
+                        'timecreated' => transform::datetime($rating->timecreated),
+                    ];
+                }
+
+                writer::with_context($context)->export_data(
+                    [get_string('pluginname', 'local_hlai_quizgen'), 'review_ratings'],
+                    (object)['review_ratings' => $data]
+                );
+            }
+
+            // Export revisions.
+            $revisions = $DB->get_records('local_hlai_quizgen_revisions', [
+                'userid' => $userid,
+            ]);
+
+            if (!empty($revisions)) {
+                $data = [];
+                foreach ($revisions as $revision) {
+                    $data[] = [
+                        'changes' => $revision->changes ?? '',
+                        'timecreated' => transform::datetime($revision->timecreated),
+                    ];
+                }
+
+                writer::with_context($context)->export_data(
+                    [get_string('pluginname', 'local_hlai_quizgen'), 'revisions'],
+                    (object)['revisions' => $data]
+                );
+            }
+
+            // Export review log.
+            $reviewlogs = $DB->get_records('local_hlai_quizgen_review_log', [
+                'userid' => $userid,
+            ]);
+
+            if (!empty($reviewlogs)) {
+                $data = [];
+                foreach ($reviewlogs as $log) {
+                    $data[] = [
+                        'action' => $log->action ?? '',
+                        'timecreated' => transform::datetime($log->timecreated),
+                    ];
+                }
+
+                writer::with_context($context)->export_data(
+                    [get_string('pluginname', 'local_hlai_quizgen'), 'review_log'],
+                    (object)['review_log' => $data]
+                );
+            }
+
+            // Export refinement suggestions.
+            $suggestions = $DB->get_records('local_hlai_quizgen_refine_suggest', [
+                'userid' => $userid,
+            ]);
+
+            if (!empty($suggestions)) {
+                $data = [];
+                foreach ($suggestions as $suggestion) {
+                    $data[] = [
+                        'suggestion' => $suggestion->suggestion ?? '',
+                        'timecreated' => transform::datetime($suggestion->timecreated),
+                    ];
+                }
+
+                writer::with_context($context)->export_data(
+                    [get_string('pluginname', 'local_hlai_quizgen'), 'refine_suggestions'],
+                    (object)['refine_suggestions' => $data]
+                );
+            }
+
+            // Export question history.
+            $history = $DB->get_records('local_hlai_quizgen_qst_history', [
+                'userid' => $userid,
+            ]);
+
+            if (!empty($history)) {
+                $data = [];
+                foreach ($history as $entry) {
+                    $data[] = [
+                        'changes' => $entry->changes ?? '',
+                        'timecreated' => transform::datetime($entry->timecreated),
+                    ];
+                }
+
+                writer::with_context($context)->export_data(
+                    [get_string('pluginname', 'local_hlai_quizgen'), 'question_history'],
+                    (object)['question_history' => $data]
+                );
+            }
+
+            // Export templates.
+            $templates = $DB->get_records('local_hlai_quizgen_templates', [
+                'userid' => $userid,
+            ]);
+
+            if (!empty($templates)) {
+                $data = [];
+                foreach ($templates as $template) {
+                    $data[] = [
+                        'name' => $template->name ?? '',
+                        'config' => $template->config ?? '',
+                        'timecreated' => transform::datetime($template->timecreated),
+                    ];
+                }
+
+                writer::with_context($context)->export_data(
+                    [get_string('pluginname', 'local_hlai_quizgen'), 'templates'],
+                    (object)['templates' => $data]
+                );
+            }
+
+            // Export wizard state.
+            $wizardstates = $DB->get_records('local_hlai_quizgen_wizard_state', [
+                'userid' => $userid,
+            ]);
+
+            if (!empty($wizardstates)) {
+                $data = [];
+                foreach ($wizardstates as $state) {
+                    $data[] = [
+                        'state_data' => $state->state_data ?? '',
+                        'timecreated' => transform::datetime($state->timecreated),
+                    ];
+                }
+
+                writer::with_context($context)->export_data(
+                    [get_string('pluginname', 'local_hlai_quizgen'), 'wizard_state'],
+                    (object)['wizard_state' => $data]
+                );
+            }
+
+            // Export rate limit log.
+            $ratelimits = $DB->get_records('local_hlai_quizgen_ratelimit_log', [
+                'userid' => $userid,
+            ]);
+
+            if (!empty($ratelimits)) {
+                $data = [];
+                foreach ($ratelimits as $entry) {
+                    $data[] = [
+                        'timecreated' => transform::datetime($entry->timecreated),
+                    ];
+                }
+
+                writer::with_context($context)->export_data(
+                    [get_string('pluginname', 'local_hlai_quizgen'), 'ratelimit_log'],
+                    (object)['ratelimit_log' => $data]
+                );
+            }
         }
     }
 

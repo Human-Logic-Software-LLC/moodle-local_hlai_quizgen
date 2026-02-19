@@ -90,12 +90,23 @@ class quiz_deployer {
         $errors = [];
         $questionnumber = 1;
 
+        // Batch-fetch all questions to avoid N+1 queries.
+        list($qinsql, $qinparams) = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED);
+        $allgenquestions = $DB->get_records_select(
+            'local_hlai_quizgen_questions',
+            "id $qinsql",
+            $qinparams
+        );
+
         foreach ($questionids as $questionid) {
             try {
                 debugging("deploy_to_question_bank: Processing question ID: $questionid", DEBUG_DEVELOPER);
 
-                // Get question from our table.
-                $genquestion = $DB->get_record('local_hlai_quizgen_questions', ['id' => $questionid], '*', MUST_EXIST);
+                // Get question from pre-fetched batch.
+                if (!isset($allgenquestions[$questionid])) {
+                    throw new \moodle_exception('questionnotfound', 'local_hlai_quizgen');
+                }
+                $genquestion = $allgenquestions[$questionid];
                 debugging(
                     "deploy_to_question_bank: Loaded genquestion, type=" .
                     ($genquestion->questiontype ?? 'null'),
@@ -1244,16 +1255,26 @@ class quiz_deployer {
         $added = 0;
         $questionsperpage = $quiz->questionsperpage ?? 1;
 
+        // Batch-fetch question bank entries to avoid N+1 queries.
+        list($vinsql, $vinparams) = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED);
+        $allversions = $DB->get_records_sql(
+            "SELECT qv.questionid, qv.questionbankentryid
+               FROM {question_versions} qv
+              WHERE qv.questionid $vinsql
+           ORDER BY qv.questionid, qv.version DESC",
+            $vinparams
+        );
+        // Keep only the latest version per questionid.
+        $versionmap = [];
+        foreach ($allversions as $v) {
+            if (!isset($versionmap[$v->questionid])) {
+                $versionmap[$v->questionid] = $v;
+            }
+        }
+
         foreach ($questionids as $questionid) {
-            // Get question bank entry for this question.
-            $qversion = $DB->get_record_sql(
-                "SELECT qv.questionbankentryid
-                 FROM {question_versions} qv
-                 WHERE qv.questionid = ?
-                 ORDER BY qv.version DESC
-                 LIMIT 1",
-                [$questionid]
-            );
+            // Look up pre-fetched question bank entry.
+            $qversion = $versionmap[$questionid] ?? null;
 
             if (!$qversion) {
                 continue;
