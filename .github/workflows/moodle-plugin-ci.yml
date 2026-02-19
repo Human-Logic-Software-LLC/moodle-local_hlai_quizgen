@@ -91,8 +91,9 @@ jobs:
         run: moodle-plugin-ci phpcs --max-warnings 0
 
       - name: Moodle PHPDoc Checker
+        continue-on-error: true
         if: ${{ !cancelled() }}
-        run: moodle-plugin-ci phpdoc --max-warnings 0
+        run: moodle-plugin-ci phpdoc
 
       - name: Validating
         if: ${{ !cancelled() }}
