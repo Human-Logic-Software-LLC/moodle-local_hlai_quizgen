@@ -100,14 +100,21 @@ jobs:
         if: ${{ !cancelled() }}
         run: moodle-plugin-ci grunt --max-lint-warnings 0
 
-      - name: Upload grunt-built AMD files (debug)
+      - name: Rebuild and upload grunt AMD files (debug)
+        if: ${{ failure() && steps.grunt.outcome == 'failure' }}
+        run: |
+          cd moodle
+          npx grunt rollup --root=local/hlai_quizgen
+          mkdir -p /tmp/grunt-output
+          cp local/hlai_quizgen/amd/build/dashboard.min.js /tmp/grunt-output/
+          cp local/hlai_quizgen/amd/build/dashboard.min.js.map /tmp/grunt-output/
+
+      - name: Upload rebuilt AMD files
         if: ${{ failure() && steps.grunt.outcome == 'failure' }}
         uses: actions/upload-artifact@v4
         with:
           name: grunt-built-amd-${{ join(matrix.*, '-') }}
-          path: |
-            moodle/local/hlai_quizgen/amd/build/dashboard.min.js
-            moodle/local/hlai_quizgen/amd/build/dashboard.min.js.map
+          path: /tmp/grunt-output/
           retention-days: 3
 
       - name: PHPUnit tests
