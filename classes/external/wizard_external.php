@@ -27,6 +27,25 @@
 
 namespace local_hlai_quizgen\external;
 
+defined('MOODLE_INTERNAL') || die();
+
+// Backward compatibility for Moodle < 4.2 (before core_external namespace was introduced).
+if (!class_exists('core_external\external_api')) {
+    global $CFG;
+    require_once($CFG->libdir . '/externallib.php');
+    class_alias('external_api', 'core_external\external_api');
+    class_alias('external_function_parameters', 'core_external\external_function_parameters');
+    class_alias('external_value', 'core_external\external_value');
+    class_alias('external_single_structure', 'core_external\external_single_structure');
+    class_alias('external_multiple_structure', 'core_external\external_multiple_structure');
+}
+
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_multiple_structure;
+use core_external\external_value;
+
 /**
  * Wizard external API class.
  *
@@ -37,17 +56,17 @@ namespace local_hlai_quizgen\external;
  * @copyright  2025 Human Logic Software LLC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class wizard_external extends \external_api {
+class wizard_external extends external_api {
     // Get progress - poll generation progress for a request.
 
     /**
      * Describes the parameters for get_progress.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
-    public static function get_progress_parameters(): \external_function_parameters {
-        return new \external_function_parameters([
-            'requestid' => new \external_value(PARAM_INT, 'The generation request ID'),
+    public static function get_progress_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'requestid' => new external_value(PARAM_INT, 'The generation request ID'),
         ]);
     }
 
@@ -163,26 +182,26 @@ class wizard_external extends \external_api {
     /**
      * Describes the return value for get_progress.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
-    public static function get_progress_returns(): \external_single_structure {
-        return new \external_single_structure([
-            'status' => new \external_value(
+    public static function get_progress_returns(): external_single_structure {
+        return new external_single_structure([
+            'status' => new external_value(
                 PARAM_TEXT,
                 'Request status (pending, analyzing, topics_ready, processing, completed, failed)'
             ),
-            'progress' => new \external_value(PARAM_FLOAT, 'Progress percentage 0-100'),
-            'message' => new \external_value(PARAM_TEXT, 'Current progress message', VALUE_OPTIONAL),
-            'questions_generated' => new \external_value(PARAM_INT, 'Number of questions generated so far'),
-            'total_questions' => new \external_value(PARAM_INT, 'Total number of questions to generate'),
-            'is_complete' => new \external_value(PARAM_BOOL, 'Whether generation is complete (success or failure)'),
-            'error' => new \external_value(PARAM_TEXT, 'Error message if status is failed', VALUE_OPTIONAL),
+            'progress' => new external_value(PARAM_FLOAT, 'Progress percentage 0-100'),
+            'message' => new external_value(PARAM_TEXT, 'Current progress message', VALUE_OPTIONAL),
+            'questions_generated' => new external_value(PARAM_INT, 'Number of questions generated so far'),
+            'total_questions' => new external_value(PARAM_INT, 'Total number of questions to generate'),
+            'is_complete' => new external_value(PARAM_BOOL, 'Whether generation is complete (success or failure)'),
+            'error' => new external_value(PARAM_TEXT, 'Error message if status is failed', VALUE_OPTIONAL),
             // These fields are JSON-encoded strings. The caller must JSON.parse() them.
             // PARAM_RAW is required because the JSON contains nested objects/arrays that
             // cannot be described with external_value alone.
-            'current_topic' => new \external_value(PARAM_RAW, 'JSON-encoded current topic object or null'),
-            'topics' => new \external_value(PARAM_RAW, 'JSON-encoded array of topic progress objects'),
-            'activities' => new \external_value(PARAM_RAW, 'JSON-encoded array of recent activity objects'),
+            'current_topic' => new external_value(PARAM_RAW, 'JSON-encoded current topic object or null'),
+            'topics' => new external_value(PARAM_RAW, 'JSON-encoded array of topic progress objects'),
+            'activities' => new external_value(PARAM_RAW, 'JSON-encoded array of recent activity objects'),
         ]);
     }
 
@@ -191,14 +210,14 @@ class wizard_external extends \external_api {
     /**
      * Describes the parameters for save_wizard_state.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
-    public static function save_wizard_state_parameters(): \external_function_parameters {
-        return new \external_function_parameters([
-            'courseid' => new \external_value(PARAM_INT, 'The course ID'),
-            'step' => new \external_value(PARAM_INT, 'The current wizard step number'),
-            'requestid' => new \external_value(PARAM_INT, 'The associated request ID (0 if none)', VALUE_DEFAULT, 0),
-            'state' => new \external_value(PARAM_RAW, 'JSON-encoded wizard state data'),
+    public static function save_wizard_state_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'The course ID'),
+            'step' => new external_value(PARAM_INT, 'The current wizard step number'),
+            'requestid' => new external_value(PARAM_INT, 'The associated request ID (0 if none)', VALUE_DEFAULT, 0),
+            'state' => new external_value(PARAM_RAW, 'JSON-encoded wizard state data'),
         ]);
     }
 
@@ -274,11 +293,11 @@ class wizard_external extends \external_api {
     /**
      * Describes the return value for save_wizard_state.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
-    public static function save_wizard_state_returns(): \external_single_structure {
-        return new \external_single_structure([
-            'step' => new \external_value(PARAM_INT, 'The saved wizard step number'),
+    public static function save_wizard_state_returns(): external_single_structure {
+        return new external_single_structure([
+            'step' => new external_value(PARAM_INT, 'The saved wizard step number'),
         ]);
     }
 
@@ -287,11 +306,11 @@ class wizard_external extends \external_api {
     /**
      * Describes the parameters for get_wizard_state.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
-    public static function get_wizard_state_parameters(): \external_function_parameters {
-        return new \external_function_parameters([
-            'courseid' => new \external_value(PARAM_INT, 'The course ID'),
+    public static function get_wizard_state_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'The course ID'),
         ]);
     }
 
@@ -341,15 +360,15 @@ class wizard_external extends \external_api {
     /**
      * Describes the return value for get_wizard_state.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
-    public static function get_wizard_state_returns(): \external_single_structure {
-        return new \external_single_structure([
-            'hasstate' => new \external_value(PARAM_BOOL, 'Whether a saved state exists'),
-            'step' => new \external_value(PARAM_INT, 'The saved wizard step number', VALUE_OPTIONAL),
-            'state' => new \external_value(PARAM_RAW, 'JSON-encoded wizard state data', VALUE_OPTIONAL),
-            'requestid' => new \external_value(PARAM_INT, 'The associated request ID', VALUE_OPTIONAL),
-            'lastmodified' => new \external_value(PARAM_TEXT, 'Human-readable last modification time', VALUE_OPTIONAL),
+    public static function get_wizard_state_returns(): external_single_structure {
+        return new external_single_structure([
+            'hasstate' => new external_value(PARAM_BOOL, 'Whether a saved state exists'),
+            'step' => new external_value(PARAM_INT, 'The saved wizard step number', VALUE_OPTIONAL),
+            'state' => new external_value(PARAM_RAW, 'JSON-encoded wizard state data', VALUE_OPTIONAL),
+            'requestid' => new external_value(PARAM_INT, 'The associated request ID', VALUE_OPTIONAL),
+            'lastmodified' => new external_value(PARAM_TEXT, 'Human-readable last modification time', VALUE_OPTIONAL),
         ]);
     }
 
@@ -358,11 +377,11 @@ class wizard_external extends \external_api {
     /**
      * Describes the parameters for clear_wizard_state.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
-    public static function clear_wizard_state_parameters(): \external_function_parameters {
-        return new \external_function_parameters([
-            'courseid' => new \external_value(PARAM_INT, 'The course ID'),
+    public static function clear_wizard_state_parameters(): external_function_parameters {
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'The course ID'),
         ]);
     }
 
@@ -402,11 +421,11 @@ class wizard_external extends \external_api {
     /**
      * Describes the return value for clear_wizard_state.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
-    public static function clear_wizard_state_returns(): \external_single_structure {
-        return new \external_single_structure([
-            'cleared' => new \external_value(PARAM_BOOL, 'Whether the state was cleared'),
+    public static function clear_wizard_state_returns(): external_single_structure {
+        return new external_single_structure([
+            'cleared' => new external_value(PARAM_BOOL, 'Whether the state was cleared'),
         ]);
     }
 }

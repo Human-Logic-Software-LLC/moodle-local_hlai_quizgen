@@ -24,6 +24,25 @@
 
 namespace local_hlai_quizgen\external;
 
+defined('MOODLE_INTERNAL') || die();
+
+// Backward compatibility for Moodle < 4.2 (before core_external namespace was introduced).
+if (!class_exists('core_external\external_api')) {
+    global $CFG;
+    require_once($CFG->libdir . '/externallib.php');
+    class_alias('external_api', 'core_external\external_api');
+    class_alias('external_function_parameters', 'core_external\external_function_parameters');
+    class_alias('external_value', 'core_external\external_value');
+    class_alias('external_single_structure', 'core_external\external_single_structure');
+    class_alias('external_multiple_structure', 'core_external\external_multiple_structure');
+}
+
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_multiple_structure;
+use core_external\external_value;
+
 /**
  * Dashboard external functions for the local_hlai_quizgen plugin.
  *
@@ -34,7 +53,7 @@ namespace local_hlai_quizgen\external;
  * @copyright  2025 Human Logic Software LLC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class dashboard_external extends \external_api {
+class dashboard_external extends external_api {
     // -----------------------------------------------------------------------
     // 1. get_dashboard_stats
     // -----------------------------------------------------------------------
@@ -42,11 +61,11 @@ class dashboard_external extends \external_api {
     /**
      * Describes the parameters for get_dashboard_stats.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function get_dashboard_stats_parameters() {
-        return new \external_function_parameters([
-            'courseid' => new \external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -147,17 +166,17 @@ class dashboard_external extends \external_api {
     /**
      * Describes the return value for get_dashboard_stats.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function get_dashboard_stats_returns() {
-        return new \external_single_structure([
-            'total_quizzes' => new \external_value(PARAM_INT, 'Total quizzes created by the user'),
-            'total_questions' => new \external_value(PARAM_INT, 'Total questions generated'),
-            'approved_questions' => new \external_value(PARAM_INT, 'Total questions approved'),
-            'avg_quality' => new \external_value(PARAM_FLOAT, 'Average quality score'),
-            'acceptance_rate' => new \external_value(PARAM_FLOAT, 'Acceptance rate percentage'),
-            'ftar' => new \external_value(PARAM_FLOAT, 'First-time acceptance rate percentage'),
-            'avg_regenerations' => new \external_value(PARAM_FLOAT, 'Average regeneration count per question'),
+        return new external_single_structure([
+            'total_quizzes' => new external_value(PARAM_INT, 'Total quizzes created by the user'),
+            'total_questions' => new external_value(PARAM_INT, 'Total questions generated'),
+            'approved_questions' => new external_value(PARAM_INT, 'Total questions approved'),
+            'avg_quality' => new external_value(PARAM_FLOAT, 'Average quality score'),
+            'acceptance_rate' => new external_value(PARAM_FLOAT, 'Acceptance rate percentage'),
+            'ftar' => new external_value(PARAM_FLOAT, 'First-time acceptance rate percentage'),
+            'avg_regenerations' => new external_value(PARAM_FLOAT, 'Average regeneration count per question'),
         ]);
     }
 
@@ -168,12 +187,12 @@ class dashboard_external extends \external_api {
     /**
      * Describes the parameters for get_question_type_distribution.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function get_question_type_distribution_parameters() {
-        return new \external_function_parameters([
-            'filtercourseid' => new \external_value(PARAM_INT, 'Course ID to filter by (0 for all)', VALUE_DEFAULT, 0),
-            'courseid' => new \external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+        return new external_function_parameters([
+            'filtercourseid' => new external_value(PARAM_INT, 'Course ID to filter by (0 for all)', VALUE_DEFAULT, 0),
+            'courseid' => new external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -237,15 +256,15 @@ class dashboard_external extends \external_api {
     /**
      * Describes the return value for get_question_type_distribution.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function get_question_type_distribution_returns() {
-        return new \external_single_structure([
-            'labels' => new \external_multiple_structure(
-                new \external_value(PARAM_TEXT, 'Question type label')
+        return new external_single_structure([
+            'labels' => new external_multiple_structure(
+                new external_value(PARAM_TEXT, 'Question type label')
             ),
-            'values' => new \external_multiple_structure(
-                new \external_value(PARAM_INT, 'Count for this question type')
+            'values' => new external_multiple_structure(
+                new external_value(PARAM_INT, 'Count for this question type')
             ),
         ]);
     }
@@ -257,11 +276,11 @@ class dashboard_external extends \external_api {
     /**
      * Describes the parameters for get_difficulty_distribution.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function get_difficulty_distribution_parameters() {
-        return new \external_function_parameters([
-            'courseid' => new \external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -315,13 +334,13 @@ class dashboard_external extends \external_api {
     /**
      * Describes the return value for get_difficulty_distribution.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function get_difficulty_distribution_returns() {
-        return new \external_single_structure([
-            'easy' => new \external_value(PARAM_INT, 'Count of easy questions'),
-            'medium' => new \external_value(PARAM_INT, 'Count of medium questions'),
-            'hard' => new \external_value(PARAM_INT, 'Count of hard questions'),
+        return new external_single_structure([
+            'easy' => new external_value(PARAM_INT, 'Count of easy questions'),
+            'medium' => new external_value(PARAM_INT, 'Count of medium questions'),
+            'hard' => new external_value(PARAM_INT, 'Count of hard questions'),
         ]);
     }
 
@@ -332,11 +351,11 @@ class dashboard_external extends \external_api {
     /**
      * Describes the parameters for get_blooms_distribution.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function get_blooms_distribution_parameters() {
-        return new \external_function_parameters([
-            'courseid' => new \external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -401,16 +420,16 @@ class dashboard_external extends \external_api {
     /**
      * Describes the return value for get_blooms_distribution.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function get_blooms_distribution_returns() {
-        return new \external_single_structure([
-            'remember' => new \external_value(PARAM_INT, 'Count of remember-level questions'),
-            'understand' => new \external_value(PARAM_INT, 'Count of understand-level questions'),
-            'apply' => new \external_value(PARAM_INT, 'Count of apply-level questions'),
-            'analyze' => new \external_value(PARAM_INT, 'Count of analyze-level questions'),
-            'evaluate' => new \external_value(PARAM_INT, 'Count of evaluate-level questions'),
-            'create' => new \external_value(PARAM_INT, 'Count of create-level questions'),
+        return new external_single_structure([
+            'remember' => new external_value(PARAM_INT, 'Count of remember-level questions'),
+            'understand' => new external_value(PARAM_INT, 'Count of understand-level questions'),
+            'apply' => new external_value(PARAM_INT, 'Count of apply-level questions'),
+            'analyze' => new external_value(PARAM_INT, 'Count of analyze-level questions'),
+            'evaluate' => new external_value(PARAM_INT, 'Count of evaluate-level questions'),
+            'create' => new external_value(PARAM_INT, 'Count of create-level questions'),
         ]);
     }
 
@@ -421,12 +440,12 @@ class dashboard_external extends \external_api {
     /**
      * Describes the parameters for get_acceptance_trend.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function get_acceptance_trend_parameters() {
-        return new \external_function_parameters([
-            'limit' => new \external_value(PARAM_INT, 'Number of recent generations to include', VALUE_DEFAULT, 10),
-            'courseid' => new \external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+        return new external_function_parameters([
+            'limit' => new external_value(PARAM_INT, 'Number of recent generations to include', VALUE_DEFAULT, 10),
+            'courseid' => new external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -516,18 +535,18 @@ class dashboard_external extends \external_api {
     /**
      * Describes the return value for get_acceptance_trend.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function get_acceptance_trend_returns() {
-        return new \external_single_structure([
-            'labels' => new \external_multiple_structure(
-                new \external_value(PARAM_TEXT, 'Generation label')
+        return new external_single_structure([
+            'labels' => new external_multiple_structure(
+                new external_value(PARAM_TEXT, 'Generation label')
             ),
-            'acceptance_rates' => new \external_multiple_structure(
-                new \external_value(PARAM_FLOAT, 'Acceptance rate percentage')
+            'acceptance_rates' => new external_multiple_structure(
+                new external_value(PARAM_FLOAT, 'Acceptance rate percentage')
             ),
-            'ftar_rates' => new \external_multiple_structure(
-                new \external_value(PARAM_FLOAT, 'First-time acceptance rate percentage')
+            'ftar_rates' => new external_multiple_structure(
+                new external_value(PARAM_FLOAT, 'First-time acceptance rate percentage')
             ),
         ]);
     }
@@ -539,11 +558,11 @@ class dashboard_external extends \external_api {
     /**
      * Describes the parameters for get_regeneration_by_type.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function get_regeneration_by_type_parameters() {
-        return new \external_function_parameters([
-            'courseid' => new \external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -606,11 +625,11 @@ class dashboard_external extends \external_api {
     /**
      * Describes the return value for get_regeneration_by_type.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function get_regeneration_by_type_returns() {
-        return new \external_single_structure([
-            'data' => new \external_value(PARAM_RAW, 'JSON-encoded regeneration stats keyed by question type'),
+        return new external_single_structure([
+            'data' => new external_value(PARAM_RAW, 'JSON-encoded regeneration stats keyed by question type'),
         ]);
     }
 
@@ -621,11 +640,11 @@ class dashboard_external extends \external_api {
     /**
      * Describes the parameters for get_quality_distribution.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function get_quality_distribution_parameters() {
-        return new \external_function_parameters([
-            'courseid' => new \external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -706,15 +725,15 @@ class dashboard_external extends \external_api {
     /**
      * Describes the return value for get_quality_distribution.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function get_quality_distribution_returns() {
-        return new \external_single_structure([
-            'labels' => new \external_multiple_structure(
-                new \external_value(PARAM_TEXT, 'Score range label')
+        return new external_single_structure([
+            'labels' => new external_multiple_structure(
+                new external_value(PARAM_TEXT, 'Score range label')
             ),
-            'values' => new \external_multiple_structure(
-                new \external_value(PARAM_INT, 'Count of questions in this range')
+            'values' => new external_multiple_structure(
+                new external_value(PARAM_INT, 'Count of questions in this range')
             ),
         ]);
     }
@@ -726,12 +745,12 @@ class dashboard_external extends \external_api {
     /**
      * Describes the parameters for get_recent_requests.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function get_recent_requests_parameters() {
-        return new \external_function_parameters([
-            'limit' => new \external_value(PARAM_INT, 'Maximum number of requests to return', VALUE_DEFAULT, 5),
-            'courseid' => new \external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+        return new external_function_parameters([
+            'limit' => new external_value(PARAM_INT, 'Maximum number of requests to return', VALUE_DEFAULT, 5),
+            'courseid' => new external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -818,21 +837,21 @@ class dashboard_external extends \external_api {
     /**
      * Describes the return value for get_recent_requests.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function get_recent_requests_returns() {
-        return new \external_single_structure([
-            'requests' => new \external_multiple_structure(
-                new \external_single_structure([
-                    'id' => new \external_value(PARAM_INT, 'Request ID'),
-                    'courseid' => new \external_value(PARAM_INT, 'Course ID'),
-                    'coursename' => new \external_value(PARAM_TEXT, 'Course full name'),
-                    'status' => new \external_value(PARAM_TEXT, 'Request status'),
-                    'total' => new \external_value(PARAM_INT, 'Total questions requested'),
-                    'generated' => new \external_value(PARAM_INT, 'Number of questions generated'),
-                    'approved' => new \external_value(PARAM_INT, 'Number of questions approved'),
-                    'timecreated' => new \external_value(PARAM_TEXT, 'Formatted creation date'),
-                    'timeago' => new \external_value(PARAM_TEXT, 'Human-readable time since creation'),
+        return new external_single_structure([
+            'requests' => new external_multiple_structure(
+                new external_single_structure([
+                    'id' => new external_value(PARAM_INT, 'Request ID'),
+                    'courseid' => new external_value(PARAM_INT, 'Course ID'),
+                    'coursename' => new external_value(PARAM_TEXT, 'Course full name'),
+                    'status' => new external_value(PARAM_TEXT, 'Request status'),
+                    'total' => new external_value(PARAM_INT, 'Total questions requested'),
+                    'generated' => new external_value(PARAM_INT, 'Number of questions generated'),
+                    'approved' => new external_value(PARAM_INT, 'Number of questions approved'),
+                    'timecreated' => new external_value(PARAM_TEXT, 'Formatted creation date'),
+                    'timeago' => new external_value(PARAM_TEXT, 'Human-readable time since creation'),
                 ])
             ),
         ]);

@@ -27,6 +27,25 @@
 
 namespace local_hlai_quizgen\external;
 
+defined('MOODLE_INTERNAL') || die();
+
+// Backward compatibility for Moodle < 4.2 (before core_external namespace was introduced).
+if (!class_exists('core_external\external_api')) {
+    global $CFG;
+    require_once($CFG->libdir . '/externallib.php');
+    class_alias('external_api', 'core_external\external_api');
+    class_alias('external_function_parameters', 'core_external\external_function_parameters');
+    class_alias('external_value', 'core_external\external_value');
+    class_alias('external_single_structure', 'core_external\external_single_structure');
+    class_alias('external_multiple_structure', 'core_external\external_multiple_structure');
+}
+
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_multiple_structure;
+use core_external\external_value;
+
 /**
  * Question external API class.
  *
@@ -37,7 +56,7 @@ namespace local_hlai_quizgen\external;
  * @copyright  2025 Human Logic Software LLC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class question_external extends \external_api {
+class question_external extends external_api {
     // -------------------------------------------------------------------------
     // 1. update_question
     // -------------------------------------------------------------------------
@@ -45,13 +64,13 @@ class question_external extends \external_api {
     /**
      * Describes the parameters for update_question.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function update_question_parameters() {
-        return new \external_function_parameters([
-            'questionid' => new \external_value(PARAM_INT, 'The question ID', VALUE_REQUIRED),
-            'field' => new \external_value(PARAM_TEXT, 'The field to update', VALUE_REQUIRED),
-            'value' => new \external_value(PARAM_TEXT, 'The new value for the field', VALUE_REQUIRED),
+        return new external_function_parameters([
+            'questionid' => new external_value(PARAM_INT, 'The question ID', VALUE_REQUIRED),
+            'field' => new external_value(PARAM_TEXT, 'The field to update', VALUE_REQUIRED),
+            'value' => new external_value(PARAM_TEXT, 'The new value for the field', VALUE_REQUIRED),
         ]);
     }
 
@@ -118,12 +137,12 @@ class question_external extends \external_api {
     /**
      * Describes the return value for update_question.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function update_question_returns() {
-        return new \external_single_structure([
-            'field' => new \external_value(PARAM_TEXT, 'The updated field name'),
-            'value' => new \external_value(PARAM_TEXT, 'The updated value'),
+        return new external_single_structure([
+            'field' => new external_value(PARAM_TEXT, 'The updated field name'),
+            'value' => new external_value(PARAM_TEXT, 'The updated value'),
         ]);
     }
 
@@ -134,13 +153,13 @@ class question_external extends \external_api {
     /**
      * Describes the parameters for update_answer.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function update_answer_parameters() {
-        return new \external_function_parameters([
-            'answerid' => new \external_value(PARAM_INT, 'The answer ID', VALUE_REQUIRED),
-            'field' => new \external_value(PARAM_TEXT, 'The field to update', VALUE_REQUIRED),
-            'value' => new \external_value(PARAM_TEXT, 'The new value for the field', VALUE_REQUIRED),
+        return new external_function_parameters([
+            'answerid' => new external_value(PARAM_INT, 'The answer ID', VALUE_REQUIRED),
+            'field' => new external_value(PARAM_TEXT, 'The field to update', VALUE_REQUIRED),
+            'value' => new external_value(PARAM_TEXT, 'The new value for the field', VALUE_REQUIRED),
         ]);
     }
 
@@ -207,12 +226,12 @@ class question_external extends \external_api {
     /**
      * Describes the return value for update_answer.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function update_answer_returns() {
-        return new \external_single_structure([
-            'field' => new \external_value(PARAM_TEXT, 'The updated field name'),
-            'value' => new \external_value(PARAM_TEXT, 'The updated value'),
+        return new external_single_structure([
+            'field' => new external_value(PARAM_TEXT, 'The updated field name'),
+            'value' => new external_value(PARAM_TEXT, 'The updated value'),
         ]);
     }
 
@@ -223,13 +242,13 @@ class question_external extends \external_api {
     /**
      * Describes the parameters for reorder_answers.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function reorder_answers_parameters() {
-        return new \external_function_parameters([
-            'questionid' => new \external_value(PARAM_INT, 'The question ID', VALUE_REQUIRED),
+        return new external_function_parameters([
+            'questionid' => new external_value(PARAM_INT, 'The question ID', VALUE_REQUIRED),
             // PARAM_RAW required for JSON array input; validated via json_decode() in method body.
-            'order' => new \external_value(PARAM_RAW, 'JSON array of answer IDs in new order', VALUE_REQUIRED),
+            'order' => new external_value(PARAM_RAW, 'JSON array of answer IDs in new order', VALUE_REQUIRED),
         ]);
     }
 
@@ -289,11 +308,11 @@ class question_external extends \external_api {
     /**
      * Describes the return value for reorder_answers.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function reorder_answers_returns() {
-        return new \external_single_structure([
-            'reordered' => new \external_value(PARAM_INT, 'Number of answers reordered'),
+        return new external_single_structure([
+            'reordered' => new external_value(PARAM_INT, 'Number of answers reordered'),
         ]);
     }
 
@@ -304,12 +323,12 @@ class question_external extends \external_api {
     /**
      * Describes the parameters for approve_question.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function approve_question_parameters() {
-        return new \external_function_parameters([
-            'questionid' => new \external_value(PARAM_INT, 'The question ID', VALUE_REQUIRED),
-            'confidence' => new \external_value(PARAM_INT, 'Confidence rating (0-5)', VALUE_DEFAULT, 0),
+        return new external_function_parameters([
+            'questionid' => new external_value(PARAM_INT, 'The question ID', VALUE_REQUIRED),
+            'confidence' => new external_value(PARAM_INT, 'Confidence rating (0-5)', VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -372,11 +391,11 @@ class question_external extends \external_api {
     /**
      * Describes the return value for approve_question.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function approve_question_returns() {
-        return new \external_single_structure([
-            'status' => new \external_value(PARAM_TEXT, 'The new question status'),
+        return new external_single_structure([
+            'status' => new external_value(PARAM_TEXT, 'The new question status'),
         ]);
     }
 
@@ -387,13 +406,13 @@ class question_external extends \external_api {
     /**
      * Describes the parameters for reject_question.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function reject_question_parameters() {
-        return new \external_function_parameters([
-            'questionid' => new \external_value(PARAM_INT, 'The question ID', VALUE_REQUIRED),
-            'reason' => new \external_value(PARAM_TEXT, 'Reason for rejection', VALUE_DEFAULT, ''),
-            'feedback' => new \external_value(PARAM_TEXT, 'Additional feedback', VALUE_DEFAULT, ''),
+        return new external_function_parameters([
+            'questionid' => new external_value(PARAM_INT, 'The question ID', VALUE_REQUIRED),
+            'reason' => new external_value(PARAM_TEXT, 'Reason for rejection', VALUE_DEFAULT, ''),
+            'feedback' => new external_value(PARAM_TEXT, 'Additional feedback', VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -462,12 +481,12 @@ class question_external extends \external_api {
     /**
      * Describes the return value for reject_question.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function reject_question_returns() {
-        return new \external_single_structure([
-            'status' => new \external_value(PARAM_TEXT, 'The new question status'),
-            'reason' => new \external_value(PARAM_TEXT, 'The rejection reason'),
+        return new external_single_structure([
+            'status' => new external_value(PARAM_TEXT, 'The new question status'),
+            'reason' => new external_value(PARAM_TEXT, 'The rejection reason'),
         ]);
     }
 
@@ -478,12 +497,12 @@ class question_external extends \external_api {
     /**
      * Describes the parameters for bulk_approve.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function bulk_approve_parameters() {
-        return new \external_function_parameters([
+        return new external_function_parameters([
             // PARAM_RAW required for JSON array input; validated via json_decode() in method body.
-            'questionids' => new \external_value(PARAM_RAW, 'JSON array of question IDs to approve', VALUE_REQUIRED),
+            'questionids' => new external_value(PARAM_RAW, 'JSON array of question IDs to approve', VALUE_REQUIRED),
         ]);
     }
 
@@ -557,11 +576,11 @@ class question_external extends \external_api {
     /**
      * Describes the return value for bulk_approve.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function bulk_approve_returns() {
-        return new \external_single_structure([
-            'approved' => new \external_value(PARAM_INT, 'Number of questions approved'),
+        return new external_single_structure([
+            'approved' => new external_value(PARAM_INT, 'Number of questions approved'),
         ]);
     }
 
@@ -572,13 +591,13 @@ class question_external extends \external_api {
     /**
      * Describes the parameters for bulk_reject.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function bulk_reject_parameters() {
-        return new \external_function_parameters([
+        return new external_function_parameters([
             // PARAM_RAW required for JSON array input; validated via json_decode() in method body.
-            'questionids' => new \external_value(PARAM_RAW, 'JSON array of question IDs to reject', VALUE_REQUIRED),
-            'reason' => new \external_value(PARAM_TEXT, 'Reason for rejection', VALUE_DEFAULT, ''),
+            'questionids' => new external_value(PARAM_RAW, 'JSON array of question IDs to reject', VALUE_REQUIRED),
+            'reason' => new external_value(PARAM_TEXT, 'Reason for rejection', VALUE_DEFAULT, ''),
         ]);
     }
 
@@ -656,12 +675,12 @@ class question_external extends \external_api {
     /**
      * Describes the return value for bulk_reject.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function bulk_reject_returns() {
-        return new \external_single_structure([
-            'rejected' => new \external_value(PARAM_INT, 'Number of questions rejected'),
-            'reason' => new \external_value(PARAM_TEXT, 'The rejection reason'),
+        return new external_single_structure([
+            'rejected' => new external_value(PARAM_INT, 'Number of questions rejected'),
+            'reason' => new external_value(PARAM_TEXT, 'The rejection reason'),
         ]);
     }
 }

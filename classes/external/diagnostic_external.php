@@ -24,6 +24,25 @@
 
 namespace local_hlai_quizgen\external;
 
+defined('MOODLE_INTERNAL') || die();
+
+// Backward compatibility for Moodle < 4.2 (before core_external namespace was introduced).
+if (!class_exists('core_external\external_api')) {
+    global $CFG;
+    require_once($CFG->libdir . '/externallib.php');
+    class_alias('external_api', 'core_external\external_api');
+    class_alias('external_function_parameters', 'core_external\external_function_parameters');
+    class_alias('external_value', 'core_external\external_value');
+    class_alias('external_single_structure', 'core_external\external_single_structure');
+    class_alias('external_multiple_structure', 'core_external\external_multiple_structure');
+}
+
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_multiple_structure;
+use core_external\external_value;
+
 /**
  * Diagnostic external functions for the local_hlai_quizgen plugin.
  *
@@ -35,7 +54,7 @@ namespace local_hlai_quizgen\external;
  * @copyright  2025 Human Logic Software LLC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class diagnostic_external extends \external_api {
+class diagnostic_external extends external_api {
     // -----------------------------------------------------------------------
     // 1. fix_category
     // -----------------------------------------------------------------------
@@ -43,11 +62,11 @@ class diagnostic_external extends \external_api {
     /**
      * Describes the parameters for fix_category.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function fix_category_parameters() {
-        return new \external_function_parameters([
-            'courseid' => new \external_value(PARAM_INT, 'Course ID'),
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'Course ID'),
         ]);
     }
 
@@ -180,15 +199,15 @@ class diagnostic_external extends \external_api {
     /**
      * Describes the return value for fix_category.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function fix_category_returns() {
-        return new \external_single_structure([
-            'questions_checked' => new \external_value(PARAM_INT, 'Number of questions checked'),
-            'questions_fixed' => new \external_value(PARAM_INT, 'Number of questions fixed'),
-            'has_category_column' => new \external_value(PARAM_BOOL, 'Whether the question table has a category column'),
-            'message' => new \external_value(PARAM_TEXT, 'Summary message'),
-            'details' => new \external_value(PARAM_RAW, 'JSON-encoded details: columns, errors, sample'),
+        return new external_single_structure([
+            'questions_checked' => new external_value(PARAM_INT, 'Number of questions checked'),
+            'questions_fixed' => new external_value(PARAM_INT, 'Number of questions fixed'),
+            'has_category_column' => new external_value(PARAM_BOOL, 'Whether the question table has a category column'),
+            'message' => new external_value(PARAM_TEXT, 'Summary message'),
+            'details' => new external_value(PARAM_RAW, 'JSON-encoded details: columns, errors, sample'),
         ]);
     }
 
@@ -199,11 +218,11 @@ class diagnostic_external extends \external_api {
     /**
      * Describes the parameters for check_question_types.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function check_question_types_parameters() {
-        return new \external_function_parameters([
-            'courseid' => new \external_value(PARAM_INT, 'Course ID'),
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'Course ID'),
         ]);
     }
 
@@ -343,14 +362,14 @@ class diagnostic_external extends \external_api {
     /**
      * Describes the return value for check_question_types.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function check_question_types_returns() {
-        return new \external_single_structure([
-            'total_questions' => new \external_value(PARAM_INT, 'Total number of questions checked'),
-            'repaired_status' => new \external_value(PARAM_INT, 'Number of draft questions repaired to ready status'),
-            'message' => new \external_value(PARAM_TEXT, 'Summary message'),
-            'details' => new \external_value(PARAM_RAW, 'JSON-encoded details: by_type, missing_type_data, draft_status'),
+        return new external_single_structure([
+            'total_questions' => new external_value(PARAM_INT, 'Total number of questions checked'),
+            'repaired_status' => new external_value(PARAM_INT, 'Number of draft questions repaired to ready status'),
+            'message' => new external_value(PARAM_TEXT, 'Summary message'),
+            'details' => new external_value(PARAM_RAW, 'JSON-encoded details: by_type, missing_type_data, draft_status'),
         ]);
     }
 
@@ -361,11 +380,11 @@ class diagnostic_external extends \external_api {
     /**
      * Describes the parameters for repair_questions.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function repair_questions_parameters() {
-        return new \external_function_parameters([
-            'courseid' => new \external_value(PARAM_INT, 'Course ID'),
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'Course ID'),
         ]);
     }
 
@@ -476,15 +495,15 @@ class diagnostic_external extends \external_api {
     /**
      * Describes the return value for repair_questions.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function repair_questions_returns() {
-        return new \external_single_structure([
-            'has_category_column' => new \external_value(PARAM_BOOL, 'Whether the question table has a category column'),
-            'found' => new \external_value(PARAM_INT, 'Number of questions found'),
-            'repaired' => new \external_value(PARAM_INT, 'Number of questions repaired'),
-            'message' => new \external_value(PARAM_TEXT, 'Summary message'),
-            'details' => new \external_value(PARAM_RAW, 'JSON-encoded details: errors, extra info'),
+        return new external_single_structure([
+            'has_category_column' => new external_value(PARAM_BOOL, 'Whether the question table has a category column'),
+            'found' => new external_value(PARAM_INT, 'Number of questions found'),
+            'repaired' => new external_value(PARAM_INT, 'Number of questions repaired'),
+            'message' => new external_value(PARAM_TEXT, 'Summary message'),
+            'details' => new external_value(PARAM_RAW, 'JSON-encoded details: errors, extra info'),
         ]);
     }
 
@@ -495,12 +514,12 @@ class diagnostic_external extends \external_api {
     /**
      * Describes the parameters for diagnose.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function diagnose_parameters() {
-        return new \external_function_parameters([
-            'requestid' => new \external_value(PARAM_INT, 'Request ID to diagnose (0 if not used)', VALUE_DEFAULT, 0),
-            'courseid' => new \external_value(
+        return new external_function_parameters([
+            'requestid' => new external_value(PARAM_INT, 'Request ID to diagnose (0 if not used)', VALUE_DEFAULT, 0),
+            'courseid' => new external_value(
                 PARAM_INT,
                 'Course ID to diagnose all requests for (0 if not used)',
                 VALUE_DEFAULT,
@@ -607,11 +626,11 @@ class diagnostic_external extends \external_api {
     /**
      * Describes the return value for diagnose.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function diagnose_returns() {
-        return new \external_single_structure([
-            'data' => new \external_value(PARAM_RAW, 'JSON-encoded full diagnostic result'),
+        return new external_single_structure([
+            'data' => new external_value(PARAM_RAW, 'JSON-encoded full diagnostic result'),
         ]);
     }
 }

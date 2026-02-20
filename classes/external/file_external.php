@@ -24,6 +24,25 @@
 
 namespace local_hlai_quizgen\external;
 
+defined('MOODLE_INTERNAL') || die();
+
+// Backward compatibility for Moodle < 4.2 (before core_external namespace was introduced).
+if (!class_exists('core_external\external_api')) {
+    global $CFG;
+    require_once($CFG->libdir . '/externallib.php');
+    class_alias('external_api', 'core_external\external_api');
+    class_alias('external_function_parameters', 'core_external\external_function_parameters');
+    class_alias('external_value', 'core_external\external_value');
+    class_alias('external_single_structure', 'core_external\external_single_structure');
+    class_alias('external_multiple_structure', 'core_external\external_multiple_structure');
+}
+
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_multiple_structure;
+use core_external\external_value;
+
 /**
  * External API class for file management in the AI Quiz Generator.
  *
@@ -34,18 +53,18 @@ namespace local_hlai_quizgen\external;
  * @copyright  2025 Human Logic Software LLC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class file_external extends \external_api {
+class file_external extends external_api {
     // Upload file methods.
 
     /**
      * Describes the parameters for upload_file.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function upload_file_parameters() {
-        return new \external_function_parameters([
-            'courseid' => new \external_value(PARAM_INT, 'The course ID to upload the file for'),
-            'draftitemid' => new \external_value(PARAM_INT, 'The draft area item ID containing the uploaded file'),
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'The course ID to upload the file for'),
+            'draftitemid' => new external_value(PARAM_INT, 'The draft area item ID containing the uploaded file'),
         ]);
     }
 
@@ -100,12 +119,12 @@ class file_external extends \external_api {
     /**
      * Describes the return value for upload_file.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function upload_file_returns() {
-        return new \external_single_structure([
-            'success' => new \external_value(PARAM_BOOL, 'Whether the file was uploaded successfully'),
-            'itemid' => new \external_value(PARAM_INT, 'The item ID assigned to the stored file'),
+        return new external_single_structure([
+            'success' => new external_value(PARAM_BOOL, 'Whether the file was uploaded successfully'),
+            'itemid' => new external_value(PARAM_INT, 'The item ID assigned to the stored file'),
         ]);
     }
 
@@ -114,12 +133,12 @@ class file_external extends \external_api {
     /**
      * Describes the parameters for remove_file.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function remove_file_parameters() {
-        return new \external_function_parameters([
-            'courseid' => new \external_value(PARAM_INT, 'The course ID the file belongs to'),
-            'itemid' => new \external_value(PARAM_INT, 'The item ID of the file to remove'),
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'The course ID the file belongs to'),
+            'itemid' => new external_value(PARAM_INT, 'The item ID of the file to remove'),
         ]);
     }
 
@@ -161,11 +180,11 @@ class file_external extends \external_api {
     /**
      * Describes the return value for remove_file.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function remove_file_returns() {
-        return new \external_single_structure([
-            'removed' => new \external_value(PARAM_INT, 'The item ID of the removed file'),
+        return new external_single_structure([
+            'removed' => new external_value(PARAM_INT, 'The item ID of the removed file'),
         ]);
     }
 }

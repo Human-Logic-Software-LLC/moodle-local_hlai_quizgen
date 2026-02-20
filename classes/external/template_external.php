@@ -24,6 +24,25 @@
 
 namespace local_hlai_quizgen\external;
 
+defined('MOODLE_INTERNAL') || die();
+
+// Backward compatibility for Moodle < 4.2 (before core_external namespace was introduced).
+if (!class_exists('core_external\external_api')) {
+    global $CFG;
+    require_once($CFG->libdir . '/externallib.php');
+    class_alias('external_api', 'core_external\external_api');
+    class_alias('external_function_parameters', 'core_external\external_function_parameters');
+    class_alias('external_value', 'core_external\external_value');
+    class_alias('external_single_structure', 'core_external\external_single_structure');
+    class_alias('external_multiple_structure', 'core_external\external_multiple_structure');
+}
+
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_multiple_structure;
+use core_external\external_value;
+
 /**
  * External API class for template management in the AI Quiz Generator.
  *
@@ -33,20 +52,20 @@ namespace local_hlai_quizgen\external;
  * @copyright  2025 Human Logic Software LLC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class template_external extends \external_api {
+class template_external extends external_api {
     // Save template methods.
 
     /**
      * Describes the parameters for save_template.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function save_template_parameters() {
-        return new \external_function_parameters([
-            'name' => new \external_value(PARAM_TEXT, 'The name of the template'),
+        return new external_function_parameters([
+            'name' => new external_value(PARAM_TEXT, 'The name of the template'),
             // PARAM_RAW required for JSON object input; validated via json_decode() in method body.
-            'config' => new \external_value(PARAM_RAW, 'The template configuration as a JSON string'),
-            'courseid' => new \external_value(PARAM_INT, 'The course ID (0 for user-level)', VALUE_DEFAULT, 0),
+            'config' => new external_value(PARAM_RAW, 'The template configuration as a JSON string'),
+            'courseid' => new external_value(PARAM_INT, 'The course ID (0 for user-level)', VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -101,11 +120,11 @@ class template_external extends \external_api {
     /**
      * Describes the return value for save_template.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function save_template_returns() {
-        return new \external_single_structure([
-            'saved' => new \external_value(PARAM_TEXT, 'The name of the saved template'),
+        return new external_single_structure([
+            'saved' => new external_value(PARAM_TEXT, 'The name of the saved template'),
         ]);
     }
 
@@ -114,10 +133,10 @@ class template_external extends \external_api {
     /**
      * Describes the parameters for get_templates.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function get_templates_parameters() {
-        return new \external_function_parameters([]);
+        return new external_function_parameters([]);
     }
 
     /**
@@ -163,16 +182,16 @@ class template_external extends \external_api {
     /**
      * Describes the return value for get_templates.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function get_templates_returns() {
-        return new \external_single_structure([
-            'templates' => new \external_multiple_structure(
-                new \external_single_structure([
-                    'id' => new \external_value(PARAM_INT, 'The template record ID'),
-                    'name' => new \external_value(PARAM_TEXT, 'The template name'),
-                    'config' => new \external_value(PARAM_RAW, 'The template configuration as a JSON string'),
-                    'created' => new \external_value(PARAM_TEXT, 'The human-readable creation date'),
+        return new external_single_structure([
+            'templates' => new external_multiple_structure(
+                new external_single_structure([
+                    'id' => new external_value(PARAM_INT, 'The template record ID'),
+                    'name' => new external_value(PARAM_TEXT, 'The template name'),
+                    'config' => new external_value(PARAM_RAW, 'The template configuration as a JSON string'),
+                    'created' => new external_value(PARAM_TEXT, 'The human-readable creation date'),
                 ])
             ),
         ]);
@@ -183,11 +202,11 @@ class template_external extends \external_api {
     /**
      * Describes the parameters for delete_template.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function delete_template_parameters() {
-        return new \external_function_parameters([
-            'templateid' => new \external_value(PARAM_INT, 'The ID of the template to delete'),
+        return new external_function_parameters([
+            'templateid' => new external_value(PARAM_INT, 'The ID of the template to delete'),
         ]);
     }
 
@@ -225,11 +244,11 @@ class template_external extends \external_api {
     /**
      * Describes the return value for delete_template.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function delete_template_returns() {
-        return new \external_single_structure([
-            'deleted' => new \external_value(PARAM_INT, 'The ID of the deleted template'),
+        return new external_single_structure([
+            'deleted' => new external_value(PARAM_INT, 'The ID of the deleted template'),
         ]);
     }
 }

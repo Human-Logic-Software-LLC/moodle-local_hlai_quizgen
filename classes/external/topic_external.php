@@ -24,6 +24,25 @@
 
 namespace local_hlai_quizgen\external;
 
+defined('MOODLE_INTERNAL') || die();
+
+// Backward compatibility for Moodle < 4.2 (before core_external namespace was introduced).
+if (!class_exists('core_external\external_api')) {
+    global $CFG;
+    require_once($CFG->libdir . '/externallib.php');
+    class_alias('external_api', 'core_external\external_api');
+    class_alias('external_function_parameters', 'core_external\external_function_parameters');
+    class_alias('external_value', 'core_external\external_value');
+    class_alias('external_single_structure', 'core_external\external_single_structure');
+    class_alias('external_multiple_structure', 'core_external\external_multiple_structure');
+}
+
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_multiple_structure;
+use core_external\external_value;
+
 /**
  * External API class for topic management in the AI Quiz Generator.
  *
@@ -33,18 +52,18 @@ namespace local_hlai_quizgen\external;
  * @copyright  2025 Human Logic Software LLC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class topic_external extends \external_api {
+class topic_external extends external_api {
     // Update topic methods.
 
     /**
      * Describes the parameters for update_topic.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function update_topic_parameters() {
-        return new \external_function_parameters([
-            'topicid' => new \external_value(PARAM_INT, 'The ID of the topic to update'),
-            'title' => new \external_value(PARAM_TEXT, 'The new title for the topic'),
+        return new external_function_parameters([
+            'topicid' => new external_value(PARAM_INT, 'The ID of the topic to update'),
+            'title' => new external_value(PARAM_TEXT, 'The new title for the topic'),
         ]);
     }
 
@@ -88,11 +107,11 @@ class topic_external extends \external_api {
     /**
      * Describes the return value for update_topic.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function update_topic_returns() {
-        return new \external_single_structure([
-            'title' => new \external_value(PARAM_TEXT, 'The updated topic title'),
+        return new external_single_structure([
+            'title' => new external_value(PARAM_TEXT, 'The updated topic title'),
         ]);
     }
 
@@ -101,12 +120,12 @@ class topic_external extends \external_api {
     /**
      * Describes the parameters for merge_topics.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function merge_topics_parameters() {
-        return new \external_function_parameters([
-            'topicid1' => new \external_value(PARAM_INT, 'The ID of the first topic (merge target)'),
-            'topicid2' => new \external_value(PARAM_INT, 'The ID of the second topic (to be merged and deleted)'),
+        return new external_function_parameters([
+            'topicid1' => new external_value(PARAM_INT, 'The ID of the first topic (merge target)'),
+            'topicid2' => new external_value(PARAM_INT, 'The ID of the second topic (to be merged and deleted)'),
         ]);
     }
 
@@ -180,14 +199,14 @@ class topic_external extends \external_api {
     /**
      * Describes the return value for merge_topics.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function merge_topics_returns() {
-        return new \external_single_structure([
-            'merged_into' => new \external_value(PARAM_INT, 'The ID of the topic that was merged into'),
-            'deleted' => new \external_value(PARAM_INT, 'The ID of the topic that was deleted'),
-            'new_title' => new \external_value(PARAM_TEXT, 'The new combined title'),
-            'new_questions' => new \external_value(PARAM_INT, 'The new total number of questions'),
+        return new external_single_structure([
+            'merged_into' => new external_value(PARAM_INT, 'The ID of the topic that was merged into'),
+            'deleted' => new external_value(PARAM_INT, 'The ID of the topic that was deleted'),
+            'new_title' => new external_value(PARAM_TEXT, 'The new combined title'),
+            'new_questions' => new external_value(PARAM_INT, 'The new total number of questions'),
         ]);
     }
 
@@ -196,11 +215,11 @@ class topic_external extends \external_api {
     /**
      * Describes the parameters for delete_topic.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function delete_topic_parameters() {
-        return new \external_function_parameters([
-            'topicid' => new \external_value(PARAM_INT, 'The ID of the topic to delete'),
+        return new external_function_parameters([
+            'topicid' => new external_value(PARAM_INT, 'The ID of the topic to delete'),
         ]);
     }
 
@@ -242,11 +261,11 @@ class topic_external extends \external_api {
     /**
      * Describes the return value for delete_topic.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function delete_topic_returns() {
-        return new \external_single_structure([
-            'deleted' => new \external_value(PARAM_INT, 'The ID of the deleted topic'),
+        return new external_single_structure([
+            'deleted' => new external_value(PARAM_INT, 'The ID of the deleted topic'),
         ]);
     }
 }

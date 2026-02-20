@@ -24,6 +24,25 @@
 
 namespace local_hlai_quizgen\external;
 
+defined('MOODLE_INTERNAL') || die();
+
+// Backward compatibility for Moodle < 4.2 (before core_external namespace was introduced).
+if (!class_exists('core_external\external_api')) {
+    global $CFG;
+    require_once($CFG->libdir . '/externallib.php');
+    class_alias('external_api', 'core_external\external_api');
+    class_alias('external_function_parameters', 'core_external\external_function_parameters');
+    class_alias('external_value', 'core_external\external_value');
+    class_alias('external_single_structure', 'core_external\external_single_structure');
+    class_alias('external_multiple_structure', 'core_external\external_multiple_structure');
+}
+
+use core_external\external_api;
+use core_external\external_function_parameters;
+use core_external\external_single_structure;
+use core_external\external_multiple_structure;
+use core_external\external_value;
+
 /**
  * External API class for analytics endpoints.
  *
@@ -34,15 +53,15 @@ namespace local_hlai_quizgen\external;
  * @copyright  2025 Human Logic Software LLC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class analytics_external extends \external_api {
+class analytics_external extends external_api {
     /**
      * Describes the parameters for get_course_analytics.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function get_course_analytics_parameters() {
-        return new \external_function_parameters([
-            'courseid' => new \external_value(PARAM_INT, 'The course ID to get analytics for'),
+        return new external_function_parameters([
+            'courseid' => new external_value(PARAM_INT, 'The course ID to get analytics for'),
         ]);
     }
 
@@ -142,32 +161,32 @@ class analytics_external extends \external_api {
     /**
      * Describes the return value for get_course_analytics.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function get_course_analytics_returns() {
-        return new \external_single_structure([
-            'by_type' => new \external_multiple_structure(
-                new \external_single_structure([
-                    'questiontype' => new \external_value(PARAM_TEXT, 'The question type'),
-                    'count' => new \external_value(PARAM_INT, 'Number of questions of this type'),
-                    'avg_quality' => new \external_value(PARAM_FLOAT, 'Average validation score'),
-                    'approved' => new \external_value(PARAM_INT, 'Number of approved questions'),
-                    'avg_regens' => new \external_value(PARAM_FLOAT, 'Average regeneration count'),
+        return new external_single_structure([
+            'by_type' => new external_multiple_structure(
+                new external_single_structure([
+                    'questiontype' => new external_value(PARAM_TEXT, 'The question type'),
+                    'count' => new external_value(PARAM_INT, 'Number of questions of this type'),
+                    'avg_quality' => new external_value(PARAM_FLOAT, 'Average validation score'),
+                    'approved' => new external_value(PARAM_INT, 'Number of approved questions'),
+                    'avg_regens' => new external_value(PARAM_FLOAT, 'Average regeneration count'),
                 ]),
                 'Questions grouped by type'
             ),
-            'by_difficulty' => new \external_multiple_structure(
-                new \external_single_structure([
-                    'difficulty' => new \external_value(PARAM_TEXT, 'The difficulty level'),
-                    'count' => new \external_value(PARAM_INT, 'Number of questions at this difficulty'),
-                    'approved' => new \external_value(PARAM_INT, 'Number of approved questions'),
+            'by_difficulty' => new external_multiple_structure(
+                new external_single_structure([
+                    'difficulty' => new external_value(PARAM_TEXT, 'The difficulty level'),
+                    'count' => new external_value(PARAM_INT, 'Number of questions at this difficulty'),
+                    'approved' => new external_value(PARAM_INT, 'Number of approved questions'),
                 ]),
                 'Questions grouped by difficulty'
             ),
-            'trend' => new \external_multiple_structure(
-                new \external_single_structure([
-                    'date' => new \external_value(PARAM_TEXT, 'The date (YYYY-MM-DD)'),
-                    'count' => new \external_value(PARAM_INT, 'Number of questions generated on this date'),
+            'trend' => new external_multiple_structure(
+                new external_single_structure([
+                    'date' => new external_value(PARAM_TEXT, 'The date (YYYY-MM-DD)'),
+                    'count' => new external_value(PARAM_INT, 'Number of questions generated on this date'),
                 ]),
                 'Daily generation trend for the last 30 days'
             ),
@@ -177,10 +196,10 @@ class analytics_external extends \external_api {
     /**
      * Describes the parameters for get_teacher_confidence.
      *
-     * @return \external_function_parameters
+     * @return external_function_parameters
      */
     public static function get_teacher_confidence_parameters() {
-        return new \external_function_parameters([]);
+        return new external_function_parameters([]);
     }
 
     /**
@@ -246,16 +265,16 @@ class analytics_external extends \external_api {
     /**
      * Describes the return value for get_teacher_confidence.
      *
-     * @return \external_single_structure
+     * @return external_single_structure
      */
     public static function get_teacher_confidence_returns() {
-        return new \external_single_structure([
-            'overall_average' => new \external_value(PARAM_FLOAT, 'Overall average confidence rating'),
-            'total_ratings' => new \external_value(PARAM_INT, 'Total number of confidence ratings'),
-            'trend' => new \external_multiple_structure(
-                new \external_single_structure([
-                    'group' => new \external_value(PARAM_TEXT, 'The group label'),
-                    'avg' => new \external_value(PARAM_FLOAT, 'Average confidence for this group'),
+        return new external_single_structure([
+            'overall_average' => new external_value(PARAM_FLOAT, 'Overall average confidence rating'),
+            'total_ratings' => new external_value(PARAM_INT, 'Total number of confidence ratings'),
+            'trend' => new external_multiple_structure(
+                new external_single_structure([
+                    'group' => new external_value(PARAM_TEXT, 'The group label'),
+                    'avg' => new external_value(PARAM_FLOAT, 'Average confidence for this group'),
                 ]),
                 'Rolling average confidence in groups of 10'
             ),
