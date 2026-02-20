@@ -29,7 +29,7 @@ require_once(__DIR__ . '/../../config.php');
 require_once($CFG->libdir . '/adminlib.php');
 
 $courseid = required_param('courseid', PARAM_INT);
-$timerange = optional_param('timerange', '30', PARAM_ALPHA); // 7, 30, 90, all.
+$timerange = optional_param('timerange', '30', PARAM_ALPHANUM); // 7, 30, 90, all.
 
 require_login($courseid);
 $context = context_course::instance($courseid);
