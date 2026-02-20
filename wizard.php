@@ -1767,14 +1767,16 @@ function local_hlai_quizgen_render_step2(int $courseid, int $requestid): string 
         $context['topics'] = $topicsdata;
 
         // JavaScript for Select All / Deselect All buttons and selected count.
+        $topicsselectedstr = json_encode(get_string('wizard_n_topics_selected', 'local_hlai_quizgen', '__COUNT__'));
         $PAGE->requires->js_amd_inline("
             require(['jquery'], function($) {
+                var topicsSelectedTemplate = {$topicsselectedstr};
                 /**
                  * Update selected count.
                  */
                 function updateSelectedCount() {
                     var count = $('input.hlai-topic-checkbox:checked').length;
-                    var text = count === 1 ? '1 topic selected' : count + ' topics selected';
+                    var text = topicsSelectedTemplate.replace('__COUNT__', count);
                     $('#selected-topics-count').text(text);
 
                     // Update the selected bar visibility/style.
