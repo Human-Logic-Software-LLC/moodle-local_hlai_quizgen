@@ -20,6 +20,7 @@
  * for ApexCharts integration throughout the plugin.
  *
  * @module     local_hlai_quizgen/charts
+ * @package
  * @copyright  2025 Human Logic Software LLC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

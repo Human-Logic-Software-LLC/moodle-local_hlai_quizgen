@@ -21,6 +21,7 @@
  * question type bar, and difficulty distribution charts using ApexCharts.
  *
  * @module     local_hlai_quizgen/admindashboard
+ * @package
  * @copyright  2025 Human Logic Software LLC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
