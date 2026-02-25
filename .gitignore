@@ -1,0 +1,74 @@
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+*.old
+
+# Environment files (but allow .env.example)
+.env
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Node modules (if any)
+node_modules/
+
+# Log files
+*.log
+*.log.*
+
+# Build files
+amd/build/*.min.js
+amd/build/*.min.js.map
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Temporary test files in root (but allow tests/ directory for PHPUnit)
+/test_*.php
+
+# Documentation files that are development-only
+docs/
+CODING_STANDARDS.md
+COPILOT_GUIDE.md
+COMPLETE_FIX_SUMMARY.md
+FIXES_SUMMARY.md
+GITHUB_ACTIONS_GUIDE.md
+GITHUB_FAILURES_FIX.md
+.github/CICD.md
+
+# Moodle plugin CI cache
+ci/
+moodledata/
+.phpunit.result.cache
+
+# Composer dependencies (if vendor is not tracked)
+# vendor/
+vendor_local/
+
+# Coding standards check tools
+check_standards.php
+fix_*.php
+fix_*.py
+quick_check.*
+
+# Gateway subdirectory (excluded from CI)
+gateway/
+phpcs_output.json

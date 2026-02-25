@@ -1,0 +1,11 @@
+/**
+ * Plugin styles for AI Quiz Generator.
+ *
+ * NOTE: All plugin styles are in styles-bulma.css (loaded explicitly via $PAGE->requires->css()).
+ * This file is intentionally empty to prevent Moodle's auto-loader from injecting unscoped CSS
+ * into every page. Moodle automatically includes styles.css from every plugin directory.
+ *
+ * @package    local_hlai_quizgen
+ * @copyright  2025 Human Logic Software LLC
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */

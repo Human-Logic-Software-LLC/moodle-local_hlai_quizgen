@@ -1,0 +1,81 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_hlai_quizgen/debug_logs_requests
+
+    Recent requests tab content.
+
+    Context variables required for this template:
+    * requests - Object with recent requests data
+
+    Example context (json):
+    {
+        "requests": {
+            "hasrequests": true,
+            "items": []
+        }
+    }
+}}
+{{^requests.hasrequests}}
+<div class="notification is-info is-light">{{requests.nofoundmessage}}</div>
+{{/requests.hasrequests}}
+{{#requests.hasrequests}}
+<div class="table-container">
+    <table class="table is-fullwidth is-striped is-hoverable">
+        <thead>
+            <tr>
+                <th>{{requests.headers.id}}</th>
+                <th>{{requests.headers.course}}</th>
+                <th>{{requests.headers.user}}</th>
+                <th>{{requests.headers.status}}</th>
+                <th>{{requests.headers.questions}}</th>
+                <th>{{requests.headers.tokens}}</th>
+                <th>{{requests.headers.created}}</th>
+                <th>{{requests.headers.error}}</th>
+                <th>{{requests.headers.actions}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#requests.items}}
+            <tr>
+                <td>{{id}}</td>
+                <td>{{courseid}}</td>
+                <td>{{userid}}</td>
+                <td><span class="tag is-{{statusclass}}">{{statusupper}}</span></td>
+                <td>{{questionscount}}</td>
+                <td>{{tokenscount}}</td>
+                <td><small>{{time}}</small></td>
+                <td>
+                    {{#haserror}}
+                    <span class="text-danger" title="{{errorfull}}">{{errortruncated}}...</span>
+                    {{/haserror}}
+                    {{#hasprogress}}
+                    <small>{{progresstruncated}}</small>
+                    {{/hasprogress}}
+                    {{#noerror}}
+                    -
+                    {{/noerror}}
+                </td>
+                <td>
+                    <a href="{{logsurl}}" class="button is-small is-outlined is-primary">{{viewlogsbtn}}</a>
+                </td>
+            </tr>
+            {{/requests.items}}
+        </tbody>
+    </table>
+</div>
+{{/requests.hasrequests}}

@@ -1,0 +1,171 @@
+{{!
+    @template local_hlai_quizgen/wizard_step3
+
+    Wizard step 3: Question parameters and configuration.
+
+    Context variables required for this template:
+    * step3_title - Step heading
+    * step3_description - Step subtitle
+    * no_topics - Whether no topics are selected (show warning)
+    * no_topics_message - Warning message when no topics selected
+    * back_to_step2_url - URL to go back to step 2
+    * back_to_step2 - Back button text
+    * topics_info_html - Pre-built topics info bar HTML
+    * form_url - Form action URL
+    * sesskey - Session key
+    * total_questions_label - Label for total questions input
+    * question_difficulty_label - Difficulty label
+    * difficulty_options - Array of difficulty options: value, label, css_class, is_checked
+    * question_types_label - Question types heading
+    * qtype_count_hint - Hint text for question type counts
+    * question_types - Array of question type objects: type, label, icon_html, color, icon_style
+    * total_label - "Total" label
+    * blooms_taxonomy_label - Bloom's taxonomy heading
+    * blooms_hint - Bloom's taxonomy hint text
+    * blooms_levels - Array: level, label, default_val, color, desc, dot_style, slider_style, value_style
+    * prev_url - Previous step URL
+    * previous - Previous button text
+    * generate_questions - Generate button text
+    * generating_title - Generating overlay title
+    * generating_subtitle - Overlay subtitle
+    * generating_warning - Overlay warning text
+
+    Example context (json):
+    {
+        "no_topics": false,
+        "form_url": "/local/hlai_quizgen/wizard.php?...",
+        "question_types": [{"type": "multichoice", "label": "Multiple Choice", "icon_html": "<i class=\"fa fa-dot-circle-o\"></i>", "color": "#3B82F6"}]
+    }
+}}
+{{#no_topics}}
+<div class="hlai-step-content hlai-step3-minimal">
+    <h2 class="title is-4 mb-0 hlai-step3-title">{{{step3_title}}}</h2>
+    <p class="subtitle is-6 has-text-grey mt-1 mb-4 hlai-step3-subtitle">{{{step3_description}}}</p>
+    <hr class="mt-0 mb-5 hlai-step3-divider">
+    <div class="notification is-warning">{{{no_topics_message}}}</div>
+    <a href="{{back_to_step2_url}}" class="button is-primary mt-4">
+        <i class="fa fa-arrow-left hlai-icon-info"></i> {{{back_to_step2}}}
+    </a>
+</div>
+{{/no_topics}}
+
+{{^no_topics}}
+<div class="hlai-step-content hlai-step3-minimal">
+    <h2 class="title is-4 mb-0 hlai-step3-title">{{{step3_title}}}</h2>
+    <p class="subtitle is-6 has-text-grey mt-1 mb-4 hlai-step3-subtitle">{{{step3_description}}}</p>
+    <hr class="mt-0 mb-5 hlai-step3-divider">
+
+    {{! Topics info bar }}
+    {{{topics_info_html}}}
+
+    <form method="post" action="{{form_url}}" id="question-config-form">
+        <input type="hidden" name="sesskey" value="{{sesskey}}">
+
+        <div class="hlai-config-grid">
+            {{! Total questions card }}
+            <div class="hlai-config-card">
+                <label class="hlai-config-label" for="total-questions">{{{total_questions_label}}}</label>
+                <input type="number" name="total_questions" id="total-questions" class="hlai-config-input"
+                       min="1" max="100" value="10" required="required">
+            </div>
+
+            {{! Difficulty card }}
+            <div class="hlai-config-card">
+                <label class="hlai-config-label">{{{question_difficulty_label}}}</label>
+                <div class="hlai-diff-buttons">
+                    {{#difficulty_options}}
+                    <label class="hlai-diff-btn {{css_class}}{{#is_checked}} is-active{{/is_checked}}">
+                        <input type="radio" name="difficulty" value="{{value}}"{{#is_checked}} checked="checked"{{/is_checked}}>
+                        <span>{{{label}}}</span>
+                    </label>
+                    {{/difficulty_options}}
+                </div>
+            </div>
+        </div>
+
+        {{! Question types section }}
+        <div class="hlai-section hlai-section-qtypes mt-5">
+            <div class="hlai-section-header">
+                <span class="hlai-section-icon"><i class="fa fa-edit hlai-icon-primary"></i></span>
+                <div class="hlai-section-title-wrap">
+                    <h4 class="hlai-section-label">{{{question_types_label}}}</h4>
+                    <p class="hlai-section-hint">{{{qtype_count_hint}}}</p>
+                </div>
+            </div>
+
+            <div class="hlai-qtype-list">
+                {{#question_types}}
+                <div class="hlai-qtype-row" data-type="{{type}}">
+                    <div class="hlai-qtype-left hlai-flex-center">
+                        <span class="hlai-qtype-icon hlai-flex-center-all" style="{{{icon_style}}}">{{{icon_html}}}</span>
+                        <span class="hlai-qtype-name hlai-flex-center">{{{label}}}</span>
+                    </div>
+                    <input type="number" name="qtype_count[{{type}}]" id="qtype_count_{{type}}"
+                           class="hlai-qtype-input" min="0" max="100" value="0">
+                </div>
+                {{/question_types}}
+                <div class="hlai-qtype-row hlai-qtype-total">
+                    <span class="hlai-qtype-name">{{{total_label}}}</span>
+                    <span id="qtype-total-display" class="hlai-qtype-total-val">0 / 10</span>
+                </div>
+            </div>
+        </div>
+
+        {{! Bloom's Taxonomy section }}
+        <div class="hlai-section hlai-section-blooms mt-5">
+            <div class="hlai-section-header">
+                <span class="hlai-section-icon"><i class="fa fa-lightbulb-o hlai-icon-primary"></i></span>
+                <div class="hlai-section-title-wrap">
+                    <h4 class="hlai-section-label">{{{blooms_taxonomy_label}}}</h4>
+                    <p class="hlai-section-hint">{{{blooms_hint}}}</p>
+                </div>
+            </div>
+
+            <div class="hlai-blooms-list">
+                {{#blooms_levels}}
+                <div class="hlai-blooms-item" data-level="{{level}}">
+                    <div class="hlai-blooms-label-wrap hlai-flex-center">
+                        <span class="hlai-blooms-dot hlai-flex-center" style="{{{dot_style}}}"></span>
+                        <span class="hlai-blooms-name hlai-flex-center">{{{label}}}</span>
+                    </div>
+                    <div class="hlai-blooms-control">
+                        <input type="range" name="blooms_{{level}}" id="blooms_{{level}}"
+                               min="0" max="100" value="{{default_val}}" class="hlai-slider"
+                               data-color="{{color}}" style="{{{slider_style}}}">
+                        <span id="blooms_{{level}}_value" class="hlai-slider-val" style="{{{value_style}}}">{{default_val}}%</span>
+                    </div>
+                </div>
+                {{/blooms_levels}}
+                <div class="hlai-blooms-item hlai-blooms-total-row">
+                    <span class="hlai-blooms-name">{{{total_label}}}</span>
+                    <span id="blooms_total" class="hlai-blooms-total-val">100%</span>
+                </div>
+            </div>
+        </div>
+
+        {{! Navigation }}
+        <div class="level is-mobile mt-5">
+            <div class="level-left">
+                <a href="{{prev_url}}" class="button is-light">
+                    <i class="fa fa-arrow-left hlai-icon-info"></i> {{{previous}}}
+                </a>
+            </div>
+            <div class="level-right">
+                <button type="submit" class="button is-primary" id="generate-btn">
+                    <i class="fa fa-rocket hlai-icon-white"></i> {{{generate_questions}}}
+                </button>
+            </div>
+        </div>
+    </form>
+
+    {{! Loading overlay }}
+    <div class="hlai-generating-overlay hlai-hidden" id="loading-overlay">
+        <div class="hlai-generating-modal">
+            <div class="loader"></div>
+            <h3 class="generating-title"><i class="fa fa-lightbulb-o hlai-icon-primary"></i> {{{generating_title}}}</h3>
+            <p class="generating-subtitle">{{{generating_subtitle}}}</p>
+            <p class="generating-warning">{{{generating_warning}}}</p>
+        </div>
+    </div>
+</div>
+{{/no_topics}}

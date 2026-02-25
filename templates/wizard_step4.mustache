@@ -1,0 +1,292 @@
+{{!
+    @template local_hlai_quizgen/wizard_step4
+
+    Wizard step 4: Review and edit generated questions.
+
+    Context variables required for this template:
+    * step4_title - Step heading (with icon HTML)
+    * step4_description - Step subtitle
+    * is_pending - Whether generation is still pending (show loading overlay)
+    * generating_title - Loading overlay title
+    * generating_subtitle - Loading overlay subtitle
+    * generating_warning - Loading overlay warning
+    * is_failed - Whether generation failed
+    * failed_message - Failure error message
+    * retry_url - URL to retry generation
+    * retry - Retry button text
+    * no_questions - Whether no questions were generated
+    * no_questions_message - Warning when no questions
+    * total_count - Total questions count
+    * approved_count - Approved count
+    * pending_count - Pending count
+    * rejected_count - Rejected count
+    * total_upper - "TOTAL" label
+    * approved_label - "Approved" label
+    * pending_label - "Pending" label
+    * rejected_label - "Rejected" label
+    * select_all_label - "Select All" label
+    * bulk_action_label - "Bulk Action" dropdown label
+    * approve_selected - "Approve Selected" option
+    * reject_selected - "Reject Selected" option
+    * delete_selected - "Delete Selected" option
+    * apply_label - "Apply" button text
+    * approve_all_url - URL to approve all questions
+    * approve_all_label - "Approve All" button text
+    * filter_all_status - "All Status" filter option
+    * filter_all_types - "All Types" filter option
+    * filter_all_difficulty - "All Difficulty" filter option
+    * qtype_multichoice - MCQ filter label
+    * qtype_truefalse - T/F filter label
+    * qtype_shortanswer - Short answer filter label
+    * qtype_essay - Essay filter label
+    * diff_easy - Easy difficulty label
+    * diff_medium - Medium difficulty label
+    * diff_hard - Hard difficulty label
+    * questions - Array of question objects (see below)
+    * prev_url - Previous step URL
+    * next_url - Next step URL
+    * previous - Previous button text
+    * next - Next button text
+
+    Question objects contain:
+    * id, number, questiontext_html
+    * type_label, difficulty_label, diff_tag_class
+    * status, status_label, status_tag_class
+    * card_class, data_type, data_difficulty
+    * is_essay_or_scenario, has_model_answer, model_answer_html
+    * model_answer_label, no_model_answer
+    * has_answers, answers - Array: letter, answer_html, is_correct, row_class
+    * not_approved, approve_url, approve_label
+    * not_rejected, reject_url, reject_label
+    * has_regenerations, regen_url, regen_label
+
+    Example context (json):
+    {
+        "total_count": 10,
+        "questions": [{"id": 1, "number": 1, "type_label": "MCQ"}]
+    }
+}}
+<div class="hlai-step-content">
+    <h2 class="title is-4 mb-2">{{{step4_title}}}</h2>
+    <p class="subtitle is-6 has-text-grey mb-4">{{{step4_description}}}</p>
+    <hr class="mt-0 mb-6">
+
+    {{#is_pending}}
+    <div class="hlai-generating-overlay">
+        <div class="hlai-generating-modal">
+            <div class="loader"></div>
+            <h3 class="title is-5 mb-2"><i class="fa fa-lightbulb-o hlai-icon-primary"></i> {{{generating_title}}}</h3>
+            <p class="has-text-grey is-size-6 mb-4">{{{generating_subtitle}}}</p>
+            <p class="has-text-warning-dark is-size-7 has-text-weight-bold">{{{generating_warning}}}</p>
+        </div>
+    </div>
+    {{/is_pending}}
+
+    {{#is_failed}}
+    <div class="notification is-danger">{{{failed_message}}}</div>
+    <a href="{{retry_url}}" class="button is-warning mt-3">
+        <i class="fa fa-refresh"></i> {{{retry}}}
+    </a>
+    {{/is_failed}}
+
+    {{#no_questions}}
+    <div class="notification is-warning">{{{no_questions_message}}}</div>
+    {{/no_questions}}
+
+    {{#has_questions}}
+    {{! Status cards }}
+    <div class="columns is-mobile is-multiline mb-6">
+        <div class="column is-3-desktop is-6-mobile">
+            <div class="box has-text-centered">
+                <span class="title is-3 is-block mb-1 has-text-grey-dark">{{total_count}}</span>
+                <span class="heading has-text-grey-light is-size-7 has-text-weight-bold">{{{total_upper}}}</span>
+            </div>
+        </div>
+        <div class="column is-3-desktop is-6-mobile">
+            <div class="box has-text-centered is-success-light">
+                <span class="title is-3 is-block mb-1 has-text-success">{{approved_count}}</span>
+                <span class="heading has-text-success-dark is-size-7 has-text-weight-bold">{{{approved_label}}}</span>
+            </div>
+        </div>
+        <div class="column is-3-desktop is-6-mobile">
+            <div class="box has-text-centered is-warning-light">
+                <span class="title is-3 is-block mb-1 has-text-warning-dark">{{pending_count}}</span>
+                <span class="heading has-text-warning-dark is-size-7 has-text-weight-bold">{{{pending_label}}}</span>
+            </div>
+        </div>
+        <div class="column is-3-desktop is-6-mobile">
+            <div class="box has-text-centered is-danger-light">
+                <span class="title is-3 is-block mb-1 has-text-danger">{{rejected_count}}</span>
+                <span class="heading has-text-danger-dark is-size-7 has-text-weight-bold">{{{rejected_label}}}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="questions-review-wrapper">
+        {{! Toolbar }}
+        <div class="level is-mobile mb-5 py-2">
+            <div class="level-left">
+                {{! Select all }}
+                <div class="level-item">
+                    <label class="checkbox">
+                        <input type="checkbox" id="select-all-questions" class="mr-1">
+                        {{{select_all_label}}}
+                    </label>
+                </div>
+
+                {{! Bulk action }}
+                <div class="level-item">
+                    <div class="field has-addons">
+                        <div class="control">
+                            <div class="select is-small">
+                                <select id="bulk-action-select">
+                                    <option value="">{{{bulk_action_label}}}</option>
+                                    <option value="approve">{{{approve_selected}}}</option>
+                                    <option value="reject">{{{reject_selected}}}</option>
+                                    <option value="delete">{{{delete_selected}}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="control">
+                            <button type="button" class="button is-primary is-small" id="bulk-action-btn">{{{apply_label}}}</button>
+                        </div>
+                    </div>
+                </div>
+
+                {{! Approve all }}
+                <div class="level-item">
+                    <a href="{{approve_all_url}}" class="button is-success is-small">
+                        <i class="fa fa-check-circle"></i> {{{approve_all_label}}}
+                    </a>
+                </div>
+            </div>
+
+            {{! Filters }}
+            <div class="level-right">
+                <div class="level-item">
+                    <div class="select is-small">
+                        <select id="filter-status">
+                            <option value="all">{{{filter_all_status}}}</option>
+                            <option value="approved">{{{approved_label}}}</option>
+                            <option value="pending">{{{pending_label}}}</option>
+                            <option value="rejected">{{{rejected_label}}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="level-item">
+                    <div class="select is-small">
+                        <select id="filter-type">
+                            <option value="all">{{{filter_all_types}}}</option>
+                            <option value="multichoice">{{{qtype_multichoice}}}</option>
+                            <option value="truefalse">{{{qtype_truefalse}}}</option>
+                            <option value="shortanswer">{{{qtype_shortanswer}}}</option>
+                            <option value="essay">{{{qtype_essay}}}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="level-item">
+                    <div class="select is-small">
+                        <select id="filter-difficulty">
+                            <option value="all">{{{filter_all_difficulty}}}</option>
+                            <option value="easy">{{{diff_easy}}}</option>
+                            <option value="medium">{{{diff_medium}}}</option>
+                            <option value="hard">{{{diff_hard}}}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{! Question cards }}
+        {{#questions}}
+        <div class="{{card_class}}" data-question-id="{{id}}" data-status="{{status}}" data-type="{{data_type}}" data-difficulty="{{data_difficulty}}">
+            {{! Card header }}
+            <div class="card-header is-shadowless border-bottom-0 hlai-card-header-clean">
+                <div class="card-header-title is-align-items-center py-2">
+                    <div class="is-flex is-align-items-center mr-4">
+                        <label class="checkbox mr-3 hlai-checkbox-flex">
+                            <input type="checkbox" class="question-checkbox hlai-checkbox-scale" id="question-checkbox-{{id}}" data-question-id="{{id}}">
+                        </label>
+                        <span class="has-text-weight-bold has-text-grey-darker is-size-6">{{{question_number_text}}}</span>
+                    </div>
+                    <span class="tag is-light mr-2">{{type_label}}</span>
+                    <span class="tag is-light {{diff_tag_class}}">{{difficulty_label}}</span>
+                </div>
+                <div class="card-header-icon">
+                    <span class="tag {{status_tag_class}}">{{status_label}}</span>
+                </div>
+            </div>
+
+            {{! Card content }}
+            <div class="card-content">
+                <div class="content">
+                    <p class="is-size-5 has-text-weight-medium">{{{questiontext_html}}}</p>
+
+                    {{#is_essay_or_scenario}}
+                    {{#has_model_answer}}
+                    <div class="mt-3">
+                        <p class="has-text-grey-dark mb-2"><strong>{{{model_answer_label}}}</strong></p>
+                        <div class="model-answer hlai-model-answer">{{{model_answer_html}}}</div>
+                    </div>
+                    {{/has_model_answer}}
+                    {{^has_model_answer}}
+                    <div class="mt-3">
+                        <p class="has-text-grey-light is-italic">{{{no_model_answer}}}</p>
+                    </div>
+                    {{/has_model_answer}}
+                    {{/is_essay_or_scenario}}
+
+                    {{^is_essay_or_scenario}}
+                    {{#has_answers}}
+                    <div class="mt-3">
+                        {{#answers}}
+                        <div class="{{row_class}}">
+                            <strong class="mr-3">{{letter}}.</strong>
+                            <span class="is-flex-grow-1">{{{answer_html}}}</span>
+                            {{#is_correct}}
+                            <span class="icon has-text-success ml-2">&#10004;</span>
+                            {{/is_correct}}
+                        </div>
+                        {{/answers}}
+                    </div>
+                    {{/has_answers}}
+                    {{/is_essay_or_scenario}}
+                </div>
+            </div>
+
+            {{! Card footer }}
+            <div class="card-footer">
+                {{#not_approved}}
+                <a href="{{approve_url}}" class="card-footer-item has-text-success has-text-weight-bold">{{{approve_label}}}</a>
+                {{/not_approved}}
+                {{^not_approved}}
+                <span class="card-footer-item has-text-grey-light">{{{approved_label}}}</span>
+                {{/not_approved}}
+
+                {{#not_rejected}}
+                <a href="{{reject_url}}" class="card-footer-item has-text-danger">{{{reject_label}}}</a>
+                {{/not_rejected}}
+
+                {{#has_regenerations}}
+                <a href="{{regen_url}}" class="card-footer-item has-text-info">{{{regen_label}}}</a>
+                {{/has_regenerations}}
+            </div>
+        </div>
+        {{/questions}}
+    </div>
+
+    {{! Navigation }}
+    <div class="level is-mobile mt-5">
+        <div class="level-left">
+            <a href="{{prev_url}}" class="button is-light">
+                <i class="fa fa-arrow-left hlai-icon-secondary"></i> {{{previous}}}
+            </a>
+        </div>
+        <div class="level-right">
+            <a href="{{next_url}}" class="button is-primary">
+                {{{next}}} <i class="fa fa-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+    {{/has_questions}}
+</div>
