@@ -12,24 +12,24 @@
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
-// along with Moodle.  If not, see <https://www.gnu.org/licenses/>.
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version information for the Human Logic AI Quiz Generator plugin.
+ * Polyfill for core_userlist_provider interface.
+ *
+ * This stub interface allows the privacy provider class to implement
+ * core_userlist_provider on Moodle < 3.5.3 where it does not exist.
+ * The methods from this interface are never called on older Moodle versions.
  *
  * @package    local_hlai_quizgen
  * @copyright  2025 Human Logic Software LLC
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace core_privacy\local\request;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_hlai_quizgen';
-$plugin->version   = 2026022501;        // YYYYMMDDXX format.
-$plugin->requires  = 2017111300;        // Moodle 3.4.0+ / Totara 14+.
-$plugin->supported = [34, 500];         // Moodle 3.4.0+ to 5.0.x.
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.7.0';
-
-// Note: Requires a Human Logic API key for functionality. No external plugin dependencies.
-// Configure your API key in: Site Administration > Plugins > Local plugins > AI Quiz Generator.
+// @codingStandardsIgnoreStart
+interface core_userlist_provider {}
+// @codingStandardsIgnoreEnd

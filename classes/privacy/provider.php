@@ -26,6 +26,13 @@
 
 namespace local_hlai_quizgen\privacy;
 
+defined('MOODLE_INTERNAL') || die();
+
+// Backward compatibility for Moodle < 3.5.3 (before core_userlist_provider was introduced).
+if (!interface_exists('\core_privacy\local\request\core_userlist_provider')) {
+    require_once(__DIR__ . '/core_userlist_polyfill.php');
+}
+
 use core_privacy\local\metadata\collection;
 use core_privacy\local\metadata\provider as metadata_provider;
 use core_privacy\local\request\approved_contextlist;
