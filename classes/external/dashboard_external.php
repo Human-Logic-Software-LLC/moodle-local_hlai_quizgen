@@ -65,8 +65,7 @@ class dashboard_external extends external_api {
      */
     public static function get_dashboard_stats_parameters() {
         return new external_function_parameters([
-            'courseid' => new external_value(PARAM_INT,
-                get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
+            'courseid' => new external_value(PARAM_INT, get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -201,8 +200,7 @@ class dashboard_external extends external_api {
                 VALUE_DEFAULT,
                 0
             ),
-            'courseid' => new external_value(PARAM_INT,
-                get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
+            'courseid' => new external_value(PARAM_INT, get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -291,8 +289,7 @@ class dashboard_external extends external_api {
      */
     public static function get_difficulty_distribution_parameters() {
         return new external_function_parameters([
-            'courseid' => new external_value(PARAM_INT,
-                get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
+            'courseid' => new external_value(PARAM_INT, get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -368,8 +365,7 @@ class dashboard_external extends external_api {
      */
     public static function get_blooms_distribution_parameters() {
         return new external_function_parameters([
-            'courseid' => new external_value(PARAM_INT,
-                get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
+            'courseid' => new external_value(PARAM_INT, get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -465,8 +461,7 @@ class dashboard_external extends external_api {
                 VALUE_DEFAULT,
                 10
             ),
-            'courseid' => new external_value(PARAM_INT,
-                get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
+            'courseid' => new external_value(PARAM_INT, get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -586,8 +581,7 @@ class dashboard_external extends external_api {
      */
     public static function get_regeneration_by_type_parameters() {
         return new external_function_parameters([
-            'courseid' => new external_value(PARAM_INT,
-                get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
+            'courseid' => new external_value(PARAM_INT, get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -670,8 +664,7 @@ class dashboard_external extends external_api {
      */
     public static function get_quality_distribution_parameters() {
         return new external_function_parameters([
-            'courseid' => new external_value(PARAM_INT,
-                get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
+            'courseid' => new external_value(PARAM_INT, get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -783,8 +776,7 @@ class dashboard_external extends external_api {
                 VALUE_DEFAULT,
                 5
             ),
-            'courseid' => new external_value(PARAM_INT,
-                get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
+            'courseid' => new external_value(PARAM_INT, get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
         ]);
     }
 
