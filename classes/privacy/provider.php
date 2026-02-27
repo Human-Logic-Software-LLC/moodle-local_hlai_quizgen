@@ -181,13 +181,23 @@ class provider implements
             'privacy:metadata:local_hlai_quizgen_revisions'
         );
 
-        // External data sent to AI gateway.
+        // External data sent to AI gateway for quiz generation.
         $collection->add_external_location_link(
             'aigateway',
             [
                 'content' => 'privacy:metadata:external:aigateway:content',
+                'courseid' => 'privacy:metadata:external:aigateway:courseid',
             ],
             'privacy:metadata:external:aigateway:purpose'
+        );
+
+        // External URLs fetched for content extraction (user-provided URLs).
+        $collection->add_external_location_link(
+            'urlcontent',
+            [
+                'url' => 'privacy:metadata:external:urlcontent:url',
+            ],
+            'privacy:metadata:external:urlcontent:purpose'
         );
 
         return $collection;
@@ -607,7 +617,7 @@ class provider implements
         // Delete logs linked to requests in this course.
         if (!empty($requestids)) {
             [$insql, $inparams] = $DB->get_in_or_equal($requestids, SQL_PARAMS_NAMED, 'req');
-            $DB->delete_records_select('local_hlai_quizgen_logs', "requestid {$insql}", $inparams);
+            $DB->delete_records_select('local_hlai_quizgen_logs', "requestid " . $insql, $inparams);
         }
 
         // Delete rate limit logs for all users who had requests in this course.
@@ -674,7 +684,7 @@ class provider implements
                 $inparams['userid'] = $userid;
                 $DB->delete_records_select(
                     'local_hlai_quizgen_logs',
-                    "userid = :userid AND requestid {$insql}",
+                    "userid = :userid AND requestid " . $insql,
                     $inparams
                 );
             }
@@ -749,7 +759,7 @@ class provider implements
         $uinparams['courseid'] = $courseid;
         $allrequestids = $DB->get_fieldset_sql(
             "SELECT id FROM {local_hlai_quizgen_requests}
-              WHERE courseid = :courseid AND userid {$uinsql}",
+              WHERE courseid = :courseid AND userid " . $uinsql,
             $uinparams
         );
 
@@ -761,7 +771,7 @@ class provider implements
         // Bulk-fetch all question IDs for these users in this course.
         $allquestionids = $DB->get_fieldset_sql(
             "SELECT id FROM {local_hlai_quizgen_questions}
-              WHERE courseid = :courseid AND userid {$uinsql}",
+              WHERE courseid = :courseid AND userid " . $uinsql,
             $uinparams
         );
         self::delete_questions_cascade($allquestionids);
@@ -769,7 +779,7 @@ class provider implements
         // Bulk-delete questions for all users in this course.
         $DB->delete_records_select(
             'local_hlai_quizgen_questions',
-            "courseid = :courseid AND userid {$uinsql}",
+            "courseid = :courseid AND userid " . $uinsql,
             $uinparams
         );
 
@@ -779,16 +789,12 @@ class provider implements
             $rinparams = array_merge($rinparams, $uinparams);
             $DB->delete_records_select(
                 'local_hlai_quizgen_logs',
-                "userid {$uinsql} AND requestid {$rinsql}",
+                "userid " . $uinsql . " AND requestid " . $rinsql,
                 $rinparams
             );
         }
 
         // Bulk-delete reviews where users are reviewer/submitter, scoped to this course.
-        $reviewsql = "SELECT rv.id
-                        FROM {local_hlai_quizgen_reviews} rv
-                        JOIN {local_hlai_quizgen_questions} q ON q.id = rv.questionid
-                       WHERE q.courseid = :courseid AND (rv.reviewerid {$uinsql} OR rv.submitterid {$uinsql})";
         // Need separate param sets for each IN clause.
         [$uinsql2, $uinparams2] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'uid2');
         $reviewparams = ['courseid' => $courseid] + $uinparams;
@@ -799,7 +805,7 @@ class provider implements
         $reviewsql = "SELECT rv.id
                         FROM {local_hlai_quizgen_reviews} rv
                         JOIN {local_hlai_quizgen_questions} q ON q.id = rv.questionid
-                       WHERE q.courseid = :courseid AND (rv.reviewerid {$uinsql} OR rv.submitterid {$uinsql2})";
+                       WHERE q.courseid = :courseid AND (rv.reviewerid " . $uinsql . " OR rv.submitterid " . $uinsql2 . ")";
         $rs = $DB->get_recordset_sql($reviewsql, $reviewparams);
         $reviewids = [];
         foreach ($rs as $review) {
@@ -809,29 +815,29 @@ class provider implements
 
         if (!empty($reviewids)) {
             [$rvinsql, $rvinparams] = $DB->get_in_or_equal($reviewids, SQL_PARAMS_NAMED, 'rv');
-            $DB->delete_records_select('local_hlai_quizgen_revisions', "reviewid {$rvinsql}", $rvinparams);
-            $DB->delete_records_select('local_hlai_quizgen_reviews', "id {$rvinsql}", $rvinparams);
+            $DB->delete_records_select('local_hlai_quizgen_revisions', "reviewid " . $rvinsql, $rvinparams);
+            $DB->delete_records_select('local_hlai_quizgen_reviews', "id " . $rvinsql, $rvinparams);
         }
 
         // Bulk-delete per-user records scoped to this course.
         $DB->delete_records_select(
             'local_hlai_quizgen_settings',
-            "courseid = :courseid AND userid {$uinsql}",
+            "courseid = :courseid AND userid " . $uinsql,
             $uinparams
         );
         $DB->delete_records_select(
             'local_hlai_quizgen_wizstate',
-            "courseid = :courseid AND userid {$uinsql}",
+            "courseid = :courseid AND userid " . $uinsql,
             $uinparams
         );
         $DB->delete_records_select(
             'local_hlai_quizgen_templates',
-            "courseid = :courseid AND userid {$uinsql}",
+            "courseid = :courseid AND userid " . $uinsql,
             $uinparams
         );
         $DB->delete_records_select(
             'local_hlai_quizgen_ratelog',
-            "userid {$uinsql}",
+            "userid " . $uinsql,
             $uinparams
         );
     }
@@ -854,18 +860,18 @@ class provider implements
         [$insql, $inparams] = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED, 'qid');
 
         // Batch delete answers for all questions.
-        $DB->delete_records_select('local_hlai_quizgen_answers', "questionid {$insql}", $inparams);
+        $DB->delete_records_select('local_hlai_quizgen_answers', "questionid " . $insql, $inparams);
 
         // Batch get review IDs, then cascade-delete revisions, then reviews.
         $reviewids = $DB->get_fieldset_sql(
-            "SELECT id FROM {local_hlai_quizgen_reviews} WHERE questionid {$insql}",
+            "SELECT id FROM {local_hlai_quizgen_reviews} WHERE questionid " . $insql,
             $inparams
         );
         if (!empty($reviewids)) {
             [$rinsql, $rinparams] = $DB->get_in_or_equal($reviewids, SQL_PARAMS_NAMED, 'rid');
-            $DB->delete_records_select('local_hlai_quizgen_revisions', "reviewid {$rinsql}", $rinparams);
+            $DB->delete_records_select('local_hlai_quizgen_revisions', "reviewid " . $rinsql, $rinparams);
         }
-        $DB->delete_records_select('local_hlai_quizgen_reviews', "questionid {$insql}", $inparams);
+        $DB->delete_records_select('local_hlai_quizgen_reviews', "questionid " . $insql, $inparams);
     }
 
     /**

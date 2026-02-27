@@ -306,7 +306,7 @@ class diagnostic_external extends external_api {
             $ids = array_keys($idsbytype[$qtype]);
             [$insql, $inparams] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
             $existing = $DB->get_fieldset_sql(
-                "SELECT {$info['field']} FROM {{$info['table']}} WHERE {$info['field']} {$insql}",
+                "SELECT " . $info['field'] . " FROM {" . $info['table'] . "} WHERE " . $info['field'] . " " . $insql,
                 $inparams
             );
             foreach ($existing as $eid) {
@@ -334,7 +334,7 @@ class diagnostic_external extends external_api {
             $draftids = array_column($draftstatus, 'id');
             try {
                 [$insql, $inparams] = $DB->get_in_or_equal($draftids, SQL_PARAMS_NAMED);
-                $DB->set_field_select('question_versions', 'status', 'ready', "questionid {$insql}", $inparams);
+                $DB->set_field_select('question_versions', 'status', 'ready', "questionid " . $insql, $inparams);
                 $repairedstatus = count($draftids);
             } catch (\Exception $e) {
                 // Ignore errors.

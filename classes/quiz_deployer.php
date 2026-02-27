@@ -1263,7 +1263,7 @@ class quiz_deployer {
         $allversions = $DB->get_records_sql(
             "SELECT qv.questionid, qv.questionbankentryid
                FROM {question_versions} qv
-              WHERE qv.questionid $vinsql
+              WHERE qv.questionid " . $vinsql . "
            ORDER BY qv.questionid, qv.version DESC",
             $vinparams
         );

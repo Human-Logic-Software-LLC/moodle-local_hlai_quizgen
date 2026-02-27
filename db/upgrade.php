@@ -1035,7 +1035,7 @@ function xmldb_local_hlai_quizgen_upgrade($oldversion) {
             [$insql, $inparams] = $DB->get_in_or_equal($contextids, SQL_PARAMS_NAMED);
             $allcategories = $DB->get_records_select(
                 'question_categories',
-                "parent = 0 AND contextid {$insql}",
+                "parent = 0 AND contextid " . $insql,
                 $inparams,
                 'contextid, id ASC'
             );

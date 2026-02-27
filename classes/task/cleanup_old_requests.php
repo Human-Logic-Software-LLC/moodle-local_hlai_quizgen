@@ -63,7 +63,7 @@ class cleanup_old_requests extends \core\task\scheduled_task {
         [$insql, $inparams] = $DB->get_in_or_equal(['completed', 'failed'], SQL_PARAMS_NAMED, 'st');
         $inparams['cutoff'] = $cutofftime;
         $sql = "SELECT id FROM {local_hlai_quizgen_requests}
-                 WHERE status $insql
+                 WHERE status " . $insql . "
                    AND timecompleted < :cutoff";
 
         $rs = $DB->get_recordset_sql($sql, $inparams);

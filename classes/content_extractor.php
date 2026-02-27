@@ -986,7 +986,7 @@ class content_extractor {
             "SELECT cm.*, m.name AS modulename
                FROM {course_modules} cm
                JOIN {modules} m ON m.id = cm.module
-              WHERE cm.id {$insql}",
+              WHERE cm.id " . $insql,
             $inparams
         );
 
@@ -1210,7 +1210,7 @@ class content_extractor {
             $allposts = $DB->get_records_sql(
                 "SELECT fp.*
                    FROM {forum_posts} fp
-                  WHERE fp.discussion {$insql}
+                  WHERE fp.discussion " . $insql . "
                ORDER BY fp.discussion, fp.created ASC",
                 $inparams
             );

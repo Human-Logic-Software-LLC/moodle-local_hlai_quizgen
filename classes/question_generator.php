@@ -772,12 +772,13 @@ class question_generator {
             }
         }
 
-        // Get URL content.
-        $urlcontent = $DB->get_records('local_hlai_quizgen_urlcont', ['requestid' => $request->id]);
-        foreach ($urlcontent as $url) {
+        // Get URL content using recordset for memory-efficient processing.
+        $rs = $DB->get_recordset('local_hlai_quizgen_urlcont', ['requestid' => $request->id]);
+        foreach ($rs as $url) {
             $fullcontent .= "\n\n=== Content from {$url->title} ===\n\n";
             $fullcontent .= $url->content;
         }
+        $rs->close();
 
         // Return full content (trimmed).
         return trim($fullcontent);

@@ -205,7 +205,7 @@ class api {
             [$insql, $inparams] = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED);
             $rs = $DB->get_recordset_sql(
                 "SELECT * FROM {local_hlai_quizgen_answers}
-                  WHERE questionid {$insql}
+                  WHERE questionid " . $insql . "
                ORDER BY questionid, sortorder ASC",
                 $inparams
             );
@@ -395,27 +395,28 @@ class api {
         ];
 
         $params = [];
-        $where = '';
+        $wheresql = '';
+        $andcoursesql = '';
         if ($courseid) {
-            $where = 'WHERE r.courseid = :courseid';
+            $wheresql = ' WHERE r.courseid = :courseid';
+            $andcoursesql = ' AND r.courseid = :courseid';
             $params['courseid'] = $courseid;
         }
 
         // Total requests.
-        $sql = "SELECT COUNT(*) FROM {local_hlai_quizgen_requests} r $where";
+        $sql = "SELECT COUNT(*) FROM {local_hlai_quizgen_requests} r" . $wheresql;
         $stats['total_requests'] = $DB->count_records_sql($sql, $params);
 
         // Total questions.
         $sql = "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} q
-                JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
-                $where";
+                JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id" . $wheresql;
         $stats['total_questions'] = $DB->count_records_sql($sql, $params);
 
         // Questions by type.
         $sql = "SELECT q.questiontype, COUNT(*) as count
                 FROM {local_hlai_quizgen_questions} q
-                JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
-                $where
+                JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id" .
+                $wheresql . "
                 GROUP BY q.questiontype";
         $types = $DB->get_records_sql($sql, $params);
         foreach ($types as $type) {
@@ -425,8 +426,8 @@ class api {
         // Questions by difficulty.
         $sql = "SELECT q.difficulty, COUNT(*) as count
                 FROM {local_hlai_quizgen_questions} q
-                JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
-                $where
+                JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id" .
+                $wheresql . "
                 GROUP BY q.difficulty";
         $difficulties = $DB->get_records_sql($sql, $params);
         foreach ($difficulties as $diff) {
@@ -442,7 +443,7 @@ class api {
         $sql = "SELECT q.quality_rating, COUNT(*) as count
                 FROM {local_hlai_quizgen_questions} q
                 JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
-                $where AND q.quality_rating IS NOT NULL
+                WHERE q.quality_rating IS NOT NULL" . $andcoursesql . "
                 GROUP BY q.quality_rating";
         $qualities = $DB->get_records_sql($sql, $params);
         $stats['questions_by_quality'] = [];
@@ -454,7 +455,7 @@ class api {
         $sql = "SELECT AVG(q.validation_score) as avg_score
                 FROM {local_hlai_quizgen_questions} q
                 JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
-                $where AND q.validation_score IS NOT NULL";
+                WHERE q.validation_score IS NOT NULL" . $andcoursesql;
         $result = $DB->get_record_sql($sql, $params);
         $stats['average_validation_score'] = $result && $result->avg_score ? round($result->avg_score, 1) : null;
 
@@ -504,13 +505,13 @@ class api {
         $bankentries = [];
         if (!empty($moodleqids)) {
             [$insql, $inparams] = $DB->get_in_or_equal($moodleqids, SQL_PARAMS_NAMED);
-            $moodlequestions = $DB->get_records_select('question', "id {$insql}", $inparams);
+            $moodlequestions = $DB->get_records_select('question', "id " . $insql, $inparams);
 
             $berows = $DB->get_records_sql(
                 "SELECT qv.questionid, qbe.*, qv.status AS version_status, qv.version
                    FROM {question_bank_entries} qbe
                    JOIN {question_versions} qv ON qv.questionbankentryid = qbe.id
-                  WHERE qv.questionid {$insql}
+                  WHERE qv.questionid " . $insql . "
                ORDER BY qv.questionid, qv.version DESC",
                 $inparams
             );

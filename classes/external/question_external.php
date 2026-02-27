@@ -549,7 +549,7 @@ class question_external extends external_api {
         [$insql, $inparams] = $DB->get_in_or_equal($intids, SQL_PARAMS_NAMED);
         $questions = $DB->get_records_select(
             'local_hlai_quizgen_questions',
-            "id $insql",
+            "id " . $insql,
             $inparams
         );
 
@@ -566,8 +566,8 @@ class question_external extends external_api {
         // Batch update using DML set_field_select with IN clause.
         if (!empty($ownedids)) {
             [$insql, $inparams] = $DB->get_in_or_equal($ownedids, SQL_PARAMS_NAMED);
-            $DB->set_field_select('local_hlai_quizgen_questions', 'status', 'approved', "id {$insql}", $inparams);
-            $DB->set_field_select('local_hlai_quizgen_questions', 'timemodified', $now, "id {$insql}", $inparams);
+            $DB->set_field_select('local_hlai_quizgen_questions', 'status', 'approved', "id " . $insql, $inparams);
+            $DB->set_field_select('local_hlai_quizgen_questions', 'timemodified', $now, "id " . $insql, $inparams);
         }
 
         return [
@@ -644,7 +644,7 @@ class question_external extends external_api {
         [$insql, $inparams] = $DB->get_in_or_equal($intids, SQL_PARAMS_NAMED);
         $questions = $DB->get_records_select(
             'local_hlai_quizgen_questions',
-            "id $insql",
+            "id " . $insql,
             $inparams
         );
 
@@ -661,8 +661,8 @@ class question_external extends external_api {
         // Batch update using DML set_field_select with IN clause.
         if (!empty($ownedids)) {
             [$insql, $inparams] = $DB->get_in_or_equal($ownedids, SQL_PARAMS_NAMED);
-            $DB->set_field_select('local_hlai_quizgen_questions', 'status', 'rejected', "id {$insql}", $inparams);
-            $DB->set_field_select('local_hlai_quizgen_questions', 'timemodified', $now, "id {$insql}", $inparams);
+            $DB->set_field_select('local_hlai_quizgen_questions', 'status', 'rejected', "id " . $insql, $inparams);
+            $DB->set_field_select('local_hlai_quizgen_questions', 'timemodified', $now, "id " . $insql, $inparams);
         }
 
         return [

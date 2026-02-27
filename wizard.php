@@ -789,8 +789,8 @@ function local_hlai_quizgen_handle_save_topic_selection(int $requestid) {
     // Batch-update selected topics to avoid N+1 queries.
     if (!empty($selectedtopics)) {
         [$insql, $inparams] = $DB->get_in_or_equal($selectedtopics, SQL_PARAMS_NAMED);
-        $DB->set_field_select('local_hlai_quizgen_topics', 'selected', 1, "id $insql", $inparams);
-        $DB->set_field_select('local_hlai_quizgen_topics', 'num_questions', 5, "id $insql", $inparams);
+        $DB->set_field_select('local_hlai_quizgen_topics', 'selected', 1, "id " . $insql, $inparams);
+        $DB->set_field_select('local_hlai_quizgen_topics', 'num_questions', 5, "id " . $insql, $inparams);
     }
 
     // Redirect to step 3.
@@ -1013,7 +1013,7 @@ function local_hlai_quizgen_handle_bulk_action(string $action, int $requestid) {
     $inparams['requestid'] = $requestid;
     $questions = $DB->get_records_select(
         'local_hlai_quizgen_questions',
-        "id {$insql} AND requestid = :requestid",
+        "id " . $insql . " AND requestid = :requestid",
         $inparams
     );
 
@@ -1112,7 +1112,7 @@ function local_hlai_quizgen_auto_recover_tracking(array $questionids, int $cours
 
     // Bulk-fetch all plugin questions in one query to avoid N+1 SELECT per question ID.
     [$qinsql, $qinparams] = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED, 'qid');
-    $questions = $DB->get_records_select('local_hlai_quizgen_questions', "id {$qinsql}", $qinparams);
+    $questions = $DB->get_records_select('local_hlai_quizgen_questions', "id " . $qinsql, $qinparams);
 
     foreach ($questions as $q) {
         $qid = $q->id;
@@ -1138,7 +1138,7 @@ function local_hlai_quizgen_auto_recover_tracking(array $questionids, int $cours
                  JOIN {question_versions} qv ON qv.questionid = q.id
                  JOIN {question_bank_entries} qbe ON qbe.id = qv.questionbankentryid
                  JOIN {question_categories} qc ON qc.id = qbe.questioncategoryid
-                 WHERE qc.contextid {$insql}
+                 WHERE qc.contextid " . $insql . "
                  AND q.questiontext = :questiontext
                  AND q.qtype = :qtype
                  ORDER BY q.id DESC
@@ -2190,7 +2190,7 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
     if (!empty($questionids)) {
         [$insql, $inparams] = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED);
         $answersql = "SELECT * FROM {local_hlai_quizgen_answers}
-                       WHERE questionid $insql
+                       WHERE questionid " . $insql . "
                     ORDER BY questionid, sortorder ASC";
         $answersraw = $DB->get_records_sql($answersql, $inparams);
         foreach ($answersraw as $ans) {

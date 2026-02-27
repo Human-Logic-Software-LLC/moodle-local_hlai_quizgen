@@ -65,7 +65,8 @@ class dashboard_external extends external_api {
      */
     public static function get_dashboard_stats_parameters() {
         return new external_function_parameters([
-            'courseid' => new external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+            'courseid' => new external_value(PARAM_INT,
+                get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -133,7 +134,7 @@ class dashboard_external extends external_api {
         $totalreviewed = $DB->count_records_sql(
             "SELECT COUNT(q.id)
              FROM {local_hlai_quizgen_questions} q
-             WHERE q.userid = :userid AND q.status $insql",
+             WHERE q.userid = :userid AND q.status " . $insql,
             $inparams
         );
         $acceptancerate = $totalreviewed > 0 ? round(($approvedquestions / $totalreviewed) * 100, 1) : 0;
@@ -200,7 +201,8 @@ class dashboard_external extends external_api {
                 VALUE_DEFAULT,
                 0
             ),
-            'courseid' => new external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+            'courseid' => new external_value(PARAM_INT,
+                get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -289,7 +291,8 @@ class dashboard_external extends external_api {
      */
     public static function get_difficulty_distribution_parameters() {
         return new external_function_parameters([
-            'courseid' => new external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+            'courseid' => new external_value(PARAM_INT,
+                get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -365,7 +368,8 @@ class dashboard_external extends external_api {
      */
     public static function get_blooms_distribution_parameters() {
         return new external_function_parameters([
-            'courseid' => new external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+            'courseid' => new external_value(PARAM_INT,
+                get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -461,7 +465,8 @@ class dashboard_external extends external_api {
                 VALUE_DEFAULT,
                 10
             ),
-            'courseid' => new external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+            'courseid' => new external_value(PARAM_INT,
+                get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -523,7 +528,7 @@ class dashboard_external extends external_api {
             $ftarrecords = $DB->get_records_sql(
                 "SELECT requestid, COUNT(*) as cnt
                  FROM {local_hlai_quizgen_questions}
-                 WHERE requestid {$insql} AND status = :ftar_status AND regeneration_count = 0
+                 WHERE requestid " . $insql . " AND status = :ftar_status AND regeneration_count = 0
                  GROUP BY requestid",
                 $inparams
             );
@@ -581,7 +586,8 @@ class dashboard_external extends external_api {
      */
     public static function get_regeneration_by_type_parameters() {
         return new external_function_parameters([
-            'courseid' => new external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+            'courseid' => new external_value(PARAM_INT,
+                get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -664,7 +670,8 @@ class dashboard_external extends external_api {
      */
     public static function get_quality_distribution_parameters() {
         return new external_function_parameters([
-            'courseid' => new external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+            'courseid' => new external_value(PARAM_INT,
+                get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -776,7 +783,8 @@ class dashboard_external extends external_api {
                 VALUE_DEFAULT,
                 5
             ),
-            'courseid' => new external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
+            'courseid' => new external_value(PARAM_INT,
+                get_string('param_courseid', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
         ]);
     }
 
@@ -831,7 +839,7 @@ class dashboard_external extends external_api {
             $approvedrecords = $DB->get_records_sql(
                 "SELECT requestid, COUNT(*) as cnt
                  FROM {local_hlai_quizgen_questions}
-                 WHERE requestid {$insql} AND status = :appr_status
+                 WHERE requestid " . $insql . " AND status = :appr_status
                  GROUP BY requestid",
                 $inparams
             );
