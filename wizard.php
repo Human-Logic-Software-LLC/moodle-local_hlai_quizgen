@@ -1107,12 +1107,23 @@ function local_hlai_quizgen_auto_recover_tracking(array $questionids, int $cours
     debugging("auto_recover_tracking: Searching in " .
         count($contextids) . " contexts for course $courseid", DEBUG_DEVELOPER);
 
-    // Build placeholders for IN clause.
-    [$insql, $inparams] = $DB->get_in_or_equal($contextids, SQL_PARAMS_NAMED, 'ctx');
+    // Pre-compute all Moodle question IDs reachable from the given contexts.
+    $categories = $DB->get_records_list('question_categories', 'contextid', $contextids);
+    $bankqids = [];
+    if (!empty($categories)) {
+        $categoryids = array_keys($categories);
+        $bankentries = $DB->get_records_list('question_bank_entries', 'questioncategoryid', $categoryids);
+        if (!empty($bankentries)) {
+            $entryids = array_keys($bankentries);
+            $versions = $DB->get_records_list('question_versions', 'questionbankentryid', $entryids);
+            foreach ($versions as $v) {
+                $bankqids[$v->questionid] = $v->questionid;
+            }
+        }
+    }
 
     // Bulk-fetch all plugin questions in one query to avoid N+1 SELECT per question ID.
-    [$qinsql, $qinparams] = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED, 'qid');
-    $questions = $DB->get_records_select('local_hlai_quizgen_questions', "id " . $qinsql, $qinparams);
+    $questions = $DB->get_records_list('local_hlai_quizgen_questions', 'id', $questionids);
 
     foreach ($questions as $q) {
         $qid = $q->id;
@@ -1128,23 +1139,20 @@ function local_hlai_quizgen_auto_recover_tracking(array $questionids, int $cours
         $questiontext = $q->questiontext ?? '';
         $qtype = ($q->questiontype === 'scenario') ? 'essay' : $q->questiontype;
 
-        if (!empty($questiontext)) {
-            // Search course context + all module contexts (Moodle 4.x + 5.x compatible).
-            $inparams['questiontext'] = $questiontext;
-            $inparams['qtype'] = $qtype;
-            $match = $DB->get_record_sql(
-                "SELECT q.id
-                 FROM {question} q
-                 JOIN {question_versions} qv ON qv.questionid = q.id
-                 JOIN {question_bank_entries} qbe ON qbe.id = qv.questionbankentryid
-                 JOIN {question_categories} qc ON qc.id = qbe.questioncategoryid
-                 WHERE qc.contextid " . $insql . "
-                 AND q.questiontext = :questiontext
-                 AND q.qtype = :qtype
-                 ORDER BY q.id DESC
-                 LIMIT 1",
-                $inparams
+        if (!empty($questiontext) && !empty($bankqids)) {
+            // Search pre-computed question bank IDs (Moodle 4.x + 5.x compatible).
+            [$mqinsql, $mqinparams] = $DB->get_in_or_equal(array_values($bankqids), SQL_PARAMS_NAMED, 'mqid');
+            $mqinparams['questiontext'] = $questiontext;
+            $mqinparams['qtype'] = $qtype;
+            $matches = $DB->get_records_select(
+                'question',
+                "id " . $mqinsql . " AND questiontext = :questiontext AND qtype = :qtype",
+                $mqinparams,
+                'id DESC',
+                'id',
+                0, 1
             );
+            $match = !empty($matches) ? reset($matches) : null;
 
             if ($match) {
                 // Auto-link the found Moodle question.
@@ -2188,11 +2196,9 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
     $questionids = array_keys($questions);
     $allanswers = [];
     if (!empty($questionids)) {
-        [$insql, $inparams] = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED);
-        $answersql = "SELECT * FROM {local_hlai_quizgen_answers}
-                       WHERE questionid " . $insql . "
-                    ORDER BY questionid, sortorder ASC";
-        $answersraw = $DB->get_records_sql($answersql, $inparams);
+        $answersraw = $DB->get_records_list(
+            'local_hlai_quizgen_answers', 'questionid', $questionids, 'questionid, sortorder ASC'
+        );
         foreach ($answersraw as $ans) {
             $allanswers[$ans->questionid][] = $ans;
         }

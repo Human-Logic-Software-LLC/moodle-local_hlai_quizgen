@@ -437,12 +437,18 @@ class debug_logger {
             $params['status'] = strtolower($level);
         }
 
-        $where = empty($conditions) ? '' : 'WHERE ' . implode(' AND ', $conditions);
-
-        $sql = "SELECT * FROM {local_hlai_quizgen_logs} {$where} ORDER BY timecreated DESC, id DESC";
+        $select = empty($conditions) ? '' : implode(' AND ', $conditions);
 
         try {
-            return $DB->get_records_sql($sql, $params, 0, $limit);
+            return $DB->get_records_select(
+                'local_hlai_quizgen_logs',
+                $select,
+                $params,
+                'timecreated DESC, id DESC',
+                '*',
+                0,
+                $limit
+            );
         } catch (\Exception $e) {
             return [];
         }

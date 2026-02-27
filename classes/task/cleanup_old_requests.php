@@ -62,11 +62,13 @@ class cleanup_old_requests extends \core\task\scheduled_task {
         // Find old requests that are completed or failed.
         [$insql, $inparams] = $DB->get_in_or_equal(['completed', 'failed'], SQL_PARAMS_NAMED, 'st');
         $inparams['cutoff'] = $cutofftime;
-        $sql = "SELECT id FROM {local_hlai_quizgen_requests}
-                 WHERE status " . $insql . "
-                   AND timecompleted < :cutoff";
-
-        $rs = $DB->get_recordset_sql($sql, $inparams);
+        $rs = $DB->get_recordset_select(
+            'local_hlai_quizgen_requests',
+            "status " . $insql . " AND timecompleted < :cutoff",
+            $inparams,
+            '',
+            'id'
+        );
 
         if (!$rs->valid()) {
             $rs->close();

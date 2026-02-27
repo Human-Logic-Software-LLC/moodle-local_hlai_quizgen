@@ -981,14 +981,17 @@ class content_extractor {
         $allcontent = '';
 
         // Bulk-load all course_modules with their module names to avoid N+1 queries.
-        [$insql, $inparams] = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED);
-        $cms = $DB->get_records_sql(
-            "SELECT cm.*, m.name AS modulename
-               FROM {course_modules} cm
-               JOIN {modules} m ON m.id = cm.module
-              WHERE cm.id " . $insql,
-            $inparams
-        );
+        $cms = $DB->get_records_list('course_modules', 'id', $cmids);
+        $moduleids = [];
+        foreach ($cms as $cm) {
+            $moduleids[$cm->module] = $cm->module;
+        }
+        if (!empty($moduleids)) {
+            $modules = $DB->get_records_list('modules', 'id', array_values($moduleids));
+            foreach ($cms as $cm) {
+                $cm->modulename = isset($modules[$cm->module]) ? $modules[$cm->module]->name : '';
+            }
+        }
 
         foreach ($cmids as $cmid) {
             try {
@@ -1206,13 +1209,8 @@ class content_extractor {
         $postsbydiscussion = [];
         if (!empty($discussions)) {
             $discussionids = array_keys($discussions);
-            [$insql, $inparams] = $DB->get_in_or_equal($discussionids, SQL_PARAMS_NAMED);
-            $allposts = $DB->get_records_sql(
-                "SELECT fp.*
-                   FROM {forum_posts} fp
-                  WHERE fp.discussion " . $insql . "
-               ORDER BY fp.discussion, fp.created ASC",
-                $inparams
+            $allposts = $DB->get_records_list(
+                'forum_posts', 'discussion', $discussionids, 'discussion, created ASC'
             );
             foreach ($allposts as $post) {
                 $postsbydiscussion[$post->discussion][] = $post;

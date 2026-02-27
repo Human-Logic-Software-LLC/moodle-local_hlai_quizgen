@@ -757,9 +757,10 @@ class provider implements
         // Bulk-fetch all request IDs for these users in this course to avoid N+1 queries.
         [$uinsql, $uinparams] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'uid');
         $uinparams['courseid'] = $courseid;
-        $allrequestids = $DB->get_fieldset_sql(
-            "SELECT id FROM {local_hlai_quizgen_requests}
-              WHERE courseid = :courseid AND userid " . $uinsql,
+        $allrequestids = $DB->get_fieldset_select(
+            'local_hlai_quizgen_requests',
+            'id',
+            "courseid = :courseid AND userid " . $uinsql,
             $uinparams
         );
 
@@ -769,9 +770,10 @@ class provider implements
         }
 
         // Bulk-fetch all question IDs for these users in this course.
-        $allquestionids = $DB->get_fieldset_sql(
-            "SELECT id FROM {local_hlai_quizgen_questions}
-              WHERE courseid = :courseid AND userid " . $uinsql,
+        $allquestionids = $DB->get_fieldset_select(
+            'local_hlai_quizgen_questions',
+            'id',
+            "courseid = :courseid AND userid " . $uinsql,
             $uinparams
         );
         self::delete_questions_cascade($allquestionids);
@@ -795,23 +797,30 @@ class provider implements
         }
 
         // Bulk-delete reviews where users are reviewer/submitter, scoped to this course.
-        // Need separate param sets for each IN clause.
-        [$uinsql2, $uinparams2] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'uid2');
-        $reviewparams = ['courseid' => $courseid] + $uinparams;
-        // Add second set of user params for submitterid.
-        foreach ($uinparams2 as $key => $val) {
-            $reviewparams[$key] = $val;
-        }
-        $reviewsql = "SELECT rv.id
-                        FROM {local_hlai_quizgen_reviews} rv
-                        JOIN {local_hlai_quizgen_questions} q ON q.id = rv.questionid
-                       WHERE q.courseid = :courseid AND (rv.reviewerid " . $uinsql . " OR rv.submitterid " . $uinsql2 . ")";
-        $rs = $DB->get_recordset_sql($reviewsql, $reviewparams);
+        // Break JOIN into separate select queries to avoid SQL variable concatenation.
+        $courseqids = $DB->get_fieldset_select(
+            'local_hlai_quizgen_questions', 'id', 'courseid = :courseid', ['courseid' => $courseid]
+        );
         $reviewids = [];
-        foreach ($rs as $review) {
-            $reviewids[] = $review->id;
+        if (!empty($courseqids)) {
+            [$qinsql, $qinparams] = $DB->get_in_or_equal($courseqids, SQL_PARAMS_NAMED, 'qid');
+            // Reviews where reviewer is one of the users.
+            $params1 = array_merge($qinparams, $uinparams);
+            $revids1 = $DB->get_fieldset_select(
+                'local_hlai_quizgen_reviews', 'id',
+                "questionid " . $qinsql . " AND reviewerid " . $uinsql,
+                $params1
+            );
+            // Reviews where submitter is one of the users.
+            [$uinsql2, $uinparams2] = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED, 'uid2');
+            $params2 = array_merge($qinparams, $uinparams2);
+            $revids2 = $DB->get_fieldset_select(
+                'local_hlai_quizgen_reviews', 'id',
+                "questionid " . $qinsql . " AND submitterid " . $uinsql2,
+                $params2
+            );
+            $reviewids = array_unique(array_merge($revids1, $revids2));
         }
-        $rs->close();
 
         if (!empty($reviewids)) {
             [$rvinsql, $rvinparams] = $DB->get_in_or_equal($reviewids, SQL_PARAMS_NAMED, 'rv');
@@ -863,8 +872,10 @@ class provider implements
         $DB->delete_records_select('local_hlai_quizgen_answers', "questionid " . $insql, $inparams);
 
         // Batch get review IDs, then cascade-delete revisions, then reviews.
-        $reviewids = $DB->get_fieldset_sql(
-            "SELECT id FROM {local_hlai_quizgen_reviews} WHERE questionid " . $insql,
+        $reviewids = $DB->get_fieldset_select(
+            'local_hlai_quizgen_reviews',
+            'id',
+            "questionid " . $insql,
             $inparams
         );
         if (!empty($reviewids)) {

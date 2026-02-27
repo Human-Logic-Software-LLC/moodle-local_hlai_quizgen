@@ -25,12 +25,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'local_hlai_quizgen';
-$plugin->version   = 2026022700;        // YYYYMMDDXX format.
+$plugin->version   = 2026022701;        // YYYYMMDDXX format.
 $plugin->requires  = 2022112809;        // Moodle 4.1.9+.
 $plugin->supported = [401, 500];        // Moodle 4.1.9+ to 5.0.x.
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.6.8';
+$plugin->release   = '1.6.9';
 $plugin->dependencies = [
-    'mod_quiz' => ANY_VERSION,
-    'mod_scorm' => ANY_VERSION,
+    'mod_quiz' => 2022112800,
+    'mod_scorm' => 2022112800,
 ];

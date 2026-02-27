@@ -305,8 +305,10 @@ class diagnostic_external extends external_api {
             }
             $ids = array_keys($idsbytype[$qtype]);
             [$insql, $inparams] = $DB->get_in_or_equal($ids, SQL_PARAMS_NAMED);
-            $existing = $DB->get_fieldset_sql(
-                "SELECT " . $info['field'] . " FROM {" . $info['table'] . "} WHERE " . $info['field'] . " " . $insql,
+            $existing = $DB->get_fieldset_select(
+                $info['table'],
+                $info['field'],
+                $info['field'] . " " . $insql,
                 $inparams
             );
             foreach ($existing as $eid) {

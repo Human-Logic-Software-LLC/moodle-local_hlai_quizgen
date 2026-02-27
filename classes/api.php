@@ -203,11 +203,11 @@ class api {
         $allanswers = [];
         if (!empty($questionids)) {
             [$insql, $inparams] = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED);
-            $rs = $DB->get_recordset_sql(
-                "SELECT * FROM {local_hlai_quizgen_answers}
-                  WHERE questionid " . $insql . "
-               ORDER BY questionid, sortorder ASC",
-                $inparams
+            $rs = $DB->get_recordset_select(
+                'local_hlai_quizgen_answers',
+                "questionid " . $insql,
+                $inparams,
+                'questionid, sortorder ASC'
             );
             foreach ($rs as $ans) {
                 $allanswers[$ans->questionid][$ans->id] = $ans;
@@ -394,70 +394,123 @@ class api {
             'average_questions_per_request' => 0,
         ];
 
-        $params = [];
-        $wheresql = '';
-        $andcoursesql = '';
+        // Use separate static SQL strings to avoid variable concatenation in queries.
         if ($courseid) {
-            $wheresql = ' WHERE r.courseid = :courseid';
-            $andcoursesql = ' AND r.courseid = :courseid';
-            $params['courseid'] = $courseid;
+            $params = ['courseid' => $courseid];
+
+            // Total requests.
+            $stats['total_requests'] = $DB->count_records('local_hlai_quizgen_requests', ['courseid' => $courseid]);
+
+            // Total questions.
+            $stats['total_questions'] = $DB->count_records_sql(
+                "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} q
+                 JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
+                 WHERE r.courseid = :courseid",
+                $params
+            );
+
+            // Questions by type.
+            $types = $DB->get_records_sql(
+                "SELECT q.questiontype, COUNT(*) as count
+                 FROM {local_hlai_quizgen_questions} q
+                 JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
+                 WHERE r.courseid = :courseid
+                 GROUP BY q.questiontype",
+                $params
+            );
+
+            // Questions by difficulty.
+            $difficulties = $DB->get_records_sql(
+                "SELECT q.difficulty, COUNT(*) as count
+                 FROM {local_hlai_quizgen_questions} q
+                 JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
+                 WHERE r.courseid = :courseid
+                 GROUP BY q.difficulty",
+                $params
+            );
+
+            // Quality distribution (if validation enabled).
+            $qualities = $DB->get_records_sql(
+                "SELECT q.quality_rating, COUNT(*) as count
+                 FROM {local_hlai_quizgen_questions} q
+                 JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
+                 WHERE q.quality_rating IS NOT NULL AND r.courseid = :courseid
+                 GROUP BY q.quality_rating",
+                $params
+            );
+
+            // Average validation score.
+            $result = $DB->get_record_sql(
+                "SELECT AVG(q.validation_score) as avg_score
+                 FROM {local_hlai_quizgen_questions} q
+                 JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
+                 WHERE q.validation_score IS NOT NULL AND r.courseid = :courseid",
+                $params
+            );
+        } else {
+            // Total requests.
+            $stats['total_requests'] = $DB->count_records('local_hlai_quizgen_requests');
+
+            // Total questions.
+            $stats['total_questions'] = $DB->count_records_sql(
+                "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} q
+                 JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id"
+            );
+
+            // Questions by type.
+            $types = $DB->get_records_sql(
+                "SELECT q.questiontype, COUNT(*) as count
+                 FROM {local_hlai_quizgen_questions} q
+                 JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
+                 GROUP BY q.questiontype"
+            );
+
+            // Questions by difficulty.
+            $difficulties = $DB->get_records_sql(
+                "SELECT q.difficulty, COUNT(*) as count
+                 FROM {local_hlai_quizgen_questions} q
+                 JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
+                 GROUP BY q.difficulty"
+            );
+
+            // Quality distribution (if validation enabled).
+            $qualities = $DB->get_records_sql(
+                "SELECT q.quality_rating, COUNT(*) as count
+                 FROM {local_hlai_quizgen_questions} q
+                 JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
+                 WHERE q.quality_rating IS NOT NULL
+                 GROUP BY q.quality_rating"
+            );
+
+            // Average validation score.
+            $result = $DB->get_record_sql(
+                "SELECT AVG(q.validation_score) as avg_score
+                 FROM {local_hlai_quizgen_questions} q
+                 JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
+                 WHERE q.validation_score IS NOT NULL"
+            );
         }
 
-        // Total requests.
-        $sql = "SELECT COUNT(*) FROM {local_hlai_quizgen_requests} r" . $wheresql;
-        $stats['total_requests'] = $DB->count_records_sql($sql, $params);
-
-        // Total questions.
-        $sql = "SELECT COUNT(*) FROM {local_hlai_quizgen_questions} q
-                JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id" . $wheresql;
-        $stats['total_questions'] = $DB->count_records_sql($sql, $params);
-
-        // Questions by type.
-        $sql = "SELECT q.questiontype, COUNT(*) as count
-                FROM {local_hlai_quizgen_questions} q
-                JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id" .
-                $wheresql . "
-                GROUP BY q.questiontype";
-        $types = $DB->get_records_sql($sql, $params);
         foreach ($types as $type) {
             $stats['questions_by_type'][$type->questiontype] = $type->count;
         }
-
-        // Questions by difficulty.
-        $sql = "SELECT q.difficulty, COUNT(*) as count
-                FROM {local_hlai_quizgen_questions} q
-                JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id" .
-                $wheresql . "
-                GROUP BY q.difficulty";
-        $difficulties = $DB->get_records_sql($sql, $params);
         foreach ($difficulties as $diff) {
             $stats['questions_by_difficulty'][$diff->difficulty] = $diff->count;
         }
 
         // Average questions per request.
         if ($stats['total_requests'] > 0) {
-            $stats['average_questions_per_request'] = round($stats['total_questions'] / $stats['total_requests'], 1);
+            $stats['average_questions_per_request'] = round(
+                $stats['total_questions'] / $stats['total_requests'], 1
+            );
         }
 
-        // Quality distribution (if validation enabled).
-        $sql = "SELECT q.quality_rating, COUNT(*) as count
-                FROM {local_hlai_quizgen_questions} q
-                JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
-                WHERE q.quality_rating IS NOT NULL" . $andcoursesql . "
-                GROUP BY q.quality_rating";
-        $qualities = $DB->get_records_sql($sql, $params);
         $stats['questions_by_quality'] = [];
         foreach ($qualities as $quality) {
             $stats['questions_by_quality'][$quality->quality_rating] = $quality->count;
         }
-
-        // Average validation score.
-        $sql = "SELECT AVG(q.validation_score) as avg_score
-                FROM {local_hlai_quizgen_questions} q
-                JOIN {local_hlai_quizgen_requests} r ON q.requestid = r.id
-                WHERE q.validation_score IS NOT NULL" . $andcoursesql;
-        $result = $DB->get_record_sql($sql, $params);
-        $stats['average_validation_score'] = $result && $result->avg_score ? round($result->avg_score, 1) : null;
+        $stats['average_validation_score'] = $result && $result->avg_score
+            ? round($result->avg_score, 1) : null;
 
         return $stats;
     }
@@ -504,21 +557,32 @@ class api {
         $moodlequestions = [];
         $bankentries = [];
         if (!empty($moodleqids)) {
-            [$insql, $inparams] = $DB->get_in_or_equal($moodleqids, SQL_PARAMS_NAMED);
-            $moodlequestions = $DB->get_records_select('question', "id " . $insql, $inparams);
+            $moodlequestions = $DB->get_records_list('question', 'id', $moodleqids);
 
-            $berows = $DB->get_records_sql(
-                "SELECT qv.questionid, qbe.*, qv.status AS version_status, qv.version
-                   FROM {question_bank_entries} qbe
-                   JOIN {question_versions} qv ON qv.questionbankentryid = qbe.id
-                  WHERE qv.questionid " . $insql . "
-               ORDER BY qv.questionid, qv.version DESC",
-                $inparams
+            // Fetch question versions and bank entries separately to avoid SQL concatenation.
+            $allversions = $DB->get_records_list(
+                'question_versions', 'questionid', $moodleqids, 'questionid, version DESC'
             );
-            // Keep only the latest version per questionid.
-            foreach ($berows as $row) {
-                if (!isset($bankentries[$row->questionid])) {
-                    $bankentries[$row->questionid] = $row;
+            $latestversions = [];
+            foreach ($allversions as $v) {
+                if (!isset($latestversions[$v->questionid])) {
+                    $latestversions[$v->questionid] = $v;
+                }
+            }
+            $entryids = [];
+            foreach ($latestversions as $v) {
+                $entryids[$v->questionbankentryid] = $v->questionbankentryid;
+            }
+            if (!empty($entryids)) {
+                $entries = $DB->get_records_list('question_bank_entries', 'id', array_values($entryids));
+                foreach ($latestversions as $v) {
+                    if (isset($entries[$v->questionbankentryid])) {
+                        $entry = clone $entries[$v->questionbankentryid];
+                        $entry->questionid = $v->questionid;
+                        $entry->version_status = $v->status;
+                        $entry->version = $v->version;
+                        $bankentries[$v->questionid] = $entry;
+                    }
                 }
             }
         }

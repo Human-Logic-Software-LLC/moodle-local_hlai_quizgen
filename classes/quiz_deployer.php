@@ -1259,13 +1259,8 @@ class quiz_deployer {
         $questionsperpage = $quiz->questionsperpage ?? 1;
 
         // Batch-fetch question bank entries to avoid N+1 queries.
-        [$vinsql, $vinparams] = $DB->get_in_or_equal($questionids, SQL_PARAMS_NAMED);
-        $allversions = $DB->get_records_sql(
-            "SELECT qv.questionid, qv.questionbankentryid
-               FROM {question_versions} qv
-              WHERE qv.questionid " . $vinsql . "
-           ORDER BY qv.questionid, qv.version DESC",
-            $vinparams
+        $allversions = $DB->get_records_list(
+            'question_versions', 'questionid', $questionids, 'questionid, version DESC'
         );
         // Keep only the latest version per questionid.
         $versionmap = [];

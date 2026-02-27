@@ -130,10 +130,9 @@ class dashboard_external extends external_api {
         // Acceptance rate.
         [$insql, $inparams] = $DB->get_in_or_equal(['approved', 'rejected'], SQL_PARAMS_NAMED, 'st');
         $inparams['userid'] = $userid;
-        $totalreviewed = $DB->count_records_sql(
-            "SELECT COUNT(q.id)
-             FROM {local_hlai_quizgen_questions} q
-             WHERE q.userid = :userid AND q.status " . $insql,
+        $totalreviewed = $DB->count_records_select(
+            'local_hlai_quizgen_questions',
+            "userid = :userid AND status " . $insql,
             $inparams
         );
         $acceptancerate = $totalreviewed > 0 ? round(($approvedquestions / $totalreviewed) * 100, 1) : 0;
@@ -520,15 +519,18 @@ class dashboard_external extends external_api {
         if (!empty($requestids)) {
             [$insql, $inparams] = $DB->get_in_or_equal($requestids, SQL_PARAMS_NAMED, 'rid');
             $inparams['ftar_status'] = 'approved';
-            $ftarrecords = $DB->get_records_sql(
-                "SELECT requestid, COUNT(*) as cnt
-                 FROM {local_hlai_quizgen_questions}
-                 WHERE requestid " . $insql . " AND status = :ftar_status AND regeneration_count = 0
-                 GROUP BY requestid",
-                $inparams
+            $ftarrecords = $DB->get_records_select(
+                'local_hlai_quizgen_questions',
+                "requestid " . $insql . " AND status = :ftar_status AND regeneration_count = 0",
+                $inparams,
+                '',
+                'id, requestid'
             );
             foreach ($ftarrecords as $rec) {
-                $ftarcounts[$rec->requestid] = (int) $rec->cnt;
+                if (!isset($ftarcounts[$rec->requestid])) {
+                    $ftarcounts[$rec->requestid] = 0;
+                }
+                $ftarcounts[$rec->requestid]++;
             }
         }
 
@@ -828,15 +830,18 @@ class dashboard_external extends external_api {
         if (!empty($requestids)) {
             [$insql, $inparams] = $DB->get_in_or_equal($requestids, SQL_PARAMS_NAMED, 'rid');
             $inparams['appr_status'] = 'approved';
-            $approvedrecords = $DB->get_records_sql(
-                "SELECT requestid, COUNT(*) as cnt
-                 FROM {local_hlai_quizgen_questions}
-                 WHERE requestid " . $insql . " AND status = :appr_status
-                 GROUP BY requestid",
-                $inparams
+            $approvedrecords = $DB->get_records_select(
+                'local_hlai_quizgen_questions',
+                "requestid " . $insql . " AND status = :appr_status",
+                $inparams,
+                '',
+                'id, requestid'
             );
             foreach ($approvedrecords as $rec) {
-                $approvedcounts[$rec->requestid] = (int) $rec->cnt;
+                if (!isset($approvedcounts[$rec->requestid])) {
+                    $approvedcounts[$rec->requestid] = 0;
+                }
+                $approvedcounts[$rec->requestid]++;
             }
         }
 
