@@ -168,14 +168,22 @@ class analytics_external extends external_api {
             'by_type' => new external_multiple_structure(
                 new external_single_structure([
                     'questiontype' => new external_value(PARAM_TEXT, 'The question type'),
-                    'count' => new external_value(PARAM_INT,
-                        get_string('ws_count_questions_desc', 'local_hlai_quizgen')),
-                    'avg_quality' => new external_value(PARAM_FLOAT,
-                        get_string('ws_avg_quality_desc', 'local_hlai_quizgen')),
-                    'approved' => new external_value(PARAM_INT,
-                        get_string('ws_approved_questions_desc', 'local_hlai_quizgen')),
-                    'avg_regens' => new external_value(PARAM_FLOAT,
-                        get_string('ws_avg_regens_desc', 'local_hlai_quizgen')),
+                    'count' => new external_value(
+                        PARAM_INT,
+                        get_string('ws_count_questions_desc', 'local_hlai_quizgen')
+                    ),
+                    'avg_quality' => new external_value(
+                        PARAM_FLOAT,
+                        get_string('ws_avg_quality_desc', 'local_hlai_quizgen')
+                    ),
+                    'approved' => new external_value(
+                        PARAM_INT,
+                        get_string('ws_approved_questions_desc', 'local_hlai_quizgen')
+                    ),
+                    'avg_regens' => new external_value(
+                        PARAM_FLOAT,
+                        get_string('ws_avg_regens_desc', 'local_hlai_quizgen')
+                    ),
                 ]),
                 'Questions grouped by type'
             ),

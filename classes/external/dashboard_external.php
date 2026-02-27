@@ -194,8 +194,12 @@ class dashboard_external extends external_api {
      */
     public static function get_question_type_distribution_parameters() {
         return new external_function_parameters([
-            'filtercourseid' => new external_value(PARAM_INT,
-                get_string('ws_filtercourseid_desc', 'local_hlai_quizgen'), VALUE_DEFAULT, 0),
+            'filtercourseid' => new external_value(
+                PARAM_INT,
+                get_string('ws_filtercourseid_desc', 'local_hlai_quizgen'),
+                VALUE_DEFAULT,
+                0
+            ),
             'courseid' => new external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
         ]);
     }
@@ -451,8 +455,12 @@ class dashboard_external extends external_api {
      */
     public static function get_acceptance_trend_parameters() {
         return new external_function_parameters([
-            'limit' => new external_value(PARAM_INT,
-                get_string('ws_limit_generations_desc', 'local_hlai_quizgen'), VALUE_DEFAULT, 10),
+            'limit' => new external_value(
+                PARAM_INT,
+                get_string('ws_limit_generations_desc', 'local_hlai_quizgen'),
+                VALUE_DEFAULT,
+                10
+            ),
             'courseid' => new external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
         ]);
     }
@@ -762,8 +770,12 @@ class dashboard_external extends external_api {
      */
     public static function get_recent_requests_parameters() {
         return new external_function_parameters([
-            'limit' => new external_value(PARAM_INT,
-                get_string('ws_limit_requests_desc', 'local_hlai_quizgen'), VALUE_DEFAULT, 5),
+            'limit' => new external_value(
+                PARAM_INT,
+                get_string('ws_limit_requests_desc', 'local_hlai_quizgen'),
+                VALUE_DEFAULT,
+                5
+            ),
             'courseid' => new external_value(PARAM_INT, 'Course ID for context validation', VALUE_DEFAULT, 0),
         ]);
     }

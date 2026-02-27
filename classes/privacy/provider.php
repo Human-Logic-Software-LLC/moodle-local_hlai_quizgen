@@ -814,14 +814,26 @@ class provider implements
         }
 
         // Bulk-delete per-user records scoped to this course.
-        $DB->delete_records_select('local_hlai_quizgen_settings',
-            "courseid = :courseid AND userid {$uinsql}", $uinparams);
-        $DB->delete_records_select('local_hlai_quizgen_wizstate',
-            "courseid = :courseid AND userid {$uinsql}", $uinparams);
-        $DB->delete_records_select('local_hlai_quizgen_templates',
-            "courseid = :courseid AND userid {$uinsql}", $uinparams);
-        $DB->delete_records_select('local_hlai_quizgen_ratelog',
-            "userid {$uinsql}", $uinparams);
+        $DB->delete_records_select(
+            'local_hlai_quizgen_settings',
+            "courseid = :courseid AND userid {$uinsql}",
+            $uinparams
+        );
+        $DB->delete_records_select(
+            'local_hlai_quizgen_wizstate',
+            "courseid = :courseid AND userid {$uinsql}",
+            $uinparams
+        );
+        $DB->delete_records_select(
+            'local_hlai_quizgen_templates',
+            "courseid = :courseid AND userid {$uinsql}",
+            $uinparams
+        );
+        $DB->delete_records_select(
+            'local_hlai_quizgen_ratelog',
+            "userid {$uinsql}",
+            $uinparams
+        );
     }
 
     /**
