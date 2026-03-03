@@ -64,68 +64,86 @@ class topic_analyzer {
 
         // Topic caching disabled for now.
 
-        // STRATEGY: First try direct marker extraction (fast, reliable for bulk scans).
-        // Only fall back to AI if no markers found (e.g., uploaded files, URLs).
-        $topics = [];
+        // STRATEGY: Handle content that may contain a mix of marker-based content
+        // (from course activities/bulk scans) and non-marker content (uploaded files,
+        // manual text, URLs). Both types must be processed to extract all topics.
+        $markertopics = [];
+        $nonmarkercontent = '';
 
-        // Check if content has TOPIC markers (from bulk course scans).
         if (strpos($content, '=== TOPIC:') !== false) {
-            $topics = self::extract_topics_from_markers($content);
+            // Extract topics from marker blocks.
+            $markertopics = self::extract_topics_from_markers($content);
+
+            // Extract non-marker content (text before the first marker).
+            $firstmarkerpos = strpos($content, '=== TOPIC:');
+            if ($firstmarkerpos > 0) {
+                $nonmarkercontent = trim(substr($content, 0, $firstmarkerpos));
+            }
+        } else {
+            // No markers at all - entire content is non-marker.
+            $nonmarkercontent = $content;
         }
 
-        // If direct extraction found topics, use them.
-        if (!empty($topics)) {
-            // Save topics to database.
-            $savedtopics = self::save_topics($topics, $requestid);
-
-            // Cache the topics if enabled.
-            if (cache_manager::is_caching_enabled()) {
-                cache_manager::set_cached_response('topics', $cachekey, $topics, [
-                    'requestid' => $requestid,
+        // If we have non-marker content, send it to AI for topic analysis.
+        $aitopics = [];
+        if (!empty($nonmarkercontent) && strlen($nonmarkercontent) > 50) {
+            try {
+                $payload = [
+                    'content' => $nonmarkercontent,
                     'courseid' => $request->courseid,
-                ]);
+                ];
+                $response = gateway_client::analyze_topics($payload, 'best');
+                $aitopics = $response['topics'] ?? [];
+            } catch (\Exception $e) {
+                // If AI fails but we have marker topics, continue with those.
+                if (empty($markertopics)) {
+                    throw new \moodle_exception(
+                        'error:topicanalysis',
+                        'local_hlai_quizgen',
+                        '',
+                        null,
+                        $e->getMessage()
+                    );
+                }
             }
-
-            return $savedtopics;
         }
 
-        // Fall back to AI analysis for content without markers (uploads, URLs, etc.).
+        // Merge topics from both sources and deduplicate by title.
+        $alltopics = array_merge($markertopics, $aitopics);
 
-        // Call gateway for topic analysis.
-        // Use 'best' quality for topic analysis - complex task needs higher quality model.
-        try {
-            $payload = [
-                'content' => $content,
-                'courseid' => $request->courseid,
-            ];
-
-            // Call gateway with 'best' quality.
-            $response = gateway_client::analyze_topics($payload, 'best');
-
-            // Extract topics from response.
-            $topics = $response['topics'] ?? [];
-
-            // Save topics to database.
-            $savedtopics = self::save_topics($topics, $requestid);
-
-            // Cache the topics if enabled.
-            if (cache_manager::is_caching_enabled()) {
-                cache_manager::set_cached_response('topics', $cachekey, $topics, [
-                    'requestid' => $requestid,
-                    'courseid' => $request->courseid,
-                ]);
-            }
-
-            return $savedtopics;
-        } catch (\Exception $e) {
+        if (empty($alltopics)) {
             throw new \moodle_exception(
                 'error:topicanalysis',
                 'local_hlai_quizgen',
                 '',
                 null,
-                $e->getMessage()
+                'No topics could be extracted from the provided content.'
             );
         }
+
+        $seentitles = [];
+        $uniquetopics = [];
+        foreach ($alltopics as $topic) {
+            $normalizedtitle = strtolower(trim($topic['title'] ?? ''));
+            if (empty($normalizedtitle) || isset($seentitles[$normalizedtitle])) {
+                continue;
+            }
+            $seentitles[$normalizedtitle] = true;
+            $uniquetopics[] = $topic;
+        }
+
+        // Save topics to database.
+        $savedtopics = self::save_topics($uniquetopics, $requestid);
+
+        // Cache the topics if enabled.
+        if (cache_manager::is_caching_enabled()) {
+            cache_manager::set_cached_response('topics', $cachekey, $uniquetopics, [
+                'requestid' => $requestid,
+                'courseid' => $request->courseid,
+            ]);
+        }
+
+        return $savedtopics;
     }
 
     // NOTE: AI prompts are proprietary and located on the Human Logic AI Gateway server.
