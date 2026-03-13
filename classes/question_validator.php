@@ -634,8 +634,8 @@ class question_validator {
                 // Calculate similarity using multiple methods.
                 $similarity = self::calculate_question_similarity($q1, $q2);
 
-                // Threshold: 70% similar is considered a duplicate.
-                if ($similarity >= 0.70) {
+                // Threshold: 85% similar is considered a duplicate (lower values cause false positives on same-topic questions).
+                if ($similarity >= 0.85) {
                     $duplicates[] = [
                         'index1' => $i,
                         'index2' => $j,

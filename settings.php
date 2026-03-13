@@ -28,8 +28,11 @@ if ($hassiteconfig) {
     // Create settings page.
     $settings = new admin_settingpage('local_hlai_quizgen', get_string('pluginname', 'local_hlai_quizgen'));
 
-    // Check gateway availability.
-    $gatewayready = \local_hlai_quizgen\gateway_client::is_ready();
+    // Check gateway availability (guard against autoload failure during install/upgrade).
+    $gatewayready = false;
+    if (class_exists('\local_hlai_quizgen\gateway_client')) {
+        $gatewayready = \local_hlai_quizgen\gateway_client::is_ready();
+    }
 
     // Show warning if gateway is not configured.
     if (!$gatewayready) {
@@ -113,6 +116,24 @@ if ($hassiteconfig) {
         get_string('max_file_size_mb', 'local_hlai_quizgen'),
         get_string('max_file_size_mb_desc', 'local_hlai_quizgen'),
         50,
+        PARAM_INT
+    ));
+
+    // Maximum number of activities per extraction.
+    $settings->add(new admin_setting_configtext(
+        'local_hlai_quizgen/max_activities',
+        get_string('max_activities', 'local_hlai_quizgen'),
+        get_string('max_activities_desc', 'local_hlai_quizgen'),
+        20,
+        PARAM_INT
+    ));
+
+    // Maximum total content size for extraction (MB).
+    $settings->add(new admin_setting_configtext(
+        'local_hlai_quizgen/max_extraction_size_mb',
+        get_string('max_extraction_size_mb', 'local_hlai_quizgen'),
+        get_string('max_extraction_size_mb_desc', 'local_hlai_quizgen'),
+        100,
         PARAM_INT
     ));
 

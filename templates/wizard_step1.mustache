@@ -176,6 +176,12 @@
                 </div>
             </div>
 
+            {{! Warning banner for bulk scan options — shown/hidden by JS }}
+            <div id="hlai-scan-warning" class="notification is-warning is-light mt-3" style="display:none;">
+                <i class="fa fa-exclamation-triangle"></i>
+                <span id="hlai-scan-warning-text"></span>
+            </div>
+
             {{! Selected sources display }}
             <div class="notification is-info is-light mt-4 hlai-hidden" id="selected-sources-display">
                 <strong>{{{selected_sources}}}: </strong>
@@ -201,15 +207,14 @@
         <div class="field mb-5 hlai-hidden" id="section-upload">
             <label class="label"><i class="fa fa-folder-open hlai-icon-purple"></i> {{{upload_files}}}</label>
             <p class="help mb-3">{{{upload_files_help}}}</p>
-            <div class="file has-name is-boxed is-fullwidth">
-                <label class="file-label">
-                    <input type="file" name="contentfiles[]" id="content-files" class="file-input" multiple="multiple" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt">
-                    <span class="file-cta">
-                        <span class="file-icon is-size-4">&#x1F4C2;</span>
-                        <span class="file-label">{{{choose_files}}}</span>
-                    </span>
-                    <span class="file-name">{{{no_files_selected}}}</span>
-                </label>
+            <div class="hlai-dropzone" id="hlai-dropzone">
+                <input type="file" name="contentfiles[]" id="content-files" class="hlai-dropzone-input" multiple="multiple" accept=".pdf,.doc,.docx,.ppt,.pptx,.txt">
+                <div class="hlai-dropzone-body">
+                    <span class="hlai-dropzone-icon">&#x1F4C2;</span>
+                    <p class="hlai-dropzone-primary">{{{choose_files}}}</p>
+                    <p class="hlai-dropzone-hint">or drag &amp; drop files here</p>
+                    <p class="hlai-dropzone-files" id="hlai-dropzone-label">{{{no_files_selected}}}</p>
+                </div>
             </div>
             <p class="help mt-2">{{{supported_formats}}}</p>
             <div class="mt-2"><small class="has-text-grey is-size-7">{{{php_limits}}}</small></div>
@@ -252,7 +257,7 @@
             <div class="hlai-activities-list">
                 {{#activities}}
                 <label class="hlai-activity-card">
-                    <input type="checkbox" name="activityids[]" value="{{id}}" class="hlai-activity-checkbox">
+                    <input type="checkbox" name="activityids[]" value="{{id}}" class="hlai-activity-checkbox" data-modtype="{{modname}}">
                     <span class="hlai-activity-checkmark"></span>
                     <span class="hlai-activity-content">
                         <span class="hlai-activity-emoji">{{{emoji_html}}}</span>
@@ -268,6 +273,12 @@
             <div class="hlai-activities-selected-bar">
                 <span class="hlai-selected-icon"><i class="fa fa-check-circle"></i></span>
                 <span id="selected-activities-count" class="hlai-selected-text">{{{n_activities_selected}}}</span>
+            </div>
+
+            {{! Warning banner for too many activities — shown/hidden by JS }}
+            <div id="hlai-activity-warning" class="notification is-warning is-light mt-3" style="display:none;">
+                <i class="fa fa-exclamation-triangle"></i>
+                <span id="hlai-activity-warning-text"></span>
             </div>
             {{/has_activities}}
 

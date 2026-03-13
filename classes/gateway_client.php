@@ -131,6 +131,9 @@ class gateway_client {
             );
         }
 
+        // Sanitize payload strings to remove malformed UTF-8 (from PDF/SCORM extraction).
+        $payload = self::clean_payload_utf8($payload);
+
         $request = [
             'operation' => $operation,
             'quality' => $quality,
@@ -162,9 +165,26 @@ class gateway_client {
             'payload_size' => strlen(json_encode($payload)),
         ]);
 
+        $jsonbody = json_encode($request);
+        if ($jsonbody === false) {
+            $jsonerror = json_last_error_msg();
+            debugging("HLAI gateway json_encode FAILED: {$jsonerror} | operation={$operation}" .
+                " | topic_title=" . ($payload['topic_title'] ?? 'N/A'), DEBUG_DEVELOPER);
+            throw new \moodle_exception(
+                'error:noaiprovider',
+                'local_hlai_quizgen',
+                '',
+                null,
+                'Failed to encode request as JSON: ' . $jsonerror
+            );
+        }
+
+        debugging("HLAI gateway sending: operation={$operation}, json_len=" . strlen($jsonbody) .
+            ", topic_title=" . ($payload['topic_title'] ?? 'N/A'), DEBUG_DEVELOPER);
+
         try {
             $curl->setHeader($headers);
-            $response = $curl->post($url, json_encode($request));
+            $response = $curl->post($url, $jsonbody);
         } catch (\Throwable $e) {
             debug_logger::error('Gateway request failed', [
                 'operation' => $operation,
@@ -237,5 +257,28 @@ class gateway_client {
             default:
                 return '/generate'; // Fallback generic endpoint.
         }
+    }
+
+    /**
+     * Recursively clean all string values in a payload to valid UTF-8.
+     * Fixes malformed bytes from PDF/SCORM content extraction that break json_encode.
+     *
+     * @param mixed $data The payload data (array, string, or scalar)
+     * @return mixed Cleaned data
+     */
+    private static function clean_payload_utf8($data) {
+        if (is_string($data)) {
+            // Remove invalid UTF-8 sequences.
+            $data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
+            // Strip 4-byte UTF-8 chars (unsupported by MySQL utf8 3-byte).
+            $data = preg_replace('/[\xF0-\xF7][\x80-\xBF]{3}/', '', $data);
+            return $data;
+        }
+        if (is_array($data)) {
+            foreach ($data as $key => $value) {
+                $data[$key] = self::clean_payload_utf8($value);
+            }
+        }
+        return $data;
     }
 }

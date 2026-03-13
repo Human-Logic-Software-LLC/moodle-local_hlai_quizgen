@@ -978,7 +978,13 @@ class content_extractor {
             return '';
         }
 
+        $totalactivities = count($cmids);
+        $extractionstart = microtime(true);
+        debugging("HLAI extract_from_activities START: {$totalactivities} activities to process", DEBUG_DEVELOPER);
+
         $allcontent = '';
+        $processed = 0;
+        $totalwords = 0;
 
         // Bulk-load all course_modules with their module names to avoid N+1 queries.
         $cms = $DB->get_records_list('course_modules', 'id', $cmids);
@@ -993,7 +999,9 @@ class content_extractor {
             }
         }
 
+        $activityindex = 0;
         foreach ($cmids as $cmid) {
+            $activityindex++;
             try {
                 if (!isset($cms[$cmid])) {
                     continue;
@@ -1002,8 +1010,17 @@ class content_extractor {
                 $cm = $cms[$cmid];
                 $moduletype = $cm->modulename;
 
+                $actstart = microtime(true);
+                debugging("HLAI [{$activityindex}/{$totalactivities}] STARTING cmid={$cmid} type={$moduletype}", DEBUG_DEVELOPER);
+
                 // Extract content.
                 $result = self::extract_from_activity($cmid, $moduletype, $courseid);
+
+                $actduration = round(microtime(true) - $actstart, 2);
+                $wordcount = str_word_count($result['text']);
+                $totalwords += $wordcount;
+                $processed++;
+                debugging("HLAI [{$activityindex}/{$totalactivities}] DONE cmid={$cmid} type={$moduletype} name=\"{$result['name']}\" in {$actduration}s ({$wordcount} words)", DEBUG_DEVELOPER);
 
                 // Use clear, descriptive activity markers with actual names (not generic module types).
                 // This helps the AI understand what the content is about and use proper names.
@@ -1019,10 +1036,14 @@ class content_extractor {
                 $allcontent .= $result['text'];
                 $allcontent .= "\n=== END TOPIC ===\n";
             } catch (\Exception $e) {
-                // Skip activities that fail to extract.
+                $actduration = round(microtime(true) - $actstart, 2);
+                debugging("HLAI [{$activityindex}/{$totalactivities}] FAILED cmid={$cmid} in {$actduration}s: " . $e->getMessage(), DEBUG_DEVELOPER);
                 continue;
             }
         }
+
+        $totalduration = round(microtime(true) - $extractionstart, 2);
+        debugging("HLAI extract_from_activities DONE: {$processed}/{$totalactivities} succeeded in {$totalduration}s, total {$totalwords} words", DEBUG_DEVELOPER);
 
         return $allcontent;
     }
@@ -1204,6 +1225,11 @@ class content_extractor {
 
         // Get forum discussions and posts (limit to avoid too much content).
         $discussions = $DB->get_records('forum_discussions', ['forum' => $forum->id], 'timemodified DESC', '*', 0, 10);
+
+        // Skip forums with no real educational content (e.g. announcements forums with no posts).
+        if (empty($discussions) && str_word_count($text) < 50) {
+            return '';
+        }
 
         // Bulk-load posts for all discussions to avoid N+1 queries.
         $postsbydiscussion = [];

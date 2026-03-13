@@ -108,14 +108,27 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                 $questiontypedist = $dist;
             }
 
-            // CRITICAL FIX: Expand question types into a global array for all questions.
-            // This ensures correct distribution across all topics.
+            // CRITICAL FIX: Expand question types into a global array, INTERLEAVED across types.
+            // This ensures each topic gets a MIX of question types, not all of one type.
+            // E.g., with 4 MCQ + 4 T/F + 4 SA: [mcq, tf, sa, mcq, tf, sa, mcq, tf, sa, mcq, tf, sa]
             $globalquestiontypes = [];
             if (!empty($questiontypedist)) {
+                // Build per-type queues.
+                $typequeues = [];
                 foreach ($questiontypedist as $type => $count) {
                     for ($i = 0; $i < $count; $i++) {
-                        $globalquestiontypes[] = $type;
+                        $typequeues[$type][] = $type;
                     }
+                }
+                // Interleave: round-robin across types.
+                $maxcount = max(array_map('count', $typequeues));
+                for ($i = 0; $i < $maxcount; $i++) {
+                    foreach ($typequeues as $type => &$queue) {
+                        if (isset($queue[$i])) {
+                            $globalquestiontypes[] = $queue[$i];
+                        }
+                    }
+                    unset($queue);
                 }
             }
             // Fallback if no types specified.
@@ -186,6 +199,9 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                 $currentquestion += $topic->num_questions; // Use requested count for progress.
                 $totalquestionsgenerated += $questionsgenerated; // Track actual generated.
 
+                debugging("HLAI adhoc topic '{$topic->title}' (id={$topic->id}): requested={$topic->num_questions}, " .
+                    "generated={$questionsgenerated}, types=" . json_encode($topicconfig['question_types']), DEBUG_DEVELOPER);
+
                 // Delete excess questions if more were generated than requested.
                 if ($questionsgenerated > $topic->num_questions) {
                     // Get all questions for this topic in this request.
@@ -218,19 +234,94 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
             }
 
             // Update request with actual generated count.
+            debugging("HLAI adhoc SUMMARY: total_requested={$totalquestionsrequested}, total_generated={$totalquestionsgenerated}, " .
+                "topics=" . count($topics), DEBUG_DEVELOPER);
+            if ($totalquestionsgenerated < $totalquestionsrequested) {
+                debugging("HLAI adhoc WARNING: Missing " . ($totalquestionsrequested - $totalquestionsgenerated) .
+                    " questions. Check per-topic and save_question logs above.", DEBUG_DEVELOPER);
+            }
             $DB->set_field('local_hlai_quizgen_requests', 'total_questions', $totalquestionsgenerated, ['id' => $requestid]);
 
-            // POST-GENERATION: Check for duplicates and flag them.
+            // POST-GENERATION: Detect and remove duplicate questions.
             self::update_progress($requestid, 'processing', 95, "Checking for duplicate questions...");
             $allquestions = $DB->get_records('local_hlai_quizgen_questions', ['requestid' => $requestid], 'id ASC');
             $questiontexts = [];
+            $questionids = [];
+            $questionanswers = []; // Track answers for answer-based dedup.
             foreach ($allquestions as $q) {
                 $questiontexts[] = $q->questiontext;
+                $questionids[] = $q->id;
+                // Get the correct answer for this question (for shortanswer dedup).
+                $correctanswer = $DB->get_record('local_hlai_quizgen_answers', ['questionid' => $q->id, 'is_correct' => 1], 'answer');
+                $questionanswers[] = $correctanswer ? strtolower(trim($correctanswer->answer)) : '';
             }
 
-            // Check for duplicates (informational only - not deleted automatically).
+            $idstoremove = [];
+
+            // Method 1: Text similarity dedup.
             if (count($questiontexts) > 1) {
-                \local_hlai_quizgen\question_validator::check_for_duplicates($questiontexts);
+                $duplicates = \local_hlai_quizgen\question_validator::check_for_duplicates($questiontexts);
+                if (!empty($duplicates)) {
+                    foreach ($duplicates as $dup) {
+                        $dupid = $questionids[$dup['index2']];
+                        $idstoremove[$dupid] = true;
+                    }
+                }
+            }
+
+            // Method 2: Same-answer dedup for shortanswer questions.
+            // If two shortanswer questions have the same correct answer, keep only the first.
+            $seenanswers = [];
+            $seqidx = 0;
+            foreach ($allquestions as $q) {
+                if ($q->questiontype === 'shortanswer' && !empty($questionanswers[$seqidx])) {
+                    $ans = $questionanswers[$seqidx];
+                    if (isset($seenanswers[$ans])) {
+                        $idstoremove[$q->id] = true;
+                    } else {
+                        $seenanswers[$ans] = true;
+                    }
+                }
+                $seqidx++;
+            }
+
+            // Delete all flagged duplicates.
+            if (!empty($idstoremove)) {
+                foreach (array_keys($idstoremove) as $removeid) {
+                    $DB->delete_records('local_hlai_quizgen_answers', ['questionid' => $removeid]);
+                    $DB->delete_records('local_hlai_quizgen_questions', ['id' => $removeid]);
+                    $totalquestionsgenerated--;
+                }
+
+                // Generate replacement questions to fill the gap.
+                $shortfall = $totalquestionsrequested - $totalquestionsgenerated;
+                if ($shortfall > 0 && !empty($topics)) {
+                    self::update_progress($requestid, 'processing', 97, "Generating {$shortfall} replacement questions...");
+                    // Pick the first topic for replacements.
+                    $replacetopic = reset($topics);
+                    $replacetypes = [];
+                    for ($i = 0; $i < $shortfall; $i++) {
+                        $replacetypes[] = $globalquestiontypes[$i % count($globalquestiontypes)];
+                    }
+                    $replaceconfig = $baseconfig;
+                    $replaceconfig['num_questions'] = $shortfall;
+                    $replaceconfig['question_types'] = $replacetypes;
+                    try {
+                        $replacequestions = \local_hlai_quizgen\question_generator::generate_for_topic(
+                            $replacetopic->id,
+                            $requestid,
+                            $replaceconfig
+                        );
+                        $totalquestionsgenerated += count($replacequestions);
+                    } catch (\Exception $replaceex) {
+                        \local_hlai_quizgen\debug_logger::debug(
+                            "Replacement generation failed: " . $replaceex->getMessage(), [], $requestid
+                        );
+                    }
+                }
+
+                // Update count after deduplication and replacement.
+                $DB->set_field('local_hlai_quizgen_requests', 'total_questions', $totalquestionsgenerated, ['id' => $requestid]);
             }
 
             // Mark as completed.

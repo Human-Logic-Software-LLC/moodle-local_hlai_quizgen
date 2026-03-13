@@ -236,13 +236,13 @@
             {{! Card content }}
             <div class="card-content">
                 <div class="content">
-                    <p class="is-size-5 has-text-weight-medium">{{{questiontext_html}}}</p>
+                    <p class="is-size-5 has-text-weight-medium nolink">{{{questiontext_html}}}</p>
 
                     {{#is_essay_or_scenario}}
                     {{#has_model_answer}}
                     <div class="mt-3">
                         <p class="has-text-grey-dark mb-2"><strong>{{{model_answer_label}}}</strong></p>
-                        <div class="model-answer hlai-model-answer">{{{model_answer_html}}}</div>
+                        <div class="model-answer hlai-model-answer nolink">{{{model_answer_html}}}</div>
                     </div>
                     {{/has_model_answer}}
                     {{^has_model_answer}}
@@ -258,7 +258,7 @@
                         {{#answers}}
                         <div class="{{row_class}}">
                             <strong class="mr-3">{{letter}}.</strong>
-                            <span class="is-flex-grow-1">{{{answer_html}}}</span>
+                            <span class="is-flex-grow-1 nolink">{{{answer_html}}}</span>
                             {{#is_correct}}
                             <span class="icon has-text-success ml-2">&#10004;</span>
                             {{/is_correct}}

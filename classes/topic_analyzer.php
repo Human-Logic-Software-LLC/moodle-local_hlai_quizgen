@@ -283,12 +283,12 @@ class topic_analyzer {
                 // Clean up garbled PDF text (spaced characters, encoding issues).
                 $description = self::clean_garbled_text($description);
 
-                if (strlen($description) > 300) {
-                    $description = substr($description, 0, 297) . '...';
+                if (mb_strlen($description, 'UTF-8') > 300) {
+                    $description = mb_substr($description, 0, 297, 'UTF-8') . '...';
                 }
 
                 // Get content excerpt (first 300 chars of actual content).
-                $excerpt = substr(trim($sectioncontent), 0, 300);
+                $excerpt = mb_substr(trim($sectioncontent), 0, 300, 'UTF-8');
                 $excerpt = preg_replace('/^(Activity Name:.*?\n|Activity Type:.*?\n|---\n)+/s', '', $excerpt);
 
                 // Clean up garbled text in excerpt too.
@@ -581,6 +581,20 @@ class topic_analyzer {
     }
 
     /**
+     * Clean a string to contain only valid UTF-8 bytes.
+     * Fixes broken multi-byte sequences (e.g. Arabic text truncated mid-character).
+     *
+     * @param string $text Input text
+     * @return string Cleaned text with invalid byte sequences removed
+     */
+    private static function clean_utf8(string $text): string {
+        $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
+        // Strip 4-byte UTF-8 characters that fail on MySQL utf8 (3-byte max).
+        $text = preg_replace('/[\xF0-\xF7][\x80-\xBF]{3}/', '', $text);
+        return $text;
+    }
+
+    /**
      * Save topics to database.
      *
      * @param array $topics Array of topic data from AI
@@ -597,17 +611,25 @@ class topic_analyzer {
             // Save main topic.
             $topicrecord = new \stdClass();
             $topicrecord->requestid = $requestid;
-            $topicrecord->title = $maintopic['title'];
-            $topicrecord->description = $maintopic['description'] ?? '';
+            $topictitle = trim($maintopic['title'] ?? '');
+            $topictitle = !empty($topictitle) ? $topictitle : 'Untitled Topic';
+            $topicrecord->title = \core_text::substr(self::clean_utf8($topictitle), 0, 255);
+            $topicrecord->description = self::clean_utf8($maintopic['description'] ?? '');
             $topicrecord->parent_topic_id = null;
             $topicrecord->level = 1;
             $topicrecord->selected = 1;  // Default: selected.
             $topicrecord->num_questions = 5;  // Default: 5 questions.
-            $topicrecord->content_excerpt = $maintopic['content_excerpt'] ?? '';
+            $topicrecord->content_excerpt = self::clean_utf8($maintopic['content_excerpt'] ?? '');
             $topicrecord->learning_objectives = json_encode($maintopic['learning_objectives'] ?? []);
             $topicrecord->timecreated = $now;
 
-            $topicid = $DB->insert_record('local_hlai_quizgen_topics', $topicrecord);
+            try {
+                $topicid = $DB->insert_record('local_hlai_quizgen_topics', $topicrecord);
+            } catch (\Exception $e) {
+                debugging('HLAI save_topics main topic insert FAILED: ' . $e->getMessage() .
+                    ' | Record: ' . json_encode($topicrecord), DEBUG_DEVELOPER);
+                throw $e;
+            }
             $topicrecord->id = $topicid;
             $savedtopics[] = $topicrecord;
 
@@ -616,17 +638,25 @@ class topic_analyzer {
                 foreach ($maintopic['subtopics'] as $subtopic) {
                     $subtopicrecord = new \stdClass();
                     $subtopicrecord->requestid = $requestid;
-                    $subtopicrecord->title = $subtopic['title'];
-                    $subtopicrecord->description = $subtopic['description'] ?? '';
+                    $subtitletxt = trim($subtopic['title'] ?? '');
+                    $subtitletxt = !empty($subtitletxt) ? $subtitletxt : 'Untitled Subtopic';
+                    $subtopicrecord->title = \core_text::substr(self::clean_utf8($subtitletxt), 0, 255);
+                    $subtopicrecord->description = self::clean_utf8($subtopic['description'] ?? '');
                     $subtopicrecord->parent_topic_id = $topicid;
                     $subtopicrecord->level = 2;
                     $subtopicrecord->selected = 0;  // Subtopics not selected by default.
                     $subtopicrecord->num_questions = 0;
-                    $subtopicrecord->content_excerpt = $subtopic['content_excerpt'] ?? '';
+                    $subtopicrecord->content_excerpt = self::clean_utf8($subtopic['content_excerpt'] ?? '');
                     $subtopicrecord->learning_objectives = json_encode([]);
                     $subtopicrecord->timecreated = $now;
 
-                    $subtopicid = $DB->insert_record('local_hlai_quizgen_topics', $subtopicrecord);
+                    try {
+                        $subtopicid = $DB->insert_record('local_hlai_quizgen_topics', $subtopicrecord);
+                    } catch (\Exception $e) {
+                        debugging('HLAI save_topics subtopic insert FAILED: ' . $e->getMessage() .
+                            ' | Record: ' . json_encode($subtopicrecord), DEBUG_DEVELOPER);
+                        throw $e;
+                    }
                     $subtopicrecord->id = $subtopicid;
                     $savedtopics[] = $subtopicrecord;
                 }
@@ -731,9 +761,10 @@ class topic_analyzer {
 
             $newtopic = new \stdClass();
             $newtopic->requestid = $requestid;
-            $newtopic->title = $cleanedtitle; // Use cleaned title.
-            $newtopic->description = $topic['description'] ?? '';
-            $newtopic->content_excerpt = $topic['content_excerpt'] ?? '';
+            $clonetitle = !empty($cleanedtitle) ? $cleanedtitle : 'Untitled Topic';
+            $newtopic->title = \core_text::substr(self::clean_utf8($clonetitle), 0, 255);
+            $newtopic->description = self::clean_utf8($topic['description'] ?? '');
+            $newtopic->content_excerpt = self::clean_utf8($topic['content_excerpt'] ?? '');
             // Ensure learning_objectives is always a JSON string.
             if (isset($topic['learning_objectives'])) {
                 $newtopic->learning_objectives = is_string($topic['learning_objectives'])

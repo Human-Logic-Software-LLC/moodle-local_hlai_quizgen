@@ -92,6 +92,7 @@ define(['jquery'], function($) {
             this._bindStep1FormSubmit();
             this._bindContentSourceToggles();
             this._bindFileInputChange();
+            this._bindDropzone();
             this._bindActivitySelectionControls();
         },
 
@@ -306,6 +307,37 @@ define(['jquery'], function($) {
                 section.style.display = checkbox.checked ? 'block' : 'none';
             }
             this._updateSelectedSources();
+            this._updateScanWarning();
+        },
+
+        /**
+         * Show a warning when bulk scan options are selected.
+         *
+         * @private
+         */
+        _updateScanWarning: function() {
+            var scanCourse = document.getElementById('source_scan_course');
+            var scanResources = document.getElementById('source_scan_resources');
+            var scanActivities = document.getElementById('source_scan_activities');
+            var warningEl = document.getElementById('hlai-scan-warning');
+            var warningText = document.getElementById('hlai-scan-warning-text');
+
+            if (!warningEl || !warningText) {
+                return;
+            }
+
+            var anyScan = (scanCourse && scanCourse.checked) ||
+                          (scanResources && scanResources.checked) ||
+                          (scanActivities && scanActivities.checked);
+
+            if (anyScan) {
+                warningText.textContent = 'Bulk scanning options will process all matching content in the course.' +
+                    ' For courses with many activities or large SCORM/PDF files, this may take a long time' +
+                    ' or time out. If extraction fails, try using "Select Activities" instead and pick specific items.';
+                warningEl.style.display = 'block';
+            } else {
+                warningEl.style.display = 'none';
+            }
         },
 
         /**
@@ -417,6 +449,83 @@ define(['jquery'], function($) {
             });
         },
 
+        /**
+         * Bind drag-and-drop events on the file upload dropzone.
+         *
+         * @private
+         */
+        _bindDropzone: function() {
+            var dropzone = document.getElementById('hlai-dropzone');
+            var fileInput = document.getElementById('content-files');
+            var dropLabel = document.getElementById('hlai-dropzone-label');
+
+            if (!dropzone || !fileInput) {
+                return;
+            }
+
+            // Click on dropzone opens file picker.
+            dropzone.addEventListener('click', function() {
+                fileInput.click();
+            });
+
+            // Update label when files are selected via picker.
+            fileInput.addEventListener('change', function() {
+                if (!dropLabel) {
+                    return;
+                }
+                if (fileInput.files && fileInput.files.length > 0) {
+                    var names = [];
+                    for (var i = 0; i < fileInput.files.length; i++) {
+                        names.push(fileInput.files[i].name);
+                    }
+                    dropLabel.textContent = names.join(', ');
+                    dropLabel.style.color = '#2563eb';
+                } else {
+                    dropLabel.textContent = '';
+                    dropLabel.style.color = '';
+                }
+            });
+
+            // Drag events.
+            dropzone.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.add('hlai-dropzone-active');
+            });
+            dropzone.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.remove('hlai-dropzone-active');
+            });
+            dropzone.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.remove('hlai-dropzone-active');
+                var files = e.dataTransfer.files;
+                if (files && files.length > 0) {
+                    try {
+                        var dt = new DataTransfer();
+                        for (var i = 0; i < files.length; i++) {
+                            dt.items.add(files[i]);
+                        }
+                        fileInput.files = dt.files;
+                    } catch (ex) {
+                        // Fallback: files shown in label only.
+                    }
+                    // Trigger change event so _bindFileInputChange picks it up.
+                    fileInput.dispatchEvent(new Event('change'));
+                    if (dropLabel) {
+                        var names = [];
+                        for (var i = 0; i < files.length; i++) {
+                            names.push(files[i].name);
+                        }
+                        dropLabel.textContent = names.join(', ');
+                        dropLabel.style.color = '#2563eb';
+                    }
+                }
+            });
+        },
+
         // -----------------------------------------------------------------
         // Step 1 - Activity selection helpers
         // -----------------------------------------------------------------
@@ -497,6 +606,44 @@ define(['jquery'], function($) {
                     }
                 }
             });
+
+            // Show warning if heavy content types (SCORM, resource/files) are selected.
+            var warningEl = document.getElementById('hlai-activity-warning');
+            var warningText = document.getElementById('hlai-activity-warning-text');
+            if (warningEl && warningText) {
+                var scormCount = 0;
+                var resourceCount = 0;
+                document.querySelectorAll('.hlai-activity-checkbox:checked').forEach(function(cb) {
+                    var modtype = cb.dataset.modtype || '';
+                    if (modtype === 'scorm') {
+                        scormCount++;
+                    }
+                    if (modtype === 'resource') {
+                        resourceCount++;
+                    }
+                });
+
+                var warnings = [];
+                if (scormCount > 0) {
+                    warnings.push('You have selected ' + scormCount + ' SCORM package' +
+                        (scormCount > 1 ? 's' : '') + '. SCORM packages are large and can be very slow to extract.');
+                }
+                if (resourceCount > 3) {
+                    warnings.push('You have selected ' + resourceCount +
+                        ' file resources. PDF/document files require extra processing time.');
+                }
+                if (scormCount > 0 || resourceCount > 3) {
+                    warnings.push('If extraction times out, try selecting fewer of these and use smaller' +
+                        ' content types (pages, books, lessons) instead.');
+                }
+
+                if (warnings.length > 0) {
+                    warningText.textContent = warnings.join(' ');
+                    warningEl.style.display = 'block';
+                } else {
+                    warningEl.style.display = 'none';
+                }
+            }
         },
 
         // =================================================================

@@ -1,7 +1,7 @@
 # Human Logic AI Quiz Generator
 
 **Component:** `local_hlai_quizgen`
-**Version:** 1.6.5
+**Version:** 1.6.9
 **Copyright:** © 2025 Human Logic Software LLC
 **License:** GNU GPL v3 or later
 

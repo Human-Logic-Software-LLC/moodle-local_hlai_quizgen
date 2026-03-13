@@ -236,6 +236,7 @@ if ($step == 1) {
     $jsconfig['strings'] = [
         'choose_files' => get_string('choose_files', 'local_hlai_quizgen'),
     ];
+    $jsconfig['maxActivities'] = (int) (get_config('local_hlai_quizgen', 'max_activities') ?: 20);
 }
 $PAGE->requires->js_call_amd('local_hlai_quizgen/wizard', 'init', [$jsconfig]);
 
@@ -375,6 +376,65 @@ function local_hlai_quizgen_handle_content_upload(int $courseid, context $contex
             \core\output\notification::NOTIFY_ERROR
         );
         return;
+    }
+
+    // Validate total content size of selected activities (SCORM packages + resource files).
+    // This applies to both individual activity selection AND bulk scan options.
+    $maxextractionmb = (int)(get_config('local_hlai_quizgen', 'max_extraction_size_mb') ?: 100);
+    if ($hasactivities || $hasbulkscan) {
+        $totalsize = 0;
+        $fs = get_file_storage();
+
+        // Determine which cmids to check.
+        $cmidstocheck = [];
+        if ($hasactivities) {
+            $cmidstocheck = $activityids;
+        }
+        if ($hasbulkscan) {
+            // Get all course modules for this course.
+            $modinfo = get_fast_modinfo($courseid);
+            foreach ($modinfo->get_cms() as $cm) {
+                if (!$cm->uservisible) {
+                    continue;
+                }
+                if ($bulkscanentire) {
+                    $cmidstocheck[] = $cm->id;
+                } else if ($bulkscanresources && in_array($cm->modname, ['resource', 'folder', 'scorm'])) {
+                    $cmidstocheck[] = $cm->id;
+                } else if ($bulkscanactivities && !in_array($cm->modname, ['resource', 'folder', 'label'])) {
+                    $cmidstocheck[] = $cm->id;
+                }
+            }
+            $cmidstocheck = array_unique($cmidstocheck);
+        }
+
+        foreach ($cmidstocheck as $cmid) {
+            $modcontext = context_module::instance($cmid, IGNORE_MISSING);
+            if (!$modcontext) {
+                continue;
+            }
+            $files = $fs->get_area_files($modcontext->id, 'mod_scorm', 'package', false, '', false);
+            foreach ($files as $file) {
+                $totalsize += $file->get_filesize();
+            }
+            $files = $fs->get_area_files($modcontext->id, 'mod_resource', 'content', false, '', false);
+            foreach ($files as $file) {
+                $totalsize += $file->get_filesize();
+            }
+        }
+        $totalsizemb = round($totalsize / (1024 * 1024), 1);
+        if ($totalsizemb > $maxextractionmb) {
+            redirect(
+                new moodle_url('/local/hlai_quizgen/wizard.php', ['courseid' => $courseid, 'step' => 1]),
+                get_string('error:content_too_large', 'local_hlai_quizgen', (object)[
+                    'size' => $totalsizemb,
+                    'max' => $maxextractionmb,
+                ]),
+                null,
+                \core\output\notification::NOTIFY_ERROR
+            );
+            return;
+        }
     }
 
     // CONTENT DEDUPLICATION: Collect all content to calculate hash.
@@ -864,10 +924,10 @@ function local_hlai_quizgen_handle_generate_questions(int $requestid) {
 
     // Convert difficulty preset to distribution array.
     $difficultydist = ['easy' => 20, 'medium' => 60, 'hard' => 20];  // Default balanced.
-    if ($difficulty === 'easy') {
+    if ($difficulty === 'easy_only') {
         $difficultydist = ['easy' => 50, 'medium' => 40, 'hard' => 10];
-    } else if ($difficulty === 'challenging') {
-        $difficultydist = ['easy' => 10, 'medium' => 40, 'hard' => 50];
+    } else if ($difficulty === 'hard_only') {
+        $difficultydist = ['easy' => 0, 'medium' => 0, 'hard' => 100];
     }
 
     // Update request with parameters.
@@ -881,6 +941,15 @@ function local_hlai_quizgen_handle_generate_questions(int $requestid) {
     $request->timemodified = time();
 
     $DB->update_record('local_hlai_quizgen_requests', $request);
+
+    // Delete existing questions for this request before regenerating (prevents duplicates on re-submission).
+    $existingquestions = $DB->get_records('local_hlai_quizgen_questions', ['requestid' => $requestid], '', 'id');
+    if (!empty($existingquestions)) {
+        foreach ($existingquestions as $eq) {
+            $DB->delete_records('local_hlai_quizgen_answers', ['questionid' => $eq->id]);
+        }
+        $DB->delete_records('local_hlai_quizgen_questions', ['requestid' => $requestid]);
+    }
 
     // CRITICAL FIX: Distribute total questions across ALL selected topics.
     $selectedtopics = $DB->get_records('local_hlai_quizgen_topics', ['requestid' => $requestid, 'selected' => 1]);
@@ -1215,6 +1284,17 @@ function local_hlai_quizgen_handle_deploy_questions(int $requestid, int $coursei
         'requestid' => $requestid,
         'status' => 'approved',
     ], '', 'id, questiontype');
+
+    // Sort by type (grouped) then by id within each type — matches Step 4 display order.
+    $typeorder = ['multichoice' => 1, 'truefalse' => 2, 'shortanswer' => 3, 'essay' => 4, 'matching' => 5, 'scenario' => 6];
+    uasort($questions, function($a, $b) use ($typeorder) {
+        $ordera = $typeorder[$a->questiontype] ?? 99;
+        $orderb = $typeorder[$b->questiontype] ?? 99;
+        if ($ordera !== $orderb) {
+            return $ordera - $orderb;
+        }
+        return $a->id - $b->id;
+    });
     $questionids = array_keys($questions);
 
     debugging("handle_deploy_questions: Found " . count($questionids) . " approved questions", DEBUG_DEVELOPER);
@@ -1449,6 +1529,7 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
                 'id' => $cm->id,
                 'name' => $activityname,
                 'type' => $activitytype,
+                'modname' => $cm->modname,
                 'emoji_html' => $emoji,
             ];
         }
@@ -1523,6 +1604,9 @@ function local_hlai_quizgen_render_step1(int $courseid, int $requestid): string 
 function local_hlai_quizgen_render_step2(int $courseid, int $requestid): string {
     global $DB, $PAGE, $CFG, $OUTPUT;
 
+    debugging("HLAI Step 2: max_execution_time=" . ini_get('max_execution_time') .
+        "s, memory_limit=" . ini_get('memory_limit'), DEBUG_DEVELOPER);
+
     // Validate request ID - redirect to Step 1 if invalid.
     if ($requestid === 0) {
         redirect(
@@ -1553,6 +1637,8 @@ function local_hlai_quizgen_render_step2(int $courseid, int $requestid): string 
 
     // Check if we need to analyze content.
     if ($request->status === 'analyzing') {
+        $step2start = microtime(true);
+        debugging("HLAI Step 2 content extraction START", DEBUG_DEVELOPER);
         $allcontent = '';
 
         // Get manual text from custom_instructions field.
@@ -1661,6 +1747,11 @@ function local_hlai_quizgen_render_step2(int $courseid, int $requestid): string 
             }
         }
 
+        $extractionduration = round(microtime(true) - $step2start, 2);
+        $contentlen = strlen($allcontent);
+        $contentwords = str_word_count($allcontent);
+        debugging("HLAI Step 2 content extraction DONE in {$extractionduration}s: {$contentlen} bytes, {$contentwords} words", DEBUG_DEVELOPER);
+
         // Analyze all content if we have any.
         if (!empty(trim($allcontent))) {
             // Memory safety: Limit content size to prevent memory exhaustion.
@@ -1673,16 +1764,37 @@ function local_hlai_quizgen_render_step2(int $courseid, int $requestid): string 
             }
 
             try {
+                $analyzestart = microtime(true);
+                debugging("HLAI Step 2 topic analysis START: content_size={$contentsize} bytes" .
+                    ($wastruncated ? " (TRUNCATED from original)" : ""), DEBUG_DEVELOPER);
+
                 $analyzer = new \local_hlai_quizgen\topic_analyzer();
                 $topics = $analyzer->analyze_content($allcontent, $requestid);
 
-                // Update request status to topics_ready.
-                \local_hlai_quizgen\api::update_request_status($requestid, 'topics_ready');
+                $analyzeduration = round(microtime(true) - $analyzestart, 2);
+                $topiccount = is_array($topics) ? count($topics) : 0;
+                debugging("HLAI Step 2 topic analysis DONE in {$analyzeduration}s: {$topiccount} topics found", DEBUG_DEVELOPER);
             } catch (Exception $e) {
+                $analyzeduration = round(microtime(true) - ($analyzestart ?? microtime(true)), 2);
+                debugging("HLAI Step 2 topic analysis FAILED after {$analyzeduration}s: " . $e->getMessage() .
+                    ' | Trace: ' . $e->getTraceAsString(), DEBUG_DEVELOPER);
                 $errors[] = get_string('error:analysisfailed', 'local_hlai_quizgen') . ': ' . $e->getMessage();
             }
+
+            // Update request status to topics_ready (separate try so topics aren't lost).
+            if (empty($errors)) {
+                try {
+                    \local_hlai_quizgen\api::update_request_status($requestid, 'topics_ready');
+                } catch (Exception $e) {
+                    debugging('HLAI update_request_status FAILED: ' . $e->getMessage(), DEBUG_DEVELOPER);
+                }
+            }
         } else {
-            $errors[] = get_string('error:nocontent', 'local_hlai_quizgen');
+            // Only report error if no topics already exist (e.g. from deduplication cloning).
+            $existingtopics = $DB->count_records('local_hlai_quizgen_topics', ['requestid' => $requestid]);
+            if (empty($existingtopics)) {
+                $errors[] = get_string('error:nocontent', 'local_hlai_quizgen');
+            }
         }
     }
 
@@ -2129,8 +2241,17 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
         return $OUTPUT->render_from_template('local_hlai_quizgen/wizard_step4', $context);
     }
 
-    // Get generated questions.
+    // Get generated questions and sort by type (grouped) then by id within each type.
     $questions = $DB->get_records('local_hlai_quizgen_questions', ['requestid' => $requestid], 'id ASC');
+    $typeorder = ['multichoice' => 1, 'truefalse' => 2, 'shortanswer' => 3, 'essay' => 4, 'matching' => 5, 'scenario' => 6];
+    usort($questions, function($a, $b) use ($typeorder) {
+        $ordera = $typeorder[$a->questiontype] ?? 99;
+        $orderb = $typeorder[$b->questiontype] ?? 99;
+        if ($ordera !== $orderb) {
+            return $ordera - $orderb;
+        }
+        return $a->id - $b->id;
+    });
 
     if (empty($questions)) {
         $context['no_questions'] = true;
@@ -2194,7 +2315,7 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
     $context['diff_hard'] = get_string('diff_hard', 'local_hlai_quizgen');
 
     // Pre-load all answers for these questions to avoid N+1 queries.
-    $questionids = array_keys($questions);
+    $questionids = array_map(function($q) { return $q->id; }, $questions);
     $allanswers = [];
     if (!empty($questionids)) {
         $answersraw = $DB->get_records_list(
@@ -2235,7 +2356,15 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
             $cardclass .= ' has-background-white-ter';
         }
 
-        $typelabel = str_replace('multichoice', 'MCQ', $questiontype);
+        $typelabelmap = [
+            'multichoice' => 'MCQ',
+            'truefalse' => 'True/False',
+            'shortanswer' => 'Short Answer',
+            'essay' => 'Essay',
+            'scenario' => 'Scenario',
+            'matching' => 'Matching',
+        ];
+        $typelabel = $typelabelmap[$questiontype] ?? ucfirst($questiontype);
         $diffclass = $question->difficulty === 'easy' ? 'is-success' :
             ($question->difficulty === 'hard' ? 'is-danger' : 'is-warning');
         $difflabel = $diffstringmap[$question->difficulty] ?? ucfirst($question->difficulty);
@@ -2249,7 +2378,7 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
             'number' => $questionnumber,
             'question_number_text' => get_string('wizard_question_number', 'local_hlai_quizgen', $questionnumber),
             'questiontext_html' => format_text($question->questiontext),
-            'type_label' => strtoupper($typelabel),
+            'type_label' => $typelabel,
             'difficulty_label' => $difflabel,
             'diff_tag_class' => $diffclass,
             'status' => $question->status ?? 'pending',

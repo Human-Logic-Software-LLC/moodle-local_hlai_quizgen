@@ -136,8 +136,9 @@ class question_generator {
             ], $requestid);
         }
 
-        // Use cached content for this topic.
-        $topic->full_content = self::$contentcache[$cachekey];
+        // Extract only the content section relevant to this topic.
+        // Falls back to full content if no matching section found.
+        $topic->full_content = self::get_topic_content_slice(self::$contentcache[$cachekey], $topic->title);
 
         // Validate configuration.
         self::validate_config($config);
@@ -169,15 +170,17 @@ class question_generator {
             $batchstart = $batch * $batchsize;
             $batchcount = min($batchsize, $numquestions - $batchstart);
 
-            // Determine types for this batch using GLOBAL index.
+            // Determine types for this batch using LOCAL index into topic's type slice.
             $batchtypes = [];
             for ($i = 0; $i < $batchcount; $i++) {
-                $questionindex = $globalindex + $batchstart + $i;
+                $localindex = $batchstart + $i;
                 // Prevent division by zero - fallback to multichoice if questiontypes is empty.
                 if (empty($questiontypes)) {
                     $batchtypes[] = 'multichoice';
+                } else if (isset($questiontypes[$localindex])) {
+                    $batchtypes[] = $questiontypes[$localindex];
                 } else {
-                    $batchtypes[] = $questiontypes[$questionindex % count($questiontypes)];
+                    $batchtypes[] = $questiontypes[$localindex % count($questiontypes)];
                 }
             }
 
@@ -194,7 +197,11 @@ class question_generator {
                     $totalresponse += $result['tokens']->completion ?? 0;
 
                     // Save each question in batch.
-                    foreach ($result['questions'] as $questionobj) {
+                    debugging("HLAI generate batch {$batch}: requested {$batchcount}, AI returned " .
+                        count($result['questions'] ?? []) . " questions, types=" .
+                        json_encode($batchtypes), DEBUG_DEVELOPER);
+
+                    foreach ($result['questions'] as $qi => $questionobj) {
                         // Ensure properties are set as object properties.
                         if (!is_object($questionobj)) {
                             $questionobj = (object)$questionobj;
@@ -204,14 +211,56 @@ class question_generator {
                         $questionobj->courseid = $request->courseid;
                         $questionobj->userid = $request->userid;
 
-                        $savedquestion = self::save_question($questionobj);
-                        $questions[] = $savedquestion;
+                        try {
+                            $savedquestion = self::save_question($questionobj);
+                            $questions[] = $savedquestion;
+                        } catch (\Exception $saveex) {
+                            debugging("HLAI save_question FAILED for question {$qi} in batch {$batch}: " .
+                                $saveex->getMessage() . ' | type=' . ($questionobj->questiontype ?? 'unknown') .
+                                ' | text_len=' . strlen($questionobj->questiontext ?? '') .
+                                ' | answers=' . count($questionobj->answers ?? []), DEBUG_DEVELOPER);
+                        }
+                    }
+
+                    // Check if AI returned fewer questions than requested.
+                    $returned = count($result['questions'] ?? []);
+                    if ($returned < $batchcount) {
+                        $shortfall = $batchcount - $returned;
+                        debug_logger::debug("Batch returned {$returned} of {$batchcount}, retrying for {$shortfall} missing", [
+                            'topic_id' => $topicid,
+                            'batch' => $batch,
+                        ], $requestid);
+
+                        // Build types for the missing questions.
+                        $missingtypes = array_slice($batchtypes, $returned);
+                        try {
+                            $extraresult = self::generate_question_batch($topic, $missingtypes, $config);
+                            $totalprompt += $extraresult['tokens']->prompt ?? 0;
+                            $totalresponse += $extraresult['tokens']->completion ?? 0;
+                            foreach ($extraresult['questions'] as $questionobj) {
+                                if (!is_object($questionobj)) {
+                                    $questionobj = (object)$questionobj;
+                                }
+                                $questionobj->requestid = $requestid;
+                                $questionobj->topicid = $topicid;
+                                $questionobj->courseid = $request->courseid;
+                                $questionobj->userid = $request->userid;
+                                $savedquestion = self::save_question($questionobj);
+                                $questions[] = $savedquestion;
+                            }
+                        } catch (\Exception $extraex) {
+                            debug_logger::debug("Shortfall retry failed: " . $extraex->getMessage(), [], $requestid);
+                        }
                     }
 
                     $batchsuccess = true;
                 } catch (\Exception $e) {
+                    debugging("HLAI batch {$batch} EXCEPTION (retry {$retry}/{$maxretries}), topic_id={$topicid}: " .
+                        $e->getMessage(), DEBUG_DEVELOPER);
                     if ($retry >= $maxretries) {
                         // Final retry failed - log error and continue.
+                        debugging("HLAI batch {$batch} GAVE UP after {$maxretries} retries for topic {$topicid}. " .
+                            "Types=" . json_encode($batchtypes), DEBUG_DEVELOPER);
                         error_handler::handle_exception($e, $requestid, 'question_generator', error_handler::SEVERITY_WARNING);
                     } else {
                         // Wait before retry.
@@ -233,6 +282,14 @@ class question_generator {
         }
 
         // Log the completion of topic generation.
+        debugging("HLAI generate_for_topic DONE: requested={$numquestions}, saved=" . count($questions) .
+            ", topic_id={$topicid}, types=" . json_encode($questiontypes), DEBUG_DEVELOPER);
+
+        if (count($questions) < $numquestions) {
+            debugging("HLAI WARNING: Only " . count($questions) . " of {$numquestions} questions were saved for topic {$topicid}." .
+                " Check above for save_question failures or AI returning fewer questions.", DEBUG_DEVELOPER);
+        }
+
         debug_logger::question_generation(
             $requestid,
             $topicid,
@@ -301,6 +358,11 @@ class question_generator {
         $oldquestiontext = $config['old_question_text'] ?? '';
 
         // Build payload for gateway.
+        debugging("HLAI generate_question_batch: topic_id=" . ($topic->id ?? '?') .
+            ", title='" . ($topic->title ?? 'NULL') . "'" .
+            ", title_len=" . strlen($topic->title ?? '') .
+            ", content_len=" . strlen($fullcontent), DEBUG_DEVELOPER);
+
         $payload = [
             'topic_title' => $topic->title,
             'topic_content' => $fullcontent,
@@ -584,13 +646,22 @@ class question_generator {
             );
         }
 
-        $questionid = $DB->insert_record('local_hlai_quizgen_questions', $record);
+        try {
+            $questionid = $DB->insert_record('local_hlai_quizgen_questions', $record);
+        } catch (\Exception $e) {
+            debugging('HLAI insert question FAILED: ' . $e->getMessage() .
+                ' | type=' . $record->questiontype .
+                ' | text_len=' . strlen($record->questiontext ?? '') .
+                ' | feedback_len=' . strlen($record->generalfeedback ?? '') .
+                ' | reasoning_len=' . strlen($record->ai_reasoning ?? ''), DEBUG_DEVELOPER);
+            throw $e;
+        }
         $record->id = $questionid;
 
         // Save answers if present.
         if (!empty($question->answers)) {
             $answerorder = 0;
-            foreach ($question->answers as $answer) {
+            foreach ($question->answers as $ai => $answer) {
                 $answerrecord = new \stdClass();
                 $answerrecord->questionid = $questionid;
                 $answerrecord->answer = $answer['text'] ?? '';
@@ -601,7 +672,16 @@ class question_generator {
                 $answerrecord->distractor_reasoning = $answer['reasoning'] ?? '';
                 $answerrecord->sortorder = $answerorder++;
 
-                $DB->insert_record('local_hlai_quizgen_answers', $answerrecord);
+                try {
+                    $DB->insert_record('local_hlai_quizgen_answers', $answerrecord);
+                } catch (\Exception $e) {
+                    debugging('HLAI insert answer FAILED for question ' . $questionid . ', answer ' . $ai .
+                        ': ' . $e->getMessage() .
+                        ' | answer_len=' . strlen($answerrecord->answer) .
+                        ' | feedback_len=' . strlen($answerrecord->feedback ?? '') .
+                        ' | reasoning_len=' . strlen($answerrecord->distractor_reasoning ?? ''), DEBUG_DEVELOPER);
+                    throw $e;
+                }
             }
         }
 
@@ -667,6 +747,62 @@ class question_generator {
         if (isset($config['difficulty']) && !in_array($config['difficulty'], self::DIFFICULTY_LEVELS)) {
             throw new \moodle_exception('error:invaliddifficulty', 'local_hlai_quizgen');
         }
+    }
+
+    /**
+     * Extract the content section matching a topic title from the full content blob.
+     *
+     * Looks for === TOPIC: Title === markers and returns only that section.
+     * Also checks for ## Chapter: Title markers (from book extraction).
+     * Falls back to full content if no matching section is found.
+     *
+     * @param string $fullcontent The full extracted content
+     * @param string $topictitle The topic title to match
+     * @return string The content slice for this topic, or full content as fallback
+     */
+    private static function get_topic_content_slice(string $fullcontent, string $topictitle): string {
+        if (empty($fullcontent) || empty($topictitle)) {
+            return $fullcontent;
+        }
+
+        // Method 1: Match === TOPIC: Title (Type) === markers.
+        $escapedtitle = preg_quote($topictitle, '/');
+        $pattern = '/=== TOPIC:\s*' . $escapedtitle . '\s*(?:\([^)]*\))?\s*===\s*(.*?)(?==== (?:TOPIC:|END TOPIC)|\z)/si';
+        if (preg_match($pattern, $fullcontent, $matches)) {
+            $slice = trim($matches[1]);
+            if (strlen($slice) > 50) {
+                return $slice;
+            }
+        }
+
+        // Method 2: Match ## Chapter: Title markers (from book extraction).
+        $chapterpattern = '/## Chapter:\s*' . $escapedtitle . '\s*\n(.*?)(?=\n## Chapter:|\n=== |\z)/si';
+        if (preg_match($chapterpattern, $fullcontent, $matches)) {
+            $slice = trim($matches[1]);
+            if (strlen($slice) > 50) {
+                return $slice;
+            }
+        }
+
+        // Method 3: Fuzzy match — find the section that contains the topic title.
+        $sections = preg_split('/(?==== TOPIC:)/', $fullcontent);
+        foreach ($sections as $section) {
+            if (stripos($section, $topictitle) !== false) {
+                // Remove the marker lines and return the content.
+                $cleaned = preg_replace('/^=== TOPIC:.*?===\s*/s', '', $section);
+                $cleaned = preg_replace('/=== END TOPIC ===\s*$/s', '', $cleaned);
+                $cleaned = preg_replace('/^Activity Name:.*\n/m', '', $cleaned);
+                $cleaned = preg_replace('/^Activity Type:.*\n/m', '', $cleaned);
+                $cleaned = preg_replace('/^---\s*\n/m', '', $cleaned);
+                $cleaned = trim($cleaned);
+                if (strlen($cleaned) > 50) {
+                    return $cleaned;
+                }
+            }
+        }
+
+        // Fallback: return full content if no matching section found.
+        return $fullcontent;
     }
 
     /**
@@ -742,32 +878,28 @@ class question_generator {
                         }
                     }
                 } else if (strpos($source, 'bulk_scan:') === 0) {
-                    // For bulk scans, get content from all topics' descriptions.
-                    // Log bulk scan handling.
-                    \local_hlai_quizgen\debug_logger::debug('Handling bulk_scan content source', [
-                        'request_id' => $request->id,
-                        'source' => $source,
-                    ], $request->id);
-
-                    $topics = $DB->get_records('local_hlai_quizgen_topics', ['requestid' => $request->id], 'id ASC');
-                    \local_hlai_quizgen\debug_logger::debug('Found topics for bulk scan', [
-                        'topic_count' => count($topics),
-                    ], $request->id);
-
-                    foreach ($topics as $topic) {
-                        if (!empty($topic->description)) {
-                            $fullcontent .= "\n\n=== TOPIC: {$topic->title} ===\n\n";
-                            $fullcontent .= $topic->description;
+                    // For bulk scans, re-extract full content from course activities.
+                    // Stored topic descriptions/excerpts are too short (cleaned/truncated).
+                    try {
+                        $scanresult = \local_hlai_quizgen\course_scanner::scan_entire_course($request->courseid);
+                        if (!empty(trim($scanresult['text']))) {
+                            $fullcontent .= "\n\n" . $scanresult['text'];
                         }
-                        if (!empty($topic->content_excerpt)) {
-                            $fullcontent .= "\n\n" . $topic->content_excerpt;
+                    } catch (\Exception $e) {
+                        // Fallback to stored topic data if re-extraction fails.
+                        $topics = $DB->get_records('local_hlai_quizgen_topics', [
+                            'requestid' => $request->id,
+                        ], 'id ASC');
+                        foreach ($topics as $topic) {
+                            if (!empty($topic->description)) {
+                                $fullcontent .= "\n\n=== TOPIC: {$topic->title} ===\n\n";
+                                $fullcontent .= $topic->description;
+                            }
+                            if (!empty($topic->content_excerpt)) {
+                                $fullcontent .= "\n\n" . $topic->content_excerpt;
+                            }
                         }
                     }
-
-                    // Log extracted content length.
-                    \local_hlai_quizgen\debug_logger::debug('Bulk scan content extracted', [
-                        'content_length' => strlen($fullcontent),
-                    ], $request->id);
                 }
             }
         }

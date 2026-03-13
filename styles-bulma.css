@@ -528,6 +528,58 @@ body.path-local-hlai_quizgen {
     margin-top: 0.35rem;
 }
 
+/* Dropzone file upload */
+.hlai-quizgen-wizard .hlai-dropzone {
+    position: relative;
+    border: 2px dashed #cbd5e1;
+    border-radius: 10px;
+    background: #f8fafc;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+.hlai-quizgen-wizard .hlai-dropzone:hover {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+.hlai-quizgen-wizard .hlai-dropzone.hlai-dropzone-active {
+    border-color: #2563eb;
+    background: #dbeafe;
+}
+.hlai-quizgen-wizard .hlai-dropzone-input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+    pointer-events: none;
+}
+.hlai-quizgen-wizard .hlai-dropzone-body {
+    pointer-events: none;
+}
+.hlai-quizgen-wizard .hlai-dropzone-icon {
+    font-size: 2.5em;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+.hlai-quizgen-wizard .hlai-dropzone-primary {
+    font-weight: 600;
+    color: #2563eb;
+    font-size: 1em;
+    margin: 0 0 0.25rem;
+}
+.hlai-quizgen-wizard .hlai-dropzone-hint {
+    color: #64748b;
+    font-size: 0.875em;
+    margin: 0 0 0.5rem;
+}
+.hlai-quizgen-wizard .hlai-dropzone-files {
+    font-size: 0.85em;
+    color: #94a3b8;
+    margin: 0;
+    word-break: break-all;
+}
+
 /* =====================================================
    STEP 2: Configure Topics - Polished Design
    ===================================================== */
