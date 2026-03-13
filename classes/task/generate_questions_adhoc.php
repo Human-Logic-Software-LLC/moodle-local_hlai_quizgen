@@ -256,7 +256,7 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
             $allqids = array_keys($allquestions);
             $correctanswersmap = [];
             if (!empty($allqids)) {
-                list($insql, $inparams) = $DB->get_in_or_equal($allqids, SQL_PARAMS_NAMED);
+                [$insql, $inparams] = $DB->get_in_or_equal($allqids, SQL_PARAMS_NAMED);
                 $sql = "SELECT questionid, answer
                           FROM {local_hlai_quizgen_answers}
                          WHERE questionid {$insql} AND is_correct = 1";
