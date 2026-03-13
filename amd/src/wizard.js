@@ -516,8 +516,8 @@ define(['jquery'], function($) {
                     fileInput.dispatchEvent(new Event('change'));
                     if (dropLabel) {
                         var names = [];
-                        for (var i = 0; i < files.length; i++) {
-                            names.push(files[i].name);
+                        for (var j = 0; j < files.length; j++) {
+                            names.push(files[j].name);
                         }
                         dropLabel.textContent = names.join(', ');
                         dropLabel.style.color = '#2563eb';

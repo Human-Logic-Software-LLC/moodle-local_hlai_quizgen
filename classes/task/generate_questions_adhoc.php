@@ -110,7 +110,7 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
 
             // CRITICAL FIX: Expand question types into a global array, INTERLEAVED across types.
             // This ensures each topic gets a MIX of question types, not all of one type.
-            // E.g., with 4 MCQ + 4 T/F + 4 SA: [mcq, tf, sa, mcq, tf, sa, mcq, tf, sa, mcq, tf, sa]
+            // E.g. with 4 MCQ + 4 T/F + 4 SA: [mcq, tf, sa, mcq, tf, sa, mcq, tf, sa, mcq, tf, sa].
             $globalquestiontypes = [];
             if (!empty($questiontypedist)) {
                 // Build per-type queues.
@@ -234,8 +234,11 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
             }
 
             // Update request with actual generated count.
-            debugging("HLAI adhoc SUMMARY: total_requested={$totalquestionsrequested}, total_generated={$totalquestionsgenerated}, " .
-                "topics=" . count($topics), DEBUG_DEVELOPER);
+            debugging(
+                "HLAI adhoc SUMMARY: total_requested={$totalquestionsrequested}, total_generated={$totalquestionsgenerated}, " .
+                "topics=" . count($topics),
+                DEBUG_DEVELOPER
+            );
             if ($totalquestionsgenerated < $totalquestionsrequested) {
                 debugging("HLAI adhoc WARNING: Missing " . ($totalquestionsrequested - $totalquestionsgenerated) .
                     " questions. Check per-topic and save_question logs above.", DEBUG_DEVELOPER);
@@ -252,7 +255,11 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                 $questiontexts[] = $q->questiontext;
                 $questionids[] = $q->id;
                 // Get the correct answer for this question (for shortanswer dedup).
-                $correctanswer = $DB->get_record('local_hlai_quizgen_answers', ['questionid' => $q->id, 'is_correct' => 1], 'answer');
+                $correctanswer = $DB->get_record(
+                    'local_hlai_quizgen_answers',
+                    ['questionid' => $q->id, 'is_correct' => 1],
+                    'answer'
+                );
                 $questionanswers[] = $correctanswer ? strtolower(trim($correctanswer->answer)) : '';
             }
 
@@ -315,7 +322,9 @@ class generate_questions_adhoc extends \core\task\adhoc_task {
                         $totalquestionsgenerated += count($replacequestions);
                     } catch (\Exception $replaceex) {
                         \local_hlai_quizgen\debug_logger::debug(
-                            "Replacement generation failed: " . $replaceex->getMessage(), [], $requestid
+                            "Replacement generation failed: " . $replaceex->getMessage(),
+                            [],
+                            $requestid
                         );
                     }
                 }

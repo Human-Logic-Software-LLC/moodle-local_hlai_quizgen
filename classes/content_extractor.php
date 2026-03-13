@@ -1020,7 +1020,11 @@ class content_extractor {
                 $wordcount = str_word_count($result['text']);
                 $totalwords += $wordcount;
                 $processed++;
-                debugging("HLAI [{$activityindex}/{$totalactivities}] DONE cmid={$cmid} type={$moduletype} name=\"{$result['name']}\" in {$actduration}s ({$wordcount} words)", DEBUG_DEVELOPER);
+                debugging(
+                    "HLAI [{$activityindex}/{$totalactivities}] DONE cmid={$cmid} type={$moduletype}" .
+                    " name=\"{$result['name']}\" in {$actduration}s ({$wordcount} words)",
+                    DEBUG_DEVELOPER
+                );
 
                 // Use clear, descriptive activity markers with actual names (not generic module types).
                 // This helps the AI understand what the content is about and use proper names.
@@ -1037,13 +1041,21 @@ class content_extractor {
                 $allcontent .= "\n=== END TOPIC ===\n";
             } catch (\Exception $e) {
                 $actduration = round(microtime(true) - $actstart, 2);
-                debugging("HLAI [{$activityindex}/{$totalactivities}] FAILED cmid={$cmid} in {$actduration}s: " . $e->getMessage(), DEBUG_DEVELOPER);
+                debugging(
+                    "HLAI [{$activityindex}/{$totalactivities}] FAILED cmid={$cmid} in {$actduration}s: " .
+                    $e->getMessage(),
+                    DEBUG_DEVELOPER
+                );
                 continue;
             }
         }
 
         $totalduration = round(microtime(true) - $extractionstart, 2);
-        debugging("HLAI extract_from_activities DONE: {$processed}/{$totalactivities} succeeded in {$totalduration}s, total {$totalwords} words", DEBUG_DEVELOPER);
+        debugging(
+            "HLAI extract_from_activities DONE: {$processed}/{$totalactivities} succeeded" .
+            " in {$totalduration}s, total {$totalwords} words",
+            DEBUG_DEVELOPER
+        );
 
         return $allcontent;
     }

@@ -1287,7 +1287,7 @@ function local_hlai_quizgen_handle_deploy_questions(int $requestid, int $coursei
 
     // Sort by type (grouped) then by id within each type — matches Step 4 display order.
     $typeorder = ['multichoice' => 1, 'truefalse' => 2, 'shortanswer' => 3, 'essay' => 4, 'matching' => 5, 'scenario' => 6];
-    uasort($questions, function($a, $b) use ($typeorder) {
+    uasort($questions, function ($a, $b) use ($typeorder) {
         $ordera = $typeorder[$a->questiontype] ?? 99;
         $orderb = $typeorder[$b->questiontype] ?? 99;
         if ($ordera !== $orderb) {
@@ -1750,7 +1750,10 @@ function local_hlai_quizgen_render_step2(int $courseid, int $requestid): string 
         $extractionduration = round(microtime(true) - $step2start, 2);
         $contentlen = strlen($allcontent);
         $contentwords = str_word_count($allcontent);
-        debugging("HLAI Step 2 content extraction DONE in {$extractionduration}s: {$contentlen} bytes, {$contentwords} words", DEBUG_DEVELOPER);
+        debugging(
+            "HLAI Step 2 content extraction DONE in {$extractionduration}s: {$contentlen} bytes, {$contentwords} words",
+            DEBUG_DEVELOPER
+        );
 
         // Analyze all content if we have any.
         if (!empty(trim($allcontent))) {
@@ -2244,7 +2247,7 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
     // Get generated questions and sort by type (grouped) then by id within each type.
     $questions = $DB->get_records('local_hlai_quizgen_questions', ['requestid' => $requestid], 'id ASC');
     $typeorder = ['multichoice' => 1, 'truefalse' => 2, 'shortanswer' => 3, 'essay' => 4, 'matching' => 5, 'scenario' => 6];
-    usort($questions, function($a, $b) use ($typeorder) {
+    usort($questions, function ($a, $b) use ($typeorder) {
         $ordera = $typeorder[$a->questiontype] ?? 99;
         $orderb = $typeorder[$b->questiontype] ?? 99;
         if ($ordera !== $orderb) {
@@ -2315,7 +2318,9 @@ function local_hlai_quizgen_render_step4(int $courseid, int $requestid): string 
     $context['diff_hard'] = get_string('diff_hard', 'local_hlai_quizgen');
 
     // Pre-load all answers for these questions to avoid N+1 queries.
-    $questionids = array_map(function($q) { return $q->id; }, $questions);
+    $questionids = array_map(function ($q) {
+        return $q->id;
+    }, $questions);
     $allanswers = [];
     if (!empty($questionids)) {
         $answersraw = $DB->get_records_list(
